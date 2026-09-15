@@ -4,20 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-`tmdb-sync` is a from-scratch Go CLI for the TMDB (themoviedb.org) API, meant to mirror the
-architecture of the author's existing [`trakt-sync`](https://github.com/mfederowicz/trakt-sync).
-
-A first code skeleton was written and then **deliberately deleted** to redo documentation first —
-see `docs/PRD.md`, `docs/ARCHITECTURE.md`, `docs/API_COVERAGE.md`, and `docs/CLI.md`. Those four
-docs are the source of truth for scope, package layout, and the endpoint checklist. Read them
-before writing code. Currently the repo contains only `go.mod` and `Makefile` — no Go source.
+`tmdb-sync` is a Go CLI for the TMDB (themoviedb.org) API. `docs/PRD.md`, `docs/ARCHITECTURE.md`,
+`docs/API_COVERAGE.md`, and `docs/CLI.md` are the source of truth for scope, package layout, and
+the endpoint checklist — read them before writing code.
 
 Key decisions already made (don't relitigate without asking):
 - v3 API fully, then v4 later, as an additive phase (see `docs/ARCHITECTURE.md`'s auth section).
-- Architecture and CLI shape mirror trakt-sync closely (TOML config, `<module> -a <action>`
-  dispatch, one `internal/<x>_service.go` + `handlers/<x>_handler.go` + `str/<x>.go` per endpoint
-  area).
-- Local git repo only, default branch `main`, no remote yet. Only commit when asked.
+- TOML config, `<module> -a <action>` command dispatch, one `internal/<x>_service.go` +
+  `handlers/<x>_handler.go` + `str/<x>.go` per endpoint area (see `docs/ARCHITECTURE.md`).
+- One module per branch/PR; if a module has more than ~3 endpoints, split it into smaller
+  branches rather than landing it all at once.
+- Modules are implemented in TMDB's own reference-nav order (see `docs/API_COVERAGE.md`'s section
+  order and `docs/CLI.md`'s module table).
+- `main` is pushed to a public GitHub remote now — commit and push only when asked.
 
 ## Commands
 
@@ -25,8 +24,7 @@ Key decisions already made (don't relitigate without asking):
 - `make build` — build the binary, embedding version info via ldflags
 - `make test` — `go test -v -race ./...`
 - `make cover` — `go test -cover -coverprofile coverage.out ./...`
-- `make linter` — `revive --config ./revive.toml --formatter friendly ./...` (requires `revive`;
-  no `revive.toml` present yet)
+- `make linter` — `revive --config ./revive.toml --formatter friendly ./...` (requires `revive`)
 - `make cleanup` — `gofmt -w` on all `.go` files
 - `make clean` — removes `*.json` files in the repo root
 

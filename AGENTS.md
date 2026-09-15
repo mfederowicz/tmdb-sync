@@ -6,15 +6,14 @@ file; this file is the generic source of truth.
 
 ## What this project is
 
-`tmdb-sync` is a Go CLI for The Movie Database (TMDB) API, built to mirror the architecture of
-the author's existing [`trakt-sync`](https://github.com/mfederowicz/trakt-sync) project as
-closely as possible: TOML config, `<module> -a <action>` command dispatch, one
-`internal/<x>_service.go` + `handlers/<x>_handler.go` + `str/<x>.go` per API endpoint area.
+`tmdb-sync` is a Go CLI for The Movie Database (TMDB) API: TOML config, `<module> -a <action>`
+command dispatch, one `internal/<x>_service.go` + `handlers/<x>_handler.go` + `str/<x>.go` per
+API endpoint area.
 
 ## Current state
 
-Documentation-first: `go.mod` and `Makefile` exist, no Go source yet. Read these before writing
-any code, in this order:
+Docs are the source of truth for scope, package layout, and the endpoint checklist. Read these
+before writing any code, in this order:
 
 1. `docs/PRD.md` — scope, goals, non-goals, phases.
 2. `docs/ARCHITECTURE.md` — package layout and the exact recipe for adding a module.
@@ -28,10 +27,13 @@ any code, in this order:
 - v4 auth/endpoints are an explicitly separate, later phase and must be addable as new files
   (`internal/auth_v4_service.go`, a new `cli` flow) without modifying v3 code
   (`internal/auth_service.go`, `cli/session.go`).
-- Architecture and CLI conventions mirror trakt-sync closely — don't redesign the shape (e.g.
-  don't switch to cobra/urfave-cli, don't rename the config format away from TOML) without
-  asking first.
-- Local git repo only, default branch `main`, no remote configured. Only create commits when
+- Don't redesign the established shape (e.g. don't switch to cobra/urfave-cli, don't rename the
+  config format away from TOML) without asking first.
+- One module per branch/PR; if a module has more than ~3 endpoints, split it into smaller
+  branches instead of landing it all at once.
+- Modules are implemented in TMDB's own reference-nav order (see `docs/API_COVERAGE.md`'s section
+  order and `docs/CLI.md`'s module table).
+- Default branch `main`, pushed to a public GitHub remote. Only create commits/pushes when
   explicitly asked to.
 
 ## Working on this repo

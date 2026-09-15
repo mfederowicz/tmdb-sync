@@ -40,7 +40,7 @@ pages_limit = 10       # cap on pages walked by -all; 0 = unlimited (bounded by 
 tmdb-sync <module> -a <action> [module-specific flags]
 ```
 
-`<module>` may be an unambiguous prefix of a module name (mirrors trakt-sync). Running with no
+`<module>` may be an unambiguous prefix of a module name. Running with no
 args, or `tmdb-sync help`, lists all modules.
 
 ## Modules (see API_COVERAGE.md for the full endpoint list per module)
@@ -80,7 +80,7 @@ read that persisted session rather than triggering the flow themselves.
 ## Pagination
 
 TMDB list endpoints paginate via `page`/`total_pages` fields in the JSON body (there's no
-pagination info in HTTP headers, unlike GitHub/Trakt), and TMDB fixes the page size at 20 items —
+pagination info in HTTP headers, unlike some other APIs), and TMDB fixes the page size at 20 items —
 there's no API lever to change it. Every list action (e.g. `movies -a popular`) always fetches
 `min(total_pages, pages_limit)` pages and merges them into one result — no separate flag needed:
 
