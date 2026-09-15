@@ -22,7 +22,7 @@ func HandleToken(fs afero.Fs, config *cfg.Config, client *internal.Client, optio
 		return nil
 	}
 
-	session, err := createSessionInteractively(fs, config, client)
+	session, err := CreateSessionInteractively(fs, config, client)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,10 @@ func HandleToken(fs afero.Fs, config *cfg.Config, client *internal.Client, optio
 	return nil
 }
 
-func createSessionInteractively(fs afero.Fs, config *cfg.Config, client *internal.Client) (*str.Session, error) {
+// CreateSessionInteractively always runs the v3 request-token -> browser
+// approval -> session flow (unlike HandleToken, it does not check for an
+// already-valid session first) and persists the result to config.SessionPath.
+func CreateSessionInteractively(fs afero.Fs, config *cfg.Config, client *internal.Client) (*str.Session, error) {
 	ctx := context.Background()
 
 	requestToken, _, err := client.Auth.CreateRequestToken(ctx)

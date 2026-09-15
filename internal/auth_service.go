@@ -47,3 +47,56 @@ func (s *AuthService) CreateSession(ctx context.Context, requestToken string) (*
 
 	return session, resp, nil
 }
+
+// ValidateKey confirms the configured api_key/read_access_token is valid.
+func (s *AuthService) ValidateKey(ctx context.Context) (*str.AuthStatus, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, "authentication", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	status := new(str.AuthStatus)
+	resp, err := s.client.Do(ctx, req, status)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return status, resp, nil
+}
+
+// CreateGuestSession requests a new guest session (no login required, used
+// for temporary rating without a full account session).
+func (s *AuthService) CreateGuestSession(ctx context.Context) (*str.GuestSession, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, "authentication/guest_session/new", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	guestSession := new(str.GuestSession)
+	resp, err := s.client.Do(ctx, req, guestSession)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return guestSession, resp, nil
+}
+
+// DeleteSession logs out by invalidating a session id.
+func (s *AuthService) DeleteSession(ctx context.Context, sessionID string) (*str.AuthStatus, *str.Response, error) {
+	body := struct {
+		SessionID string `json:"session_id"`
+	}{SessionID: sessionID}
+
+	req, err := s.client.NewRequest(http.MethodDelete, "authentication/session", body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	status := new(str.AuthStatus)
+	resp, err := s.client.Do(ctx, req, status)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return status, resp, nil
+}

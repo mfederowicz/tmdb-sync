@@ -1,8 +1,11 @@
 # tmdb-sync — CLI reference
 
-> Describes the intended CLI shape (see `PRD.md`/`ARCHITECTURE.md`). `configuration` and `movies`
-> are implemented as of this doc (see `API_COVERAGE.md`); the rest of the module table below is
-> still planned — update examples as each module actually lands.
+> Describes the intended CLI shape (see `PRD.md`/`ARCHITECTURE.md`). `authentication`,
+> `configuration`, and `movies` are implemented as of this doc (see `API_COVERAGE.md`, marked ✅
+> below); the rest of the module table is still planned — update examples as each module actually
+> lands. The table is ordered to match TMDB's own reference nav
+> (developer.themoviedb.org/reference) category-for-category, so the CLI's module list maps 1:1
+> onto TMDB's docs.
 
 ## Install
 
@@ -40,35 +43,39 @@ tmdb-sync <module> -a <action> [module-specific flags]
 `<module>` may be an unambiguous prefix of a module name (mirrors trakt-sync). Running with no
 args, or `tmdb-sync help`, lists all modules.
 
-## Planned modules (see API_COVERAGE.md for the full endpoint list per module)
+## Modules (see API_COVERAGE.md for the full endpoint list per module)
 
-| module          | actions (examples)                          |
-|-----------------|----------------------------------------------|
-| `configuration` | `details`, `countries`, `languages`, `jobs`, `timezones`, `primary-translations` |
-| `movies`        | `details -i <id>`, `popular -p <page>`, `top-rated`, `now-playing`, `upcoming`, `credits -i <id>`, `videos -i <id>`, ... |
-| `tv`            | `details -i <id>`, `popular -p <page>`, `top-rated`, `on-the-air`, `airing-today`, ... |
-| `tv-seasons`    | `details -i <id> -s <season_number>`, ... |
-| `tv-episodes`   | `details -i <id> -s <season_number> -e <episode_number>`, ... |
-| `people`        | `details -i <id>`, `popular -p <page>`, `movie-credits -i <id>`, `tv-credits -i <id>`, ... |
-| `search`        | `movie -q <query>`, `tv -q <query>`, `person -q <query>`, `multi -q <query>`, `collection -q <query>`, `company -q <query>`, `keyword -q <query>` |
-| `discover`      | `movie [filters]`, `tv [filters]` |
-| `trending`      | `all -w <day\|week>`, `movie -w <day\|week>`, `tv -w <day\|week>`, `person -w <day\|week>` |
-| `genres`        | `movie`, `tv` |
-| `keywords`      | `details -i <id>` |
-| `companies`     | `details -i <id>`, `images -i <id>` |
-| `collections`   | `details -i <id>`, `images -i <id>`, `translations -i <id>` |
-| `networks`      | `details -i <id>`, `images -i <id>` |
-| `certifications`| `movie`, `tv` |
-| `watch-providers`| `regions`, `movie`, `tv` |
-| `credits`       | `details -i <credit_id>` |
-| `reviews`       | `details -i <review_id>` |
-| `changes`       | `movie`, `tv`, `person` |
-| `find`          | `-i <external_id> --source <imdb_id\|tvdb_id\|...>` |
-| `account`       | 🔒 `details`, `favorites`, `watchlist`, `rated`, `lists`, `add-favorite`, `add-watchlist` |
-| `lists`         | `details -i <id>`, `create`, `add-movie`, `remove-movie`, `clear`, `delete` |
+Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 
-🔒 = requires a v3 session; the first 🔒 command run triggers the browser-approval flow
-(`cli/session.go`) and persists the session to `session_path`.
+| module            | actions (examples)                          |
+|-------------------|----------------------------------------------|
+| `account`         | 🔒 `details`, `favorites`, `watchlist`, `rated`, `lists`, `add-favorite`, `add-watchlist` |
+| `authentication` ✅| `validate-key`, `create-request-token`, `create-session` (🔒 interactive browser approval), `create-guest-session`, `delete-session -s <session_id>` |
+| `certifications`  | `movie`, `tv` |
+| `changes`         | `movie`, `tv`, `person` |
+| `collections`     | `details -i <id>`, `images -i <id>`, `translations -i <id>` |
+| `companies`       | `details -i <id>`, `images -i <id>` |
+| `configuration` ✅ | `details`, `countries`, `languages`, `jobs`, `timezones`, `primary-translations` |
+| `credits`         | `details -i <credit_id>` |
+| `discover`        | `movie [filters]`, `tv [filters]` |
+| `find`            | `-i <external_id> --source <imdb_id\|tvdb_id\|...>` |
+| `genres`          | `movie`, `tv` |
+| `keywords`        | `details -i <id>` |
+| `lists`           | `details -i <id>`, `create`, `add-movie`, `remove-movie`, `clear`, `delete` |
+| `movies` ✅        | `details -i <id>`, `popular` (paginated, see below), `top-rated`, `now-playing`, `upcoming`, `credits -i <id>`, `videos -i <id>`, ... |
+| `networks`        | `details -i <id>`, `images -i <id>` |
+| `people`          | `details -i <id>`, `popular`, `movie-credits -i <id>`, `tv-credits -i <id>`, ... |
+| `reviews`         | `details -i <review_id>` |
+| `search`          | `movie -q <query>`, `tv -q <query>`, `person -q <query>`, `multi -q <query>`, `collection -q <query>`, `company -q <query>`, `keyword -q <query>` |
+| `trending`        | `all -w <day\|week>`, `movie -w <day\|week>`, `tv -w <day\|week>`, `person -w <day\|week>` |
+| `tv`              | `details -i <id>`, `popular`, `top-rated`, `on-the-air`, `airing-today`, ... |
+| `tv-seasons`      | `details -i <id> -s <season_number>`, ... |
+| `tv-episodes`     | `details -i <id> -s <season_number> -e <episode_number>`, ... |
+| `watch-providers` | `regions`, `movie`, `tv` |
+
+🔒 = requires a v3 session. `authentication -a create-session` runs the browser-approval flow
+(`cli/session.go`) and persists the session to `session_path`; other 🔒 modules (like `account`)
+read that persisted session rather than triggering the flow themselves.
 
 ## Pagination
 
