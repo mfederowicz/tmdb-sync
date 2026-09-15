@@ -1,8 +1,8 @@
 # tmdb-sync — CLI reference
 
-> Describes the intended CLI shape (see `PRD.md`/`ARCHITECTURE.md`). `configuration` and `movies`
-> are implemented as of this doc (see `API_COVERAGE.md`); the rest of the module table below is
-> still planned — update examples as each module actually lands.
+> Describes the intended CLI shape (see `PRD.md`/`ARCHITECTURE.md`). `certifications`,
+> `configuration`, and `movies` are implemented as of this doc (see `API_COVERAGE.md`); the rest
+> of the module table below is still planned — update examples as each module actually lands.
 
 ## Install
 

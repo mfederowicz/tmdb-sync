@@ -32,8 +32,8 @@ after the session-auth plumbing from phase 2 exists but before any account comma
 - [ ] Get Watchlist TV Shows — `GET /account/{account_id}/watchlist/tv`
 
 ## Certifications
-- [ ] Movie Certifications — `GET /certification/movie/list`
-- [ ] TV Certifications — `GET /certification/tv/list`
+- [x] Movie Certifications — `GET /certification/movie/list`
+- [x] TV Certifications — `GET /certification/tv/list`
 
 ## Changes
 - [ ] Movie Change List — `GET /movie/changes`

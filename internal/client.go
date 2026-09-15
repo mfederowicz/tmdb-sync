@@ -44,6 +44,7 @@ type Client struct {
 	headers        map[string]any
 	common         Service
 	Auth           *AuthService
+	Certifications *CertificationsService
 	Configuration  *ConfigurationService
 	Movies         *MoviesService
 	rateMu         sync.Mutex
@@ -79,6 +80,7 @@ func (c *Client) initialize() {
 	}
 	c.common.client = c
 	c.Auth = (*AuthService)(&c.common)
+	c.Certifications = (*CertificationsService)(&c.common)
 	c.Configuration = (*ConfigurationService)(&c.common)
 	c.Movies = (*MoviesService)(&c.common)
 }
