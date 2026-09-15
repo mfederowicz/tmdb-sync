@@ -1,9 +1,9 @@
 # tmdb-sync — CLI reference
 
 > Describes the intended CLI shape (see `PRD.md`/`ARCHITECTURE.md`). `authentication`,
-> `configuration`, and `movies` are implemented as of this doc (see `API_COVERAGE.md`, marked ✅
-> below); the rest of the module table is still planned — update examples as each module actually
-> lands. The table is ordered to match TMDB's own reference nav
+> `certifications`, `configuration`, and `movies` are implemented as of this doc (see
+> `API_COVERAGE.md`, marked ✅ below); the rest of the module table is still planned — update
+> examples as each module actually lands. The table is ordered to match TMDB's own reference nav
 > (developer.themoviedb.org/reference) category-for-category, so the CLI's module list maps 1:1
 > onto TMDB's docs.
 
@@ -51,7 +51,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 |-------------------|----------------------------------------------|
 | `account`         | 🔒 `details`, `favorites`, `watchlist`, `rated`, `lists`, `add-favorite`, `add-watchlist` |
 | `authentication` ✅| `validate-key`, `create-request-token`, `create-session` (🔒 interactive browser approval), `create-guest-session`, `delete-session -s <session_id>` |
-| `certifications`  | `movie`, `tv` |
+| `certifications` ✅| `movie`, `tv` |
 | `changes`         | `movie`, `tv`, `person` |
 | `collections`     | `details -i <id>`, `images -i <id>`, `translations -i <id>` |
 | `companies`       | `details -i <id>`, `images -i <id>` |
