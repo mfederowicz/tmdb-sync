@@ -63,3 +63,78 @@ func TestCreateSession(t *testing.T) {
 		t.Errorf("SessionID = %q, want %q", session.SessionID, "sess123")
 	}
 }
+
+func TestValidateKey(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/authentication", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.Auth.ValidateKey(context.Background())
+	if err != nil {
+		t.Fatalf("ValidateKey() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("Success = %v, want true", status.Success)
+	}
+}
+
+func TestCreateGuestSession(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/authentication/guest_session/new", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":          true,
+			"guest_session_id": "guest123",
+			"expires_at":       "2024-01-01 00:00:00 UTC",
+		})
+	})
+
+	guestSession, _, err := client.Auth.CreateGuestSession(context.Background())
+	if err != nil {
+		t.Fatalf("CreateGuestSession() error = %v", err)
+	}
+	if guestSession.GuestSessionID != "guest123" {
+		t.Errorf("GuestSessionID = %q, want %q", guestSession.GuestSessionID, "guest123")
+	}
+}
+
+func TestDeleteSession(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/authentication/session", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		var body struct {
+			SessionID string `json:"session_id"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+		if body.SessionID != "sess123" {
+			t.Errorf("session_id in body = %q, want %q", body.SessionID, "sess123")
+		}
+		json.NewEncoder(w).Encode(map[string]any{"success": true})
+	})
+
+	status, _, err := client.Auth.DeleteSession(context.Background(), "sess123")
+	if err != nil {
+		t.Fatalf("DeleteSession() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("Success = %v, want true", status.Success)
+	}
+}

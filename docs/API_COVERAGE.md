@@ -11,13 +11,6 @@ added/deprecated endpoints since.
 Account endpoints (marked 🔒) require a v3 session (`session_id`) — implemented in phase 4,
 after the session-auth plumbing from phase 2 exists but before any account command is wired up.
 
-## Authentication
-- [ ] Create Guest Session — `GET /authentication/guest_session/new`
-- [ ] Create Request Token — `GET /authentication/token/new`
-- [ ] Create Session — `POST /authentication/session/new`
-- [ ] Delete Session (logout) — `DELETE /authentication/session`
-- [ ] Validate Key — `GET /authentication`
-
 ## Account 🔒
 - [ ] Details — `GET /account/{account_id}`
 - [ ] Add to Watchlist — `POST /account/{account_id}/watchlist`
@@ -30,6 +23,13 @@ after the session-auth plumbing from phase 2 exists but before any account comma
 - [ ] Get Rated TV Episodes — `GET /account/{account_id}/rated/tv/episodes`
 - [ ] Get Watchlist Movies — `GET /account/{account_id}/watchlist/movies`
 - [ ] Get Watchlist TV Shows — `GET /account/{account_id}/watchlist/tv`
+
+## Authentication
+- [x] Create Guest Session — `GET /authentication/guest_session/new`
+- [x] Create Request Token — `GET /authentication/token/new`
+- [x] Create Session — `POST /authentication/session/new`
+- [x] Delete Session (logout) — `DELETE /authentication/session`
+- [x] Validate Key — `GET /authentication`
 
 ## Certifications
 - [ ] Movie Certifications — `GET /certification/movie/list`
