@@ -70,7 +70,7 @@ func TestDo_DecodesJSON(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
-	mux.HandleFunc("/movie/1", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/movie/1", func(w http.ResponseWriter, _ *http.Request) {
 		json.NewEncoder(w).Encode(map[string]any{"id": float64(1), "title": "Some Movie"})
 	})
 
@@ -91,7 +91,7 @@ func TestDo_ErrorResponse(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
-	mux.HandleFunc("/movie/999", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/movie/999", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]any{
 			"status_code":    34,

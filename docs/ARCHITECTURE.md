@@ -46,11 +46,17 @@ about a pattern, check how trakt-sync does the equivalent thing before inventing
     (`-a details`, `-i <id>`, `-p <page>`, ...) and picks a `handlers.Handler` to run.
   - `handlers.Handler` is `Handle(ctx, client) (any, error)` — one small struct per action
     (`MoviesDetailsHandler{MovieID}`, `MoviesPopularHandler{Page}`, ...), calling exactly one
-    `internal` service method. Output is JSON-marshaled to stdout via `printer`.
+    `internal` service method. `cmds/output.go`'s `writeResult` then saves the result as JSON (see
+    Output below) instead of dumping it to stdout.
 - `printer/` — thin `fmt`-over-`io.Writer` wrapper; `printer.Stdout` is swappable so tests can
-  capture CLI output without touching global state beyond a package var.
+  capture CLI output without touching global state beyond a package var. Used only for short
+  status lines now (e.g. `writeResult`'s "wrote <path>"), not for dumping API responses.
 - `uri/` — query-string helpers (`AddPage`, `SanitizeURL` to redact `api_key` from error/log
   output).
+- `writer/` — `BuildFilename(module, action, params...)` (e.g.
+  `BuildFilename("movies", "details", "id-550")` → `movies_details_id-550.json`) and
+  `WriteJSON(fs, dir, filename, v)` (creates `dir` if needed, writes indented JSON via afero).
+  `cmds/output.go`'s `writeResult` is the one call site every command action should go through.
 - `main.go` — flags (`-v`, `-version`, `-c`), `cfg.InitConfig` → `cfg.OptionsFromConfig` →
   `internal.NewClient` → `client.UpdateHeaders` → `cmds.ModulesRuntime`. **Does not** call
   `cli.HandleToken` unconditionally — public v3 endpoints don't need a session; only a future
@@ -71,6 +77,42 @@ For an endpoint like `GET /tv/{tv_id}`:
 
 No existing file needs to change except the two registries (`Client` field list +
 `cmds.Commands`).
+
+## Pagination: always capped, never a dedicated "GetAll" function
+
+TMDB does **not** put pagination info in HTTP headers (unlike GitHub/Trakt) — list endpoints
+return `page`, `total_pages`, `total_results` in the JSON body itself. TMDB also fixes the page
+*size* at 20 items server-side; `cfg.Config.PerPage` is reserved/unused because there's no API
+lever for it. The only real control is how many *pages* to walk, `cfg.Config.PagesLimit`.
+
+The generic building block is `internal.FetchAllPages[T]` (`internal/paginate.go`): given a
+`fetch(ctx, page) (PageResult[T], error)` closure, it walks pages 1..N until either TMDB reports
+no more pages (`total_pages`) or `pagesLimit` (0 = unlimited) is hit, and returns the concatenated
+`[]T`.
+
+**There is no separate `Get<X>` (single page) + `GetAll<X>` (every page) pair, and no `-all`
+flag.** Each list endpoint gets exactly one public method that always applies the cap — see
+`internal/movies_service.go`: `getPopularMoviesPage` (unexported, one HTTP call) is the plumbing;
+`GetPopularMovies(ctx, pagesLimit)` is the only exported entry point, built on `FetchAllPages`, and
+always returns however many pages `min(total_pages, pagesLimit)` allows. A command
+(`cmds/command_movies.go`) just passes `config.PagesLimit` through — no extra flag needed. Set
+`pages_limit = 0` in config for "fetch every page TMDB has".
+
+## Output: JSON files, not stdout dumps
+
+Every command action ends by calling `writeResult(fs, config, module, action, result, params...)`
+(`cmds/output.go`), which:
+1. Builds a filename via `writer.BuildFilename(module, action, params...)` —
+   `<module>_<action>[_<param>...].json`, e.g. `movies_details_id-550.json`,
+   `movies_popular_page-1.json`, or `movies_popular_all.json` for a `-all` fetch.
+2. Writes indented JSON under `config.OutputDir` (default: current directory) via
+   `writer.WriteJSON`.
+3. Prints a one-line confirmation (`wrote <path>`) instead of the raw JSON — the file is the
+   product, not the stdout stream.
+
+`params` are the action's identifying arguments as `key-value` strings (`fmt.Sprintf("id-%d",
+movieID)`, `fmt.Sprintf("page-%d", page)`, or the literal `"all"`) — pass whatever makes two
+different invocations of the same action not collide on one filename.
 
 ## Auth model (v3 now, v4 later without rewriting)
 

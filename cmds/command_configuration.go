@@ -2,14 +2,12 @@ package cmds
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 
 	"github.com/mfederowicz/tmdb-sync/cfg"
 	"github.com/mfederowicz/tmdb-sync/handlers"
 	"github.com/mfederowicz/tmdb-sync/internal"
-	"github.com/mfederowicz/tmdb-sync/printer"
 	"github.com/mfederowicz/tmdb-sync/str"
 
 	"github.com/spf13/afero"
@@ -23,10 +21,10 @@ var ConfigurationCmd = &Command{
 	Exec:   execConfiguration,
 }
 
-func execConfiguration(_ afero.Fs, client *internal.Client, _ *cfg.Config, _ *str.Options, args []string) error {
-	fs := flag.NewFlagSet("configuration", flag.ContinueOnError)
-	action := fs.String("a", "details", "action: details")
-	if err := fs.Parse(args); err != nil {
+func execConfiguration(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
+	flagSet := flag.NewFlagSet("configuration", flag.ContinueOnError)
+	action := flagSet.String("a", "details", "action: details")
+	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
@@ -43,14 +41,5 @@ func execConfiguration(_ afero.Fs, client *internal.Client, _ *cfg.Config, _ *st
 		return err
 	}
 
-	return printJSON(result)
-}
-
-func printJSON(v any) error {
-	data, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		return err
-	}
-	printer.Println(string(data))
-	return nil
+	return writeResult(fs, config, "configuration", *action, result)
 }

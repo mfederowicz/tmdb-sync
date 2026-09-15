@@ -284,7 +284,7 @@ func (*Client) WithContext(ctx context.Context, req *http.Request) *http.Request
 
 // NewResponse creates a new Response for the provided http.Response.
 // r must not be nil.
-func (c *Client) NewResponse(r *http.Response) *str.Response {
+func (*Client) NewResponse(r *http.Response) *str.Response {
 	response := &str.Response{Response: r}
 	return response
 }

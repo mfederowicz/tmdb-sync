@@ -21,24 +21,27 @@ var MoviesCmd = &Command{
 	Exec:   execMovies,
 }
 
-func execMovies(_ afero.Fs, client *internal.Client, _ *cfg.Config, _ *str.Options, args []string) error {
-	fs := flag.NewFlagSet("movies", flag.ContinueOnError)
-	action := fs.String("a", "popular", "action: details, popular")
-	movieID := fs.Int64("i", 0, "movie id, required for -a details")
-	page := fs.Int("p", 1, "page number, used by -a popular")
-	if err := fs.Parse(args); err != nil {
+func execMovies(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
+	flagSet := flag.NewFlagSet("movies", flag.ContinueOnError)
+	action := flagSet.String("a", "popular", "action: details, popular")
+	movieID := flagSet.Int64("i", 0, "movie id, required for -a details")
+	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
 	var handler handlers.Handler
+	var params []string
 	switch *action {
 	case "details":
 		if *movieID == 0 {
 			return fmt.Errorf("movies: -i <movie_id> is required for -a details")
 		}
 		handler = handlers.MoviesDetailsHandler{MovieID: *movieID}
+		params = []string{fmt.Sprintf("id-%d", *movieID)}
 	case "popular":
-		handler = handlers.MoviesPopularHandler{Page: *page}
+		// Fetches every page up to config.PagesLimit (0 = unlimited, bounded
+		// by TMDB's total_pages) - see internal.FetchAllPages.
+		handler = handlers.MoviesPopularHandler{PagesLimit: config.PagesLimit}
 	default:
 		return fmt.Errorf("movies: unknown action %q", *action)
 	}
@@ -48,5 +51,5 @@ func execMovies(_ afero.Fs, client *internal.Client, _ *cfg.Config, _ *str.Optio
 		return err
 	}
 
-	return printJSON(result)
+	return writeResult(fs, config, "movies", *action, result, params...)
 }

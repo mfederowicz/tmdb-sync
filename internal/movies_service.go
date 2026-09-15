@@ -28,8 +28,8 @@ func (s *MoviesService) GetMovie(ctx context.Context, movieID int64) (*str.Movie
 	return movie, resp, nil
 }
 
-// GetPopularMovies returns a page of the current popular-movies list.
-func (s *MoviesService) GetPopularMovies(ctx context.Context, page int) (*str.Movies, *str.Response, error) {
+// getPopularMoviesPage fetches a single page of the popular-movies list.
+func (s *MoviesService) getPopularMoviesPage(ctx context.Context, page int) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddPage("movie/popular", page)
 	if err != nil {
 		return nil, nil, err
@@ -47,4 +47,22 @@ func (s *MoviesService) GetPopularMovies(ctx context.Context, page int) (*str.Mo
 	}
 
 	return movies, resp, nil
+}
+
+// GetPopularMovies returns the current popular-movies list, walking pages
+// until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited). TMDB's page size is fixed at 20 by the API; pagesLimit is
+// the only real lever over how much gets fetched.
+func (s *MoviesService) GetPopularMovies(ctx context.Context, pagesLimit int) ([]str.Movie, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.Movie], error) {
+		movies, _, err := s.getPopularMoviesPage(ctx, page)
+		if err != nil {
+			return PageResult[str.Movie]{}, err
+		}
+		return PageResult[str.Movie]{
+			Results:    movies.Results,
+			Page:       movies.Page,
+			TotalPages: movies.TotalPages,
+		}, nil
+	})
 }

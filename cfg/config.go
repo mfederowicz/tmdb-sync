@@ -23,6 +23,7 @@ type Config struct {
 	AuthVersion     string `toml:"auth_version"`
 	ConfigPath      string `toml:"config_path"`
 	SessionPath     string `toml:"session_path"`
+	OutputDir       string `toml:"output_dir"`
 	PerPage         int    `toml:"per_page"`
 	PagesLimit      int    `toml:"pages_limit"`
 	Verbose         bool   `toml:"verbose"`
@@ -68,6 +69,7 @@ func MergeConfigs(defaultConfig *Config, fileConfig *Config, flagConfig map[stri
 	defaultConfig.AuthVersion = processOptionAuthVersion(defaultConfig, fileConfig)
 	defaultConfig.PerPage = processOptionPerPage(defaultConfig, fileConfig)
 	defaultConfig.PagesLimit = processOptionPagesLimit(defaultConfig, fileConfig)
+	defaultConfig.OutputDir = processOptionOutputDir(defaultConfig, fileConfig)
 	defaultConfig.Verbose = processOptionVerbose(defaultConfig, fileConfig, flagConfig, flagset)
 
 	sessionPath, err := processOptionSessionPath(defaultConfig, fileConfig)
@@ -104,6 +106,13 @@ func processOptionAuthVersion(defaultConfig *Config, fileConfig *Config) string 
 		defaultConfig.AuthVersion = fileConfig.AuthVersion
 	}
 	return defaultConfig.AuthVersion
+}
+
+func processOptionOutputDir(defaultConfig *Config, fileConfig *Config) string {
+	if len(fileConfig.OutputDir) > consts.ZeroValue {
+		defaultConfig.OutputDir = fileConfig.OutputDir
+	}
+	return defaultConfig.OutputDir
 }
 
 func processOptionPerPage(defaultConfig *Config, fileConfig *Config) int {
@@ -182,6 +191,7 @@ func DefaultConfig() *Config {
 		AuthVersion:     "v3",
 		ConfigPath:      buildDefaultConfigPath(),
 		SessionPath:     buildDefaultSessionPath(),
+		OutputDir:       consts.EmptyString,
 		PerPage:         consts.ZeroValue,
 		PagesLimit:      consts.PagesLimit,
 		Verbose:         false,

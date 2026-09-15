@@ -1,8 +1,8 @@
 # tmdb-sync — CLI reference
 
-> Describes the intended CLI shape (see `PRD.md`/`ARCHITECTURE.md`). Nothing is implemented yet
-> as of this doc — update the examples below as each module actually lands, and check it off in
-> `API_COVERAGE.md`.
+> Describes the intended CLI shape (see `PRD.md`/`ARCHITECTURE.md`). `configuration` and `movies`
+> are implemented as of this doc (see `API_COVERAGE.md`); the rest of the module table below is
+> still planned — update examples as each module actually lands.
 
 ## Install
 
@@ -20,8 +20,9 @@ api_key = "your-v3-api-key"
 # read_access_token = "your-v4-read-access-token"   # used as a Bearer header instead of api_key
 
 session_path = "~/.config/tmdb-sync/session.json"   # created by the auth flow, only needed for account commands
+output_dir = ""        # where result JSON files are written; "" = current directory
 per_page = 20
-pages_limit = 10
+pages_limit = 10       # cap on pages walked by -all; 0 = unlimited (bounded by TMDB's total_pages)
 ```
 
 ## Flags
@@ -69,7 +70,22 @@ args, or `tmdb-sync help`, lists all modules.
 🔒 = requires a v3 session; the first 🔒 command run triggers the browser-approval flow
 (`cli/session.go`) and persists the session to `session_path`.
 
+## Pagination
+
+TMDB list endpoints paginate via `page`/`total_pages` fields in the JSON body (there's no
+pagination info in HTTP headers, unlike GitHub/Trakt), and TMDB fixes the page size at 20 items —
+there's no API lever to change it. Every list action (e.g. `movies -a popular`) always fetches
+`min(total_pages, pages_limit)` pages and merges them into one result — no separate flag needed:
+
+```sh
+tmdb-sync movies -a popular            # up to pages_limit pages (from config), merged
+```
+
+Set `pages_limit = 0` in config to fetch every page TMDB has for that list.
+
 ## Output
 
-Every command prints one JSON document to stdout (the raw TMDB response shape, or a thin
-pagination wrapper) — pipe to `jq` or similar for further processing.
+Every command writes its result as one JSON file, named `<module>_<action>[_<params>].json` (e.g.
+`movies_details_id-550.json`, `movies_popular.json`), under `output_dir` (default: the current
+directory), and prints a one-line `wrote <path>` confirmation — the file is the product, not the
+terminal output. Read/process the file with `jq`, a script, etc.
