@@ -1,0 +1,52 @@
+# tmdb-sync
+
+A Go CLI for [The Movie Database (TMDB)](https://www.themoviedb.org) API — the TMDB counterpart
+to [`trakt-sync`](https://github.com/mfederowicz/trakt-sync), reusing the same architecture and
+conventions.
+
+## Status
+
+📋 **Documentation phase.** Scope, architecture, and the full TMDB v3 endpoint checklist are
+written up in [`docs/`](docs/); no Go source exists yet. See:
+
+- [`docs/PRD.md`](docs/PRD.md) — goals, non-goals, scope phases, success criteria.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — package layout and how new modules get added.
+- [`docs/API_COVERAGE.md`](docs/API_COVERAGE.md) — checklist of every TMDB v3 endpoint, tracked
+  as work lands.
+- [`docs/CLI.md`](docs/CLI.md) — planned command/config shape.
+- [`AGENTS.md`](AGENTS.md) — instructions for coding agents working in this repo.
+
+## Goal
+
+Near-100% coverage of the TMDB **v3** API (movies, tv, people, search, discover, trending,
+account, etc.) from a single Go binary configured with one TOML file, with TMDB **v4** auth and
+v4-only endpoints planned as a later, additive phase.
+
+## Planned install & usage
+
+```sh
+go install github.com/mfederowicz/tmdb-sync@latest
+```
+
+```toml
+# ~/tmdb-sync.toml
+api_key = "your-v3-api-key"
+session_path = "~/.config/tmdb-sync/session.json"
+```
+
+```sh
+tmdb-sync movies -a popular -p 1
+```
+
+See [`docs/CLI.md`](docs/CLI.md) for the full planned command reference — this will be kept in
+sync as modules are actually implemented.
+
+## Development
+
+```sh
+make install   # go mod vendor
+make build     # build the binary
+make test      # go test -v -race ./...
+make cover     # coverage report
+make linter    # revive
+```
