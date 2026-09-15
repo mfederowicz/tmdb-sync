@@ -3,11 +3,8 @@
 ## Summary
 
 `tmdb-sync` is a Go CLI tool that talks to [The Movie Database (TMDB)](https://www.themoviedb.org)
-API. It is the TMDB counterpart of the author's existing
-[`trakt-sync`](https://github.com/mfederowicz/trakt-sync), reusing the same architecture
-(TOML config, `<module> -a <action>` command dispatch, one `internal/<x>_service.go` +
-`handlers/<x>_handler.go` + `str/<x>.go` per API area) so the two tools stay structurally
-interchangeable.
+API: TOML config, `<module> -a <action>` command dispatch, one `internal/<x>_service.go` +
+`handlers/<x>_handler.go` + `str/<x>.go` per API area.
 
 ## Goals
 
@@ -26,17 +23,14 @@ interchangeable.
   v4 account). Explicitly a later phase — see [Roadmap](#roadmap). The v3 phase's architecture
   must not need to change to accommodate it later (see `ARCHITECTURE.md`).
 - A GUI, TUI, or daemon/sync-loop mode — this is a one-shot CLI, invoked per command.
-- Write-heavy "sync" workflows analogous to trakt-sync's `sync`/`scrobble`/`checkin` modules —
-  TMDB's account API is much smaller than Trakt's (favorites/watchlist/ratings/lists only); no
-  equivalent of scrobbling or check-ins exists on TMDB.
-- Publishing to a public GitHub remote. This starts as a local-only repo (see
-  `ARCHITECTURE.md` for git conventions).
+- Write-heavy "sync" workflows (scrobbling, check-ins) — TMDB's account API is small
+  (favorites/watchlist/ratings/lists only); no equivalent exists on TMDB.
 
 ## Target user
 
 The tool's author, using it personally/via scripts to pull TMDB data (movie/TV metadata,
 discovery, search) and manage their TMDB account (watchlist, ratings, lists) from the command
-line or from other tooling that shells out to it — the same usage pattern as `trakt-sync`.
+line or from other tooling that shells out to it.
 
 ## Scope phases
 

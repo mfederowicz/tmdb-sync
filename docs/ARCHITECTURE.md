@@ -1,12 +1,14 @@
 # tmdb-sync — Architecture
 
-Mirrors [`trakt-sync`](https://github.com/mfederowicz/trakt-sync)'s architecture. If in doubt
-about a pattern, check how trakt-sync does the equivalent thing before inventing something new.
+If in doubt about a pattern, follow the existing shape rather than inventing something new — see
+"Adding a new module" below.
 
 ## Repo / git conventions
 
-- Local-only repo for now, no GitHub remote. Default branch is `main` (not `master`).
-- Only commit when explicitly asked.
+- Default branch is `main`, pushed to a public GitHub remote.
+- One module per branch/PR; if a module has more than ~3 endpoints, split it into smaller
+  branches rather than landing it all at once.
+- Only commit/push when explicitly asked.
 
 ## Package layout
 
@@ -80,7 +82,7 @@ No existing file needs to change except the two registries (`Client` field list 
 
 ## Pagination: always capped, never a dedicated "GetAll" function
 
-TMDB does **not** put pagination info in HTTP headers (unlike GitHub/Trakt) — list endpoints
+TMDB does **not** put pagination info in HTTP headers (unlike some other APIs) — list endpoints
 return `page`, `total_pages`, `total_results` in the JSON body itself. TMDB also fixes the page
 *size* at 20 items server-side; `cfg.Config.PerPage` is reserved/unused because there's no API
 lever for it. The only real control is how many *pages* to walk, `cfg.Config.PagesLimit`.

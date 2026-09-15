@@ -1,8 +1,7 @@
 # tmdb-sync
 
-A Go CLI for [The Movie Database (TMDB)](https://www.themoviedb.org) API — the TMDB counterpart
-to [`trakt-sync`](https://github.com/mfederowicz/trakt-sync), reusing the same architecture and
-conventions.
+A Go CLI for [The Movie Database (TMDB)](https://www.themoviedb.org) API — modular, TOML-configured,
+aiming for full TMDB v3 API coverage, one module at a time.
 
 ## Status
 
