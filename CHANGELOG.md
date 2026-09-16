@@ -33,3 +33,7 @@ schedule.
   module-level error) instead of always exiting 0.
 
 ### Fixed
+
+- Removed the `authentication` CLI module (command, handlers, and its doc page); it had no real
+  standalone use since `main` never auto-triggers the session flow — a future 🔒 module calls the
+  internal auth plumbing (`internal/auth_service.go`, `cli/session.go`) directly instead.
