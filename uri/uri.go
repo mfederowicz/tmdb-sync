@@ -26,6 +26,19 @@ func SanitizeURL(u *url.URL) *url.URL {
 	return &uCopy
 }
 
+// AccountOptions carries the session_id query parameter required by every
+// account (🔒) endpoint.
+type AccountOptions struct {
+	SessionID string `url:"session_id,omitempty"`
+}
+
+// AccountListOptions carries the session_id and page query parameters
+// required by paginated account (🔒) list endpoints.
+type AccountListOptions struct {
+	SessionID string `url:"session_id,omitempty"`
+	Page      int    `url:"page,omitempty"`
+}
+
 // ListOptions specifies the optional query parameters accepted by TMDB list
 // endpoints. Fields are added as modules need them rather than mirroring the
 // full TMDB param surface up front.

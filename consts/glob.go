@@ -15,3 +15,10 @@ const (
 	VersionUsage = "print version and exit"
 	ConfigUsage  = "path to config file"
 )
+
+// TMDB media_type values, shared by modules that accept both movie and TV
+// endpoints (e.g. account favorites/watchlist).
+const (
+	MediaTypeMovie = "movie"
+	MediaTypeTV    = "tv"
+)

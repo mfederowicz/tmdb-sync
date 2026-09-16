@@ -12,14 +12,14 @@ Account endpoints (marked 🔒) require a v3 session (`session_id`) — implemen
 after the session-auth plumbing from phase 2 exists but before any account command is wired up.
 
 ## Account 🔒
-- [ ] Details — `GET /account/{account_id}`
-- [ ] Add to Watchlist — `POST /account/{account_id}/watchlist`
-- [ ] Add/Remove Favorite — `POST /account/{account_id}/favorite`
-- [ ] Get Favorite Movies — `GET /account/{account_id}/favorite/movies`
-- [ ] Get Favorite TV Shows — `GET /account/{account_id}/favorite/tv`
-- [ ] Get Lists — `GET /account/{account_id}/lists`
-- [ ] Get Rated Movies — `GET /account/{account_id}/rated/movies`
-- [ ] Get Rated TV Shows — `GET /account/{account_id}/rated/tv`
+- [x] Details — `GET /account/{account_id}`
+- [x] Add to Watchlist — `POST /account/{account_id}/watchlist`
+- [x] Add/Remove Favorite — `POST /account/{account_id}/favorite`
+- [x] Get Favorite Movies — `GET /account/{account_id}/favorite/movies`
+- [x] Get Favorite TV Shows — `GET /account/{account_id}/favorite/tv`
+- [x] Get Lists — `GET /account/{account_id}/lists`
+- [x] Get Rated Movies — `GET /account/{account_id}/rated/movies`
+- [x] Get Rated TV Shows — `GET /account/{account_id}/rated/tv`
 - [ ] Get Rated TV Episodes — `GET /account/{account_id}/rated/tv/episodes`
 - [ ] Get Watchlist Movies — `GET /account/{account_id}/watchlist/movies`
 - [ ] Get Watchlist TV Shows — `GET /account/{account_id}/watchlist/tv`

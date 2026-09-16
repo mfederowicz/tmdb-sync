@@ -15,3 +15,18 @@ type Movie struct {
 	Video            bool    `json:"video"`
 	OriginalLanguage string  `json:"original_language"`
 }
+
+// RatedMovie is a movie as returned by an account's rated-movies endpoint,
+// which adds the account's own rating to the usual movie fields.
+type RatedMovie struct {
+	Movie
+	Rating float64 `json:"rating"`
+}
+
+// RatedMovies is a paginated list of an account's rated movies.
+type RatedMovies struct {
+	Page         int          `json:"page"`
+	Results      []RatedMovie `json:"results"`
+	TotalPages   int          `json:"total_pages"`
+	TotalResults int          `json:"total_results"`
+}

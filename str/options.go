@@ -4,5 +4,6 @@ package str
 type Options struct {
 	Headers map[string]any
 	Session *Session
+	Account *Account
 	Verbose bool
 }

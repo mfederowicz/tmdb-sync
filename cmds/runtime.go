@@ -17,6 +17,7 @@ var Commands []*Command
 
 func init() {
 	Commands = []*Command{
+		AccountCmd,
 		CertificationsCmd,
 		ConfigurationCmd,
 		MoviesCmd,

@@ -23,6 +23,7 @@ type Config struct {
 	AuthVersion     string `toml:"auth_version"`
 	ConfigPath      string `toml:"config_path"`
 	SessionPath     string `toml:"session_path"`
+	AccountPath     string `toml:"account_path"`
 	OutputDir       string `toml:"output_dir"`
 	PerPage         int    `toml:"per_page"`
 	PagesLimit      int    `toml:"pages_limit"`
@@ -77,6 +78,12 @@ func MergeConfigs(defaultConfig *Config, fileConfig *Config, flagConfig map[stri
 		return nil, fmt.Errorf("config error : %w", err)
 	}
 	defaultConfig.SessionPath = sessionPath
+
+	accountPath, err := processOptionAccountPath(defaultConfig, fileConfig)
+	if err != nil {
+		return nil, fmt.Errorf("config error : %w", err)
+	}
+	defaultConfig.AccountPath = accountPath
 
 	defaultConfig.ConfigPath = processOptionConfigPath(defaultConfig, fileConfig, flagConfig, flagset)
 
@@ -153,6 +160,18 @@ func processOptionSessionPath(defaultConfig *Config, fileConfig *Config) (string
 	return sessionPath, nil
 }
 
+func processOptionAccountPath(defaultConfig *Config, fileConfig *Config) (string, error) {
+	if len(fileConfig.AccountPath) > consts.ZeroValue {
+		defaultConfig.AccountPath = fileConfig.AccountPath
+	}
+
+	accountPath, err := expandTilde(defaultConfig.AccountPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to expand tilde from accountPath: %w", err)
+	}
+	return accountPath, nil
+}
+
 func processOptionConfigPath(defaultConfig *Config, fileConfig *Config, flagConfig map[string]string, flagset map[string]bool) string {
 	if len(fileConfig.ConfigPath) > consts.ZeroValue {
 		defaultConfig.ConfigPath = fileConfig.ConfigPath
@@ -191,6 +210,7 @@ func DefaultConfig() *Config {
 		AuthVersion:     "v3",
 		ConfigPath:      buildDefaultConfigPath(),
 		SessionPath:     buildDefaultSessionPath(),
+		AccountPath:     buildDefaultAccountPath(),
 		OutputDir:       consts.EmptyString,
 		PerPage:         consts.ZeroValue,
 		PagesLimit:      consts.PagesLimit,
@@ -231,6 +251,14 @@ func buildDefaultConfigPath() string {
 
 func buildDefaultSessionPath() string {
 	absPath, err := expandTilde("~/.config/tmdb-sync/session.json")
+	if err != nil {
+		panic(err)
+	}
+	return absPath
+}
+
+func buildDefaultAccountPath() string {
+	absPath, err := expandTilde("~/.config/tmdb-sync/account.json")
 	if err != nil {
 		panic(err)
 	}
