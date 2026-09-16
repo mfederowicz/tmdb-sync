@@ -166,3 +166,33 @@ func TestGetFavoriteMovies(t *testing.T) {
 		t.Errorf("GetFavoriteMovies() = %+v, want one movie with ID=550", movies)
 	}
 }
+
+func TestGetFavoriteTV(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/account/123/favorite/tv", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "abc123" {
+			t.Errorf("session_id query param = %q, want %q", got, "abc123")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          1,
+			"total_pages":   1,
+			"total_results": 1,
+			"results": []map[string]any{
+				{"id": 1396, "name": "Breaking Bad"},
+			},
+		})
+	})
+
+	shows, err := client.Account.GetFavoriteTV(context.Background(), 123, "abc123", 0)
+	if err != nil {
+		t.Fatalf("GetFavoriteTV() error = %v", err)
+	}
+	if len(shows) != 1 || shows[0].ID != 1396 {
+		t.Errorf("GetFavoriteTV() = %+v, want one show with ID=1396", shows)
+	}
+}

@@ -16,7 +16,7 @@ after the session-auth plumbing from phase 2 exists but before any account comma
 - [x] Add to Watchlist — `POST /account/{account_id}/watchlist`
 - [x] Add/Remove Favorite — `POST /account/{account_id}/favorite`
 - [x] Get Favorite Movies — `GET /account/{account_id}/favorite/movies`
-- [ ] Get Favorite TV Shows — `GET /account/{account_id}/favorite/tv`
+- [x] Get Favorite TV Shows — `GET /account/{account_id}/favorite/tv`
 - [ ] Get Lists — `GET /account/{account_id}/lists`
 - [ ] Get Rated Movies — `GET /account/{account_id}/rated/movies`
 - [ ] Get Rated TV Shows — `GET /account/{account_id}/rated/tv`
