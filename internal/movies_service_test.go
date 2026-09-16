@@ -1,0 +1,58 @@
+package internal
+
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"strconv"
+	"testing"
+)
+
+func TestGetPopularMovies_WalksEveryPage(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/popular", func(w http.ResponseWriter, r *http.Request) {
+		pageNum, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			pageNum = 1
+		}
+		results := []map[string]any{{"id": pageNum, "title": "movie"}}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          pageNum,
+			"results":       results,
+			"total_pages":   3,
+			"total_results": 3,
+		})
+	})
+
+	movies, err := client.Movies.GetPopularMovies(context.Background(), 0)
+	if err != nil {
+		t.Fatalf("GetPopularMovies() error = %v", err)
+	}
+	if len(movies) != 3 {
+		t.Fatalf("len(movies) = %d, want 3", len(movies))
+	}
+}
+
+func TestGetPopularMovies_RespectsPagesLimit(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/popular", func(w http.ResponseWriter, _ *http.Request) {
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          1,
+			"results":       []map[string]any{{"id": 1, "title": "movie"}},
+			"total_pages":   50,
+			"total_results": 50,
+		})
+	})
+
+	movies, err := client.Movies.GetPopularMovies(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPopularMovies() error = %v", err)
+	}
+	if len(movies) != 1 {
+		t.Fatalf("len(movies) = %d, want 1 (pagesLimit=1)", len(movies))
+	}
+}
