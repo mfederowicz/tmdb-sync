@@ -7,7 +7,6 @@ aiming for full TMDB v3 API coverage, one module at a time.
 
 🚧 **In progress**, one module at a time. Implemented so far:
 
-- [`authentication`](docs/authentication.md) ✅ — validate key, request tokens, sessions, guest sessions.
 - [`certifications`](docs/certifications.md) ✅ — movie/tv certifications, by country.
 - [`configuration`](docs/configuration.md) ✅ — image base URLs/sizes, countries, jobs, languages,
   primary translations, timezones.

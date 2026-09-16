@@ -21,7 +21,7 @@ schedule.
 - `configuration` module: `countries`, `jobs`, `languages`, `primary-translations`, `timezones`
   actions (in addition to the existing `details`).
 - `-pages-limit` flag on `movies -a popular` to override `pages_limit` per-invocation.
-- `docs/authentication.md`, `docs/certifications.md`, `docs/configuration.md` reference pages.
+- `docs/certifications.md`, `docs/configuration.md` reference pages.
 
 ### Changed
 

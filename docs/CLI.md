@@ -1,7 +1,7 @@
 # tmdb-sync — CLI reference
 
-> Describes the intended CLI shape (see `PRD.md`/`ARCHITECTURE.md`). `authentication`,
-> `certifications`, `configuration`, and `movies` are implemented as of this doc (see
+> Describes the intended CLI shape (see `PRD.md`/`ARCHITECTURE.md`). `certifications`,
+> `configuration`, and `movies` are implemented as of this doc (see
 > `API_COVERAGE.md`, marked ✅ below); the rest of the module table is still planned — update
 > examples as each module actually lands. The table is ordered to match TMDB's own reference nav
 > (developer.themoviedb.org/reference) category-for-category, so the CLI's module list maps 1:1
@@ -50,7 +50,6 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | module            | actions (examples)                          |
 |-------------------|----------------------------------------------|
 | `account`         | 🔒 `details`, `favorites`, `watchlist`, `rated`, `lists`, `add-favorite`, `add-watchlist` |
-| `authentication` ✅ ([docs](authentication.md)) | `validate-key`, `create-request-token`, `create-session` (🔒 interactive browser approval), `create-guest-session`, `delete-session -s <session_id>` |
 | `certifications` ✅ ([docs](certifications.md)) | `movie`, `tv` |
 | `changes`         | `movie`, `tv`, `person` |
 | `collections`     | `details -i <id>`, `images -i <id>`, `translations -i <id>` |
@@ -73,9 +72,10 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | `tv-episodes`     | `details -i <id> -s <season_number> -e <episode_number>`, ... |
 | `watch-providers` | `regions`, `movie`, `tv` |
 
-🔒 = requires a v3 session. `authentication -a create-session` runs the browser-approval flow
-(`cli/session.go`) and persists the session to `session_path`; other 🔒 modules (like `account`)
-read that persisted session rather than triggering the flow themselves.
+🔒 = requires a v3 session. There's no standalone `authentication` command — a 🔒 module (like
+`account`) triggers the request-token → browser-approval → session flow itself, on demand
+(`cli.HandleToken`/`cli.CreateSessionInteractively` in `cli/session.go`), and persists the result
+to `session_path` for subsequent runs to reuse.
 
 ## Pagination
 
