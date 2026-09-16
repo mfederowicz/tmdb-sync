@@ -20,7 +20,7 @@ Key decisions already made (don't relitigate without asking):
 
 ## Commands
 
-- `make install` — download dependencies (`go mod download`)
+- `make install` — vendor dependencies (`go mod vendor`)
 - `make build` — build the binary, embedding version info via ldflags
 - `make test` — `go test -v -race ./...`
 - `make cover` — `go test -cover -coverprofile coverage.out ./...`
