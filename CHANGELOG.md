@@ -22,6 +22,13 @@ schedule.
 
 ### Fixed
 
+## [0.3.0] - 2026-09-17
+
+### Added
+
+- `account` 🔒 module: `rated-tv-episodes`, `watchlist-movies`, `watchlist-tv` actions — completes
+  the module's full 11/11 endpoint coverage.
+
 ## [0.2.0] - 2026-09-17
 
 ### Added
