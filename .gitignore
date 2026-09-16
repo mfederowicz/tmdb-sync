@@ -1,3 +1,5 @@
 /tmdb-sync
 /coverage.out
 *.json
+/vendor/
+/.idea/
