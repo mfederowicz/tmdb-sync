@@ -19,10 +19,14 @@ repeating `-i`.
 | `lists`           | `tmdb-sync account -a lists`                                                         | `account_lists_id-<account_id>.json`            |
 | `rated-movies`    | `tmdb-sync account -a rated-movies`                                                  | `account_rated-movies_id-<account_id>.json`     |
 | `rated-tv`        | `tmdb-sync account -a rated-tv`                                                      | `account_rated-tv_id-<account_id>.json`         |
+| `rated-tv-episodes` | `tmdb-sync account -a rated-tv-episodes`                                           | `account_rated-tv-episodes_id-<account_id>.json` |
+| `watchlist-movies` | `tmdb-sync account -a watchlist-movies`                                             | `account_watchlist-movies_id-<account_id>.json` |
+| `watchlist-tv`    | `tmdb-sync account -a watchlist-tv`                                                  | `account_watchlist-tv_id-<account_id>.json`     |
 
 Notes:
 - `add-watchlist`/`add-favorite` default to adding (`-watchlist`/`-favorite` default `true`);
   pass `-watchlist=false` or `-favorite=false` to remove instead.
-- `favorite-movies`, `favorite-tv`, `lists`, `rated-movies`, `rated-tv` all walk every page up to
-  `-pages-limit` (default: `pages_limit` from config, `0` = unlimited), same as `movies -a popular`.
+- `favorite-movies`, `favorite-tv`, `lists`, `rated-movies`, `rated-tv`, `rated-tv-episodes`,
+  `watchlist-movies`, `watchlist-tv` all walk every page up to `-pages-limit` (default:
+  `pages_limit` from config, `0` = unlimited), same as `movies -a popular`.
 - `acc` is the module's `Abbrev` — `tmdb-sync acc -a details` also works.

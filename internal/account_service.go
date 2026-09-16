@@ -257,6 +257,123 @@ func (s *AccountService) GetRatedTV(ctx context.Context, accountID int64, sessio
 	})
 }
 
+func (s *AccountService) getRatedTVEpisodesPage(ctx context.Context, accountID int64, sessionID string, page int) (*str.RatedTVEpisodes, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("account/%d/rated/tv/episodes", accountID), &uri.AccountListOptions{SessionID: sessionID, Page: page})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	episodes := new(str.RatedTVEpisodes)
+	resp, err := s.client.Do(ctx, req, episodes)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return episodes, resp, nil
+}
+
+// GetRatedTVEpisodes returns an account's rated TV episodes, walking pages
+// until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/account-rated-tv-episodes
+func (s *AccountService) GetRatedTVEpisodes(ctx context.Context, accountID int64, sessionID string, pagesLimit int) ([]str.RatedTVEpisode, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.RatedTVEpisode], error) {
+		episodes, _, err := s.getRatedTVEpisodesPage(ctx, accountID, sessionID, page)
+		if err != nil {
+			return PageResult[str.RatedTVEpisode]{}, err
+		}
+		return PageResult[str.RatedTVEpisode]{
+			Results:    episodes.Results,
+			Page:       episodes.Page,
+			TotalPages: episodes.TotalPages,
+		}, nil
+	})
+}
+
+func (s *AccountService) getWatchlistMoviesPage(ctx context.Context, accountID int64, sessionID string, page int) (*str.Movies, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("account/%d/watchlist/movies", accountID), &uri.AccountListOptions{SessionID: sessionID, Page: page})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	movies := new(str.Movies)
+	resp, err := s.client.Do(ctx, req, movies)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return movies, resp, nil
+}
+
+// GetWatchlistMovies returns an account's watchlisted movies, walking pages
+// until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/account-watchlist-movies
+func (s *AccountService) GetWatchlistMovies(ctx context.Context, accountID int64, sessionID string, pagesLimit int) ([]str.Movie, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.Movie], error) {
+		movies, _, err := s.getWatchlistMoviesPage(ctx, accountID, sessionID, page)
+		if err != nil {
+			return PageResult[str.Movie]{}, err
+		}
+		return PageResult[str.Movie]{
+			Results:    movies.Results,
+			Page:       movies.Page,
+			TotalPages: movies.TotalPages,
+		}, nil
+	})
+}
+
+func (s *AccountService) getWatchlistTVPage(ctx context.Context, accountID int64, sessionID string, page int) (*str.TVShows, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("account/%d/watchlist/tv", accountID), &uri.AccountListOptions{SessionID: sessionID, Page: page})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	shows := new(str.TVShows)
+	resp, err := s.client.Do(ctx, req, shows)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return shows, resp, nil
+}
+
+// GetWatchlistTV returns an account's watchlisted TV shows, walking pages
+// until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/account-watchlist-tv
+func (s *AccountService) GetWatchlistTV(ctx context.Context, accountID int64, sessionID string, pagesLimit int) ([]str.TV, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.TV], error) {
+		shows, _, err := s.getWatchlistTVPage(ctx, accountID, sessionID, page)
+		if err != nil {
+			return PageResult[str.TV]{}, err
+		}
+		return PageResult[str.TV]{
+			Results:    shows.Results,
+			Page:       shows.Page,
+			TotalPages: shows.TotalPages,
+		}, nil
+	})
+}
+
 // AddRemoveFavorite marks or unmarks a movie/TV show as one of an account's favorites.
 //
 // Api docs: https://developer.themoviedb.org/reference/account-add-favorite

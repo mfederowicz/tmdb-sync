@@ -36,3 +36,30 @@ type RatedTVShows struct {
 	TotalPages   int       `json:"total_pages"`
 	TotalResults int       `json:"total_results"`
 }
+
+// RatedTVEpisode is a TV episode as returned by an account's
+// rated-tv-episodes endpoint, which adds the account's own rating to the
+// usual episode fields.
+type RatedTVEpisode struct {
+	AirDate        string  `json:"air_date"`
+	EpisodeNumber  int     `json:"episode_number"`
+	ID             int64   `json:"id"`
+	Name           string  `json:"name"`
+	Overview       string  `json:"overview"`
+	ProductionCode string  `json:"production_code"`
+	Runtime        int     `json:"runtime"`
+	SeasonNumber   int     `json:"season_number"`
+	ShowID         int64   `json:"show_id"`
+	StillPath      string  `json:"still_path"`
+	VoteAverage    float64 `json:"vote_average"`
+	VoteCount      int     `json:"vote_count"`
+	Rating         float64 `json:"rating"`
+}
+
+// RatedTVEpisodes is a paginated list of an account's rated TV episodes.
+type RatedTVEpisodes struct {
+	Page         int              `json:"page"`
+	Results      []RatedTVEpisode `json:"results"`
+	TotalPages   int              `json:"total_pages"`
+	TotalResults int              `json:"total_results"`
+}
