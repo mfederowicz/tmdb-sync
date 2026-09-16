@@ -18,6 +18,18 @@ schedule.
 
 ### Added
 
+- `configuration` module: `countries`, `jobs`, `languages`, `primary-translations`, `timezones`
+  actions (in addition to the existing `details`).
+- `-pages-limit` flag on `movies -a popular` to override `pages_limit` per-invocation.
+- `docs/authentication.md`, `docs/certifications.md`, `docs/configuration.md` reference pages.
+
 ### Changed
+
+- Every module now requires an explicit `-a`; a missing/unknown action is an error instead of
+  silently falling back to a default action.
+- Module resolution now requires an exact module name or abbreviation match instead of an
+  unambiguous prefix.
+- `main` exits with status 1 on any command failure (unknown/ambiguous module, missing `-a`, or a
+  module-level error) instead of always exiting 0.
 
 ### Fixed
