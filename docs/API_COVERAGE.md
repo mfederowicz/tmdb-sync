@@ -19,7 +19,7 @@ after the session-auth plumbing from phase 2 exists but before any account comma
 - [x] Get Favorite TV Shows — `GET /account/{account_id}/favorite/tv`
 - [x] Get Lists — `GET /account/{account_id}/lists`
 - [x] Get Rated Movies — `GET /account/{account_id}/rated/movies`
-- [ ] Get Rated TV Shows — `GET /account/{account_id}/rated/tv`
+- [x] Get Rated TV Shows — `GET /account/{account_id}/rated/tv`
 - [ ] Get Rated TV Episodes — `GET /account/{account_id}/rated/tv/episodes`
 - [ ] Get Watchlist Movies — `GET /account/{account_id}/watchlist/movies`
 - [ ] Get Watchlist TV Shows — `GET /account/{account_id}/watchlist/tv`

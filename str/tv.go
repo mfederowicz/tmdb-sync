@@ -21,3 +21,18 @@ type TVShows struct {
 	TotalPages   int  `json:"total_pages"`
 	TotalResults int  `json:"total_results"`
 }
+
+// RatedTV is a TV show as returned by an account's rated-tv endpoint, which
+// adds the account's own rating to the usual TV fields.
+type RatedTV struct {
+	TV
+	Rating float64 `json:"rating"`
+}
+
+// RatedTVShows is a paginated list of an account's rated TV shows.
+type RatedTVShows struct {
+	Page         int       `json:"page"`
+	Results      []RatedTV `json:"results"`
+	TotalPages   int       `json:"total_pages"`
+	TotalResults int       `json:"total_results"`
+}

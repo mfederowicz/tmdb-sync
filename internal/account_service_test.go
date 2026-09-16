@@ -256,3 +256,33 @@ func TestGetRatedMovies(t *testing.T) {
 		t.Errorf("GetRatedMovies() = %+v, want one movie with ID=550 Rating=8.5", movies)
 	}
 }
+
+func TestGetRatedTV(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/account/123/rated/tv", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "abc123" {
+			t.Errorf("session_id query param = %q, want %q", got, "abc123")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          1,
+			"total_pages":   1,
+			"total_results": 1,
+			"results": []map[string]any{
+				{"id": 1396, "name": "Breaking Bad", "rating": 9.5},
+			},
+		})
+	})
+
+	shows, err := client.Account.GetRatedTV(context.Background(), 123, "abc123", 0)
+	if err != nil {
+		t.Fatalf("GetRatedTV() error = %v", err)
+	}
+	if len(shows) != 1 || shows[0].ID != 1396 || shows[0].Rating != 9.5 {
+		t.Errorf("GetRatedTV() = %+v, want one show with ID=1396 Rating=9.5", shows)
+	}
+}
