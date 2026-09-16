@@ -13,6 +13,8 @@ import (
 type MoviesService Service
 
 // GetMovie fetches details for a single movie by TMDB id.
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-details
 func (s *MoviesService) GetMovie(ctx context.Context, movieID int64) (*str.Movie, *str.Response, error) {
 	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("movie/%d", movieID), nil)
 	if err != nil {
@@ -53,6 +55,8 @@ func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.List
 // until TMDB reports no more (total_pages) or pagesLimit is reached
 // (0 = unlimited). TMDB's page size is fixed at 20 by the API; pagesLimit is
 // the only real lever over how much gets fetched.
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-popular-list
 func (s *MoviesService) GetPopularMovies(ctx context.Context, pagesLimit int) ([]str.Movie, error) {
 	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.Movie], error) {
 		movies, _, err := s.getPopularMoviesPage(ctx, &uri.ListOptions{Page: page})

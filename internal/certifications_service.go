@@ -11,11 +11,15 @@ import (
 type CertificationsService Service
 
 // GetMovieCertifications returns movie certifications, by country.
+//
+// Api docs: https://developer.themoviedb.org/reference/certification-movie-list
 func (s *CertificationsService) GetMovieCertifications(ctx context.Context) (*str.Certifications, *str.Response, error) {
 	return s.getCertifications(ctx, "certification/movie/list")
 }
 
 // GetTVCertifications returns TV certifications, by country.
+//
+// Api docs: https://developer.themoviedb.org/reference/certification-tv-list
 func (s *CertificationsService) GetTVCertifications(ctx context.Context) (*str.Certifications, *str.Response, error) {
 	return s.getCertifications(ctx, "certification/tv/list")
 }
