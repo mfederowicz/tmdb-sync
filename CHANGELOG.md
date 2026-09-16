@@ -22,6 +22,21 @@ schedule.
 
 ### Fixed
 
+## [0.2.0] - 2026-09-17
+
+### Added
+
+- `account` 🔒 module: `details`, `add-watchlist`, `add-favorite`, `favorite-movies`,
+  `favorite-tv`, `lists`, `rated-movies`, `rated-tv` actions.
+- `-i <account_id>` is optional on every `account` action: omitted, `details` self-resolves the
+  account via the session and caches it to `account_path` (default
+  `~/.config/tmdb-sync/account.json`), so later invocations don't need to repeat it.
+- `docs/account.md` reference page.
+
+### Changed
+
+- `consts.MediaTypeMovie`/`MediaTypeTV` added and reused in place of repeated string literals.
+
 ## [0.1.0] - 2026-09-16
 
 ### Added
