@@ -29,8 +29,8 @@ func (s *MoviesService) GetMovie(ctx context.Context, movieID int64) (*str.Movie
 }
 
 // getPopularMoviesPage fetches a single page of the popular-movies list.
-func (s *MoviesService) getPopularMoviesPage(ctx context.Context, page int) (*str.Movies, *str.Response, error) {
-	urlStr, err := uri.AddPage("movie/popular", page)
+func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
+	urlStr, err := uri.AddQuery("movie/popular", opts)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -55,7 +55,7 @@ func (s *MoviesService) getPopularMoviesPage(ctx context.Context, page int) (*st
 // the only real lever over how much gets fetched.
 func (s *MoviesService) GetPopularMovies(ctx context.Context, pagesLimit int) ([]str.Movie, error) {
 	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.Movie], error) {
-		movies, _, err := s.getPopularMoviesPage(ctx, page)
+		movies, _, err := s.getPopularMoviesPage(ctx, &uri.ListOptions{Page: page})
 		if err != nil {
 			return PageResult[str.Movie]{}, err
 		}
