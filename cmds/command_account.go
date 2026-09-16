@@ -26,12 +26,13 @@ var AccountCmd = &Command{
 
 func execAccount(fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("account", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: details, add-watchlist, add-favorite (required)")
+	action := flagSet.String("a", "", "action: details, add-watchlist, add-favorite, favorite-movies (required)")
 	accountID := flagSet.Int64("i", 0, "account id (optional: omit to self-resolve via the session and cache it)")
 	mediaType := flagSet.String("media-type", "", "media type: movie, tv - required for -a add-watchlist, add-favorite")
 	mediaID := flagSet.Int64("media-id", 0, "movie/tv id - required for -a add-watchlist, add-favorite")
 	watchlist := flagSet.Bool("watchlist", true, "used by -a add-watchlist: true adds, false removes")
 	favorite := flagSet.Bool("favorite", true, "used by -a add-favorite: true adds, false removes")
+	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a favorite-movies (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -49,7 +50,7 @@ func execAccount(fs afero.Fs, client *internal.Client, config *cfg.Config, optio
 	var params []string
 	switch *action {
 	case "":
-		return fmt.Errorf("account: -a is required (action: details, add-watchlist, add-favorite)")
+		return fmt.Errorf("account: -a is required (action: details, add-watchlist, add-favorite, favorite-movies)")
 	case "details":
 		handler = handlers.AccountDetailsHandler{AccountID: id, SessionID: options.Session.SessionID}
 		if id != 0 {
@@ -91,6 +92,12 @@ func execAccount(fs afero.Fs, client *internal.Client, config *cfg.Config, optio
 			Favorite:  *favorite,
 		}
 		params = []string{fmt.Sprintf("id-%d", id), *mediaType, fmt.Sprintf("media-%d", *mediaID)}
+	case "favorite-movies":
+		if id == 0 {
+			return fmt.Errorf("account: -i <account_id> is required for -a favorite-movies (or run -a details once to cache it)")
+		}
+		handler = handlers.AccountFavoriteMoviesHandler{AccountID: id, SessionID: options.Session.SessionID, PagesLimit: *pagesLimit}
+		params = []string{fmt.Sprintf("id-%d", id)}
 	default:
 		return fmt.Errorf("account: unknown action %q", *action)
 	}

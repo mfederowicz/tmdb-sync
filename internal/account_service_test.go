@@ -136,3 +136,33 @@ func TestAddRemoveFavorite(t *testing.T) {
 		t.Errorf("AddRemoveFavorite() Success = %v, want true", status.Success)
 	}
 }
+
+func TestGetFavoriteMovies(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/account/123/favorite/movies", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "abc123" {
+			t.Errorf("session_id query param = %q, want %q", got, "abc123")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          1,
+			"total_pages":   1,
+			"total_results": 1,
+			"results": []map[string]any{
+				{"id": 550, "title": "Fight Club"},
+			},
+		})
+	})
+
+	movies, err := client.Account.GetFavoriteMovies(context.Background(), 123, "abc123", 0)
+	if err != nil {
+		t.Fatalf("GetFavoriteMovies() error = %v", err)
+	}
+	if len(movies) != 1 || movies[0].ID != 550 {
+		t.Errorf("GetFavoriteMovies() = %+v, want one movie with ID=550", movies)
+	}
+}
