@@ -30,3 +30,6 @@ Notes:
   `watchlist-movies`, `watchlist-tv` all walk every page up to `-pages-limit` (default:
   `pages_limit` from config, `0` = unlimited), same as `movies -a popular`.
 - `acc` is the module's `Abbrev` — `tmdb-sync acc -a details` also works.
+- If TMDB reports the cached session as no longer valid (HTTP 401 — e.g. it expired or was
+  revoked from the TMDB website), the action transparently re-runs the browser-approval login
+  flow and retries once, instead of failing outright.

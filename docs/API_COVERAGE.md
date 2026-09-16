@@ -26,12 +26,18 @@ after the session-auth plumbing from phase 2 exists but before any account comma
 
 ## Authentication
 Used internally by the session flow (`internal/auth_service.go`, `cli/session.go`), not exposed as
-a CLI action — a future 🔒 module (e.g. `account`) triggers it on demand.
+a CLI action. `CreateRequestToken`/`CreateSession` back the `account` module's login flow
+(`cli.HandleToken`); `ValidateKey` backs a startup credentials preflight (`main.go`), and a 401
+from any `account` call now transparently re-triggers login via `cli.CreateSessionInteractively`
+(`cmds/command_account.go`'s `execAccountAttempt`). `DeleteSession` and `CreateGuestSession` are
+implemented and unit-tested but have no caller yet — left unchecked deliberately (not an
+oversight) until a real feature needs them, e.g. an explicit account-switch flow or guest-only
+rating support.
 - [ ] Create Guest Session — `GET /authentication/guest_session/new`
-- [ ] Create Request Token — `GET /authentication/token/new`
-- [ ] Create Session — `POST /authentication/session/new`
+- [x] Create Request Token — `GET /authentication/token/new`
+- [x] Create Session — `POST /authentication/session/new`
 - [ ] Delete Session (logout) — `DELETE /authentication/session`
-- [ ] Validate Key — `GET /authentication`
+- [x] Validate Key — `GET /authentication`
 
 ## Certifications
 - [x] Movie Certifications — `GET /certification/movie/list`

@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 
@@ -49,6 +50,11 @@ func main() {
 
 	client := internal.NewClient(nil)
 	client.UpdateHeaders(options.Headers)
+
+	if _, _, err := client.Auth.ValidateKey(context.Background()); err != nil {
+		printer.Printf("Error: invalid api_key/read_access_token: %v\n", err)
+		os.Exit(1)
+	}
 
 	if !cmds.ModulesRuntime(args, fs, config, client, options) {
 		os.Exit(1)
