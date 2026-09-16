@@ -13,11 +13,18 @@ import (
 // TMDB API. Every method requires a valid v3 session id.
 type AccountService Service
 
-// GetDetails fetches an account's details.
+// GetDetails fetches an account's details. If accountID is 0, it resolves
+// the account belonging to sessionID (TMDB's session-only GET /account form)
+// instead of requiring the id up front.
 //
 // Api docs: https://developer.themoviedb.org/reference/account-details
 func (s *AccountService) GetDetails(ctx context.Context, accountID int64, sessionID string) (*str.Account, *str.Response, error) {
-	urlStr, err := uri.AddQuery(fmt.Sprintf("account/%d", accountID), &uri.AccountOptions{SessionID: sessionID})
+	path := "account"
+	if accountID != 0 {
+		path = fmt.Sprintf("account/%d", accountID)
+	}
+
+	urlStr, err := uri.AddQuery(path, &uri.AccountOptions{SessionID: sessionID})
 	if err != nil {
 		return nil, nil, err
 	}
