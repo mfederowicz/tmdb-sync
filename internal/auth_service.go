@@ -13,6 +13,8 @@ import (
 type AuthService Service
 
 // CreateRequestToken requests a new, unapproved request token.
+//
+// Api docs: https://developer.themoviedb.org/reference/authentication-create-request-token
 func (s *AuthService) CreateRequestToken(ctx context.Context) (*str.RequestToken, *str.Response, error) {
 	req, err := s.client.NewRequest(http.MethodGet, "authentication/token/new", nil)
 	if err != nil {
@@ -29,6 +31,8 @@ func (s *AuthService) CreateRequestToken(ctx context.Context) (*str.RequestToken
 }
 
 // CreateSession exchanges an approved request token for a session id.
+//
+// Api docs: https://developer.themoviedb.org/reference/authentication-create-session
 func (s *AuthService) CreateSession(ctx context.Context, requestToken string) (*str.Session, *str.Response, error) {
 	body := struct {
 		RequestToken string `json:"request_token"`
@@ -49,6 +53,8 @@ func (s *AuthService) CreateSession(ctx context.Context, requestToken string) (*
 }
 
 // ValidateKey confirms the configured api_key/read_access_token is valid.
+//
+// Api docs: https://developer.themoviedb.org/reference/authentication-valid-key
 func (s *AuthService) ValidateKey(ctx context.Context) (*str.AuthStatus, *str.Response, error) {
 	req, err := s.client.NewRequest(http.MethodGet, "authentication", nil)
 	if err != nil {
@@ -66,6 +72,8 @@ func (s *AuthService) ValidateKey(ctx context.Context) (*str.AuthStatus, *str.Re
 
 // CreateGuestSession requests a new guest session (no login required, used
 // for temporary rating without a full account session).
+//
+// Api docs: https://developer.themoviedb.org/reference/authentication-create-guest-session
 func (s *AuthService) CreateGuestSession(ctx context.Context) (*str.GuestSession, *str.Response, error) {
 	req, err := s.client.NewRequest(http.MethodGet, "authentication/guest_session/new", nil)
 	if err != nil {
@@ -82,6 +90,8 @@ func (s *AuthService) CreateGuestSession(ctx context.Context) (*str.GuestSession
 }
 
 // DeleteSession logs out by invalidating a session id.
+//
+// Api docs: https://developer.themoviedb.org/reference/authentication-delete-session
 func (s *AuthService) DeleteSession(ctx context.Context, sessionID string) (*str.AuthStatus, *str.Response, error) {
 	body := struct {
 		SessionID string `json:"session_id"`

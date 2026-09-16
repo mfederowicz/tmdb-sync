@@ -11,6 +11,8 @@ import (
 type ConfigurationService Service
 
 // GetAPIConfiguration returns TMDB's image base URLs/sizes and change keys.
+//
+// Api docs: https://developer.themoviedb.org/reference/configuration-details
 func (s *ConfigurationService) GetAPIConfiguration(ctx context.Context) (*str.Configuration, *str.Response, error) {
 	req, err := s.client.NewRequest(http.MethodGet, "configuration", nil)
 	if err != nil {
