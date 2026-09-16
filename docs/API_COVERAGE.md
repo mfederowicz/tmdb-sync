@@ -13,7 +13,7 @@ after the session-auth plumbing from phase 2 exists but before any account comma
 
 ## Account 🔒
 - [x] Details — `GET /account/{account_id}`
-- [ ] Add to Watchlist — `POST /account/{account_id}/watchlist`
+- [x] Add to Watchlist — `POST /account/{account_id}/watchlist`
 - [ ] Add/Remove Favorite — `POST /account/{account_id}/favorite`
 - [ ] Get Favorite Movies — `GET /account/{account_id}/favorite/movies`
 - [ ] Get Favorite TV Shows — `GET /account/{account_id}/favorite/tv`

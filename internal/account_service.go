@@ -42,3 +42,26 @@ func (s *AccountService) GetDetails(ctx context.Context, accountID int64, sessio
 
 	return account, resp, nil
 }
+
+// AddToWatchlist adds or removes a movie/TV show from an account's watchlist.
+//
+// Api docs: https://developer.themoviedb.org/reference/account-add-to-watchlist
+func (s *AccountService) AddToWatchlist(ctx context.Context, accountID int64, sessionID string, body *str.AccountWatchlistRequest) (*str.AuthStatus, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("account/%d/watchlist", accountID), &uri.AccountOptions{SessionID: sessionID})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodPost, urlStr, body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	status := new(str.AuthStatus)
+	resp, err := s.client.Do(ctx, req, status)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return status, resp, nil
+}

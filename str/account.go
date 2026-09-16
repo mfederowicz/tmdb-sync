@@ -26,3 +26,10 @@ type AccountGravatar struct {
 type AccountTmdb struct {
 	AvatarPath *string `json:"avatar_path"`
 }
+
+// AccountWatchlistRequest is the body of POST /account/{account_id}/watchlist.
+type AccountWatchlistRequest struct {
+	MediaType string `json:"media_type"`
+	MediaID   int64  `json:"media_id"`
+	Watchlist bool   `json:"watchlist"`
+}

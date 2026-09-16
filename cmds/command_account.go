@@ -25,8 +25,11 @@ var AccountCmd = &Command{
 
 func execAccount(fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("account", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: details (required)")
-	accountID := flagSet.Int64("i", 0, "account id (optional for -a details: omit to self-resolve via the session and cache it)")
+	action := flagSet.String("a", "", "action: details, add-watchlist (required)")
+	accountID := flagSet.Int64("i", 0, "account id (optional: omit to self-resolve via the session and cache it)")
+	mediaType := flagSet.String("media-type", "", "media type: movie, tv - required for -a add-watchlist")
+	mediaID := flagSet.Int64("media-id", 0, "movie/tv id - required for -a add-watchlist")
+	watchlist := flagSet.Bool("watchlist", true, "used by -a add-watchlist: true adds, false removes")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -44,12 +47,30 @@ func execAccount(fs afero.Fs, client *internal.Client, config *cfg.Config, optio
 	var params []string
 	switch *action {
 	case "":
-		return fmt.Errorf("account: -a is required (action: details)")
+		return fmt.Errorf("account: -a is required (action: details, add-watchlist)")
 	case "details":
 		handler = handlers.AccountDetailsHandler{AccountID: id, SessionID: options.Session.SessionID}
 		if id != 0 {
 			params = []string{fmt.Sprintf("id-%d", id)}
 		}
+	case "add-watchlist":
+		if id == 0 {
+			return fmt.Errorf("account: -i <account_id> is required for -a add-watchlist (or run -a details once to cache it)")
+		}
+		if *mediaType != "movie" && *mediaType != "tv" {
+			return fmt.Errorf("account: -media-type must be movie or tv for -a add-watchlist")
+		}
+		if *mediaID == 0 {
+			return fmt.Errorf("account: -media-id is required for -a add-watchlist")
+		}
+		handler = handlers.AccountWatchlistHandler{
+			AccountID: id,
+			SessionID: options.Session.SessionID,
+			MediaType: *mediaType,
+			MediaID:   *mediaID,
+			Watchlist: *watchlist,
+		}
+		params = []string{fmt.Sprintf("id-%d", id), *mediaType, fmt.Sprintf("media-%d", *mediaID)}
 	default:
 		return fmt.Errorf("account: unknown action %q", *action)
 	}
