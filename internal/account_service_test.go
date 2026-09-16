@@ -226,3 +226,33 @@ func TestGetLists(t *testing.T) {
 		t.Errorf("GetLists() = %+v, want one list with ID=42 Name=\"My List\"", lists)
 	}
 }
+
+func TestGetRatedMovies(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/account/123/rated/movies", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "abc123" {
+			t.Errorf("session_id query param = %q, want %q", got, "abc123")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          1,
+			"total_pages":   1,
+			"total_results": 1,
+			"results": []map[string]any{
+				{"id": 550, "title": "Fight Club", "rating": 8.5},
+			},
+		})
+	})
+
+	movies, err := client.Account.GetRatedMovies(context.Background(), 123, "abc123", 0)
+	if err != nil {
+		t.Fatalf("GetRatedMovies() error = %v", err)
+	}
+	if len(movies) != 1 || movies[0].ID != 550 || movies[0].Rating != 8.5 {
+		t.Errorf("GetRatedMovies() = %+v, want one movie with ID=550 Rating=8.5", movies)
+	}
+}

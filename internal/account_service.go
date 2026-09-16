@@ -181,6 +181,44 @@ func (s *AccountService) GetLists(ctx context.Context, accountID int64, sessionI
 	})
 }
 
+func (s *AccountService) getRatedMoviesPage(ctx context.Context, accountID int64, sessionID string, page int) (*str.RatedMovies, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("account/%d/rated/movies", accountID), &uri.AccountListOptions{SessionID: sessionID, Page: page})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	movies := new(str.RatedMovies)
+	resp, err := s.client.Do(ctx, req, movies)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return movies, resp, nil
+}
+
+// GetRatedMovies returns an account's rated movies, walking pages until TMDB
+// reports no more (total_pages) or pagesLimit is reached (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/account-rated-movies
+func (s *AccountService) GetRatedMovies(ctx context.Context, accountID int64, sessionID string, pagesLimit int) ([]str.RatedMovie, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.RatedMovie], error) {
+		movies, _, err := s.getRatedMoviesPage(ctx, accountID, sessionID, page)
+		if err != nil {
+			return PageResult[str.RatedMovie]{}, err
+		}
+		return PageResult[str.RatedMovie]{
+			Results:    movies.Results,
+			Page:       movies.Page,
+			TotalPages: movies.TotalPages,
+		}, nil
+	})
+}
+
 // AddRemoveFavorite marks or unmarks a movie/TV show as one of an account's favorites.
 //
 // Api docs: https://developer.themoviedb.org/reference/account-add-favorite
