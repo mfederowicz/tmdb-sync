@@ -5,14 +5,21 @@ aiming for full TMDB v3 API coverage, one module at a time.
 
 ## Status
 
-📋 **Documentation phase.** Scope, architecture, and the full TMDB v3 endpoint checklist are
-written up in [`docs/`](docs/); no Go source exists yet. See:
+🚧 **In progress**, one module at a time. Implemented so far:
+
+- [`authentication`](docs/authentication.md) ✅ — validate key, request tokens, sessions, guest sessions.
+- [`certifications`](docs/certifications.md) ✅ — movie/tv certifications, by country.
+- [`configuration`](docs/configuration.md) ✅ — image base URLs/sizes, countries, jobs, languages,
+  primary translations, timezones.
+- `movies` 🚧 — `details`, `popular` implemented; the rest of the module is still planned.
+
+See:
 
 - [`docs/PRD.md`](docs/PRD.md) — goals, non-goals, scope phases, success criteria.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — package layout and how new modules get added.
 - [`docs/API_COVERAGE.md`](docs/API_COVERAGE.md) — checklist of every TMDB v3 endpoint, tracked
   as work lands.
-- [`docs/CLI.md`](docs/CLI.md) — planned command/config shape.
+- [`docs/CLI.md`](docs/CLI.md) — full command/config reference.
 - [`AGENTS.md`](AGENTS.md) — instructions for coding agents working in this repo.
 
 ## Goal
@@ -21,7 +28,7 @@ Near-100% coverage of the TMDB **v3** API (movies, tv, people, search, discover,
 account, etc.) from a single Go binary configured with one TOML file, with TMDB **v4** auth and
 v4-only endpoints planned as a later, additive phase.
 
-## Planned install & usage
+## Install & usage
 
 ```sh
 go install github.com/mfederowicz/tmdb-sync@latest
@@ -34,11 +41,10 @@ session_path = "~/.config/tmdb-sync/session.json"
 ```
 
 ```sh
-tmdb-sync movies -a popular -p 1
+tmdb-sync certifications -a movie
 ```
 
-See [`docs/CLI.md`](docs/CLI.md) for the full planned command reference — this will be kept in
-sync as modules are actually implemented.
+See [`docs/CLI.md`](docs/CLI.md) for the full command reference, kept in sync as modules land.
 
 ## Development
 

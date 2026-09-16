@@ -50,12 +50,12 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | module            | actions (examples)                          |
 |-------------------|----------------------------------------------|
 | `account`         | 🔒 `details`, `favorites`, `watchlist`, `rated`, `lists`, `add-favorite`, `add-watchlist` |
-| `authentication` ✅| `validate-key`, `create-request-token`, `create-session` (🔒 interactive browser approval), `create-guest-session`, `delete-session -s <session_id>` |
-| `certifications` ✅| `movie`, `tv` |
+| `authentication` ✅ ([docs](authentication.md)) | `validate-key`, `create-request-token`, `create-session` (🔒 interactive browser approval), `create-guest-session`, `delete-session -s <session_id>` |
+| `certifications` ✅ ([docs](certifications.md)) | `movie`, `tv` |
 | `changes`         | `movie`, `tv`, `person` |
 | `collections`     | `details -i <id>`, `images -i <id>`, `translations -i <id>` |
 | `companies`       | `details -i <id>`, `images -i <id>` |
-| `configuration` ✅ | `details`, `countries`, `languages`, `jobs`, `timezones`, `primary-translations` |
+| `configuration` ✅ ([docs](configuration.md)) | `details`, `countries`, `languages`, `jobs`, `timezones`, `primary-translations` |
 | `credits`         | `details -i <credit_id>` |
 | `discover`        | `movie [filters]`, `tv [filters]` |
 | `find`            | `-i <external_id> --source <imdb_id\|tvdb_id\|...>` |
