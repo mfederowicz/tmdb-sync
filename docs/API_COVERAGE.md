@@ -52,11 +52,11 @@ after the session-auth plumbing from phase 2 exists but before any account comma
 
 ## Configuration
 - [x] Details — `GET /configuration`
-- [ ] Countries — `GET /configuration/countries`
-- [ ] Jobs — `GET /configuration/jobs`
-- [ ] Languages — `GET /configuration/languages`
-- [ ] Primary Translations — `GET /configuration/primary_translations`
-- [ ] Timezones — `GET /configuration/timezones`
+- [x] Countries — `GET /configuration/countries`
+- [x] Jobs — `GET /configuration/jobs`
+- [x] Languages — `GET /configuration/languages`
+- [x] Primary Translations — `GET /configuration/primary_translations`
+- [x] Timezones — `GET /configuration/timezones`
 
 ## Credits
 - [ ] Details — `GET /credit/{credit_id}`
