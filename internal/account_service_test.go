@@ -196,3 +196,33 @@ func TestGetFavoriteTV(t *testing.T) {
 		t.Errorf("GetFavoriteTV() = %+v, want one show with ID=1396", shows)
 	}
 }
+
+func TestGetLists(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/account/123/lists", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "abc123" {
+			t.Errorf("session_id query param = %q, want %q", got, "abc123")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          1,
+			"total_pages":   1,
+			"total_results": 1,
+			"results": []map[string]any{
+				{"id": 42, "name": "My List", "item_count": 5},
+			},
+		})
+	})
+
+	lists, err := client.Account.GetLists(context.Background(), 123, "abc123", 0)
+	if err != nil {
+		t.Fatalf("GetLists() error = %v", err)
+	}
+	if len(lists) != 1 || lists[0].ID != 42 || lists[0].Name != "My List" {
+		t.Errorf("GetLists() = %+v, want one list with ID=42 Name=\"My List\"", lists)
+	}
+}

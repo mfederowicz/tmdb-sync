@@ -40,3 +40,24 @@ type AccountFavoriteRequest struct {
 	MediaID   int64  `json:"media_id"`
 	Favorite  bool   `json:"favorite"`
 }
+
+// AccountList is one of an account's custom lists, as returned by
+// GET /account/{account_id}/lists.
+type AccountList struct {
+	Description   string `json:"description"`
+	FavoriteCount int    `json:"favorite_count"`
+	ID            int64  `json:"id"`
+	ItemCount     int    `json:"item_count"`
+	ISO6391       string `json:"iso_639_1"`
+	ListType      string `json:"list_type"`
+	Name          string `json:"name"`
+	PosterPath    string `json:"poster_path"`
+}
+
+// AccountLists is a paginated list of an account's custom lists.
+type AccountLists struct {
+	Page         int           `json:"page"`
+	Results      []AccountList `json:"results"`
+	TotalPages   int           `json:"total_pages"`
+	TotalResults int           `json:"total_results"`
+}

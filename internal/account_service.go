@@ -143,6 +143,44 @@ func (s *AccountService) GetFavoriteTV(ctx context.Context, accountID int64, ses
 	})
 }
 
+func (s *AccountService) getListsPage(ctx context.Context, accountID int64, sessionID string, page int) (*str.AccountLists, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("account/%d/lists", accountID), &uri.AccountListOptions{SessionID: sessionID, Page: page})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	lists := new(str.AccountLists)
+	resp, err := s.client.Do(ctx, req, lists)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return lists, resp, nil
+}
+
+// GetLists returns an account's custom lists, walking pages until TMDB
+// reports no more (total_pages) or pagesLimit is reached (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/account-lists
+func (s *AccountService) GetLists(ctx context.Context, accountID int64, sessionID string, pagesLimit int) ([]str.AccountList, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.AccountList], error) {
+		lists, _, err := s.getListsPage(ctx, accountID, sessionID, page)
+		if err != nil {
+			return PageResult[str.AccountList]{}, err
+		}
+		return PageResult[str.AccountList]{
+			Results:    lists.Results,
+			Page:       lists.Page,
+			TotalPages: lists.TotalPages,
+		}, nil
+	})
+}
+
 // AddRemoveFavorite marks or unmarks a movie/TV show as one of an account's favorites.
 //
 // Api docs: https://developer.themoviedb.org/reference/account-add-favorite
