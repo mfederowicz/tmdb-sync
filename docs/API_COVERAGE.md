@@ -25,11 +25,13 @@ after the session-auth plumbing from phase 2 exists but before any account comma
 - [ ] Get Watchlist TV Shows — `GET /account/{account_id}/watchlist/tv`
 
 ## Authentication
-- [x] Create Guest Session — `GET /authentication/guest_session/new`
-- [x] Create Request Token — `GET /authentication/token/new`
-- [x] Create Session — `POST /authentication/session/new`
-- [x] Delete Session (logout) — `DELETE /authentication/session`
-- [x] Validate Key — `GET /authentication`
+Used internally by the session flow (`internal/auth_service.go`, `cli/session.go`), not exposed as
+a CLI action — a future 🔒 module (e.g. `account`) triggers it on demand.
+- [ ] Create Guest Session — `GET /authentication/guest_session/new`
+- [ ] Create Request Token — `GET /authentication/token/new`
+- [ ] Create Session — `POST /authentication/session/new`
+- [ ] Delete Session (logout) — `DELETE /authentication/session`
+- [ ] Validate Key — `GET /authentication`
 
 ## Certifications
 - [x] Movie Certifications — `GET /certification/movie/list`
