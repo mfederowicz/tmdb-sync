@@ -12,7 +12,7 @@ Account endpoints (marked 🔒) require a v3 session (`session_id`) — implemen
 after the session-auth plumbing from phase 2 exists but before any account command is wired up.
 
 ## Account 🔒
-- [ ] Details — `GET /account/{account_id}`
+- [x] Details — `GET /account/{account_id}`
 - [ ] Add to Watchlist — `POST /account/{account_id}/watchlist`
 - [ ] Add/Remove Favorite — `POST /account/{account_id}/favorite`
 - [ ] Get Favorite Movies — `GET /account/{account_id}/favorite/movies`

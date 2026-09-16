@@ -43,6 +43,7 @@ type Client struct {
 	AuthURL        *url.URL
 	headers        map[string]any
 	common         Service
+	Account        *AccountService
 	Auth           *AuthService
 	Certifications *CertificationsService
 	Configuration  *ConfigurationService
@@ -79,6 +80,7 @@ func (c *Client) initialize() {
 		c.BaseURL, _ = url.Parse(BaseURL)
 	}
 	c.common.client = c
+	c.Account = (*AccountService)(&c.common)
 	c.Auth = (*AuthService)(&c.common)
 	c.Certifications = (*CertificationsService)(&c.common)
 	c.Configuration = (*ConfigurationService)(&c.common)
