@@ -9,7 +9,7 @@ BUILDER ?= Makefile
 VERSION_FLAGS := -X "github.com/mfederowicz/tmdb-sync/cli.date=$(DATE)" -X "github.com/mfederowicz/tmdb-sync/cli.builtBy=$(BUILDER)" -X "github.com/mfederowicz/tmdb-sync/cli.version=$(GIT_VERSION)"
 
 install:
-	@go mod vendor
+	@go mod download
 
 build:
 	@go build -ldflags='$(VERSION_FLAGS)'
