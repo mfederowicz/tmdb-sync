@@ -18,6 +18,14 @@ schedule.
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [0.1.0] - 2026-09-16
+
+### Added
+
 - `configuration` module: `countries`, `jobs`, `languages`, `primary-translations`, `timezones`
   actions (in addition to the existing `details`).
 - `-pages-limit` flag on `movies -a popular` to override `pages_limit` per-invocation.
