@@ -286,3 +286,93 @@ func TestGetRatedTV(t *testing.T) {
 		t.Errorf("GetRatedTV() = %+v, want one show with ID=1396 Rating=9.5", shows)
 	}
 }
+
+func TestGetRatedTVEpisodes(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/account/123/rated/tv/episodes", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "abc123" {
+			t.Errorf("session_id query param = %q, want %q", got, "abc123")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          1,
+			"total_pages":   1,
+			"total_results": 1,
+			"results": []map[string]any{
+				{"id": 64782, "name": "The Workplace Proximity", "show_id": 1418, "rating": 8.0},
+			},
+		})
+	})
+
+	episodes, err := client.Account.GetRatedTVEpisodes(context.Background(), 123, "abc123", 0)
+	if err != nil {
+		t.Fatalf("GetRatedTVEpisodes() error = %v", err)
+	}
+	if len(episodes) != 1 || episodes[0].ID != 64782 || episodes[0].ShowID != 1418 || episodes[0].Rating != 8.0 {
+		t.Errorf("GetRatedTVEpisodes() = %+v, want one episode with ID=64782 ShowID=1418 Rating=8.0", episodes)
+	}
+}
+
+func TestGetWatchlistMovies(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/account/123/watchlist/movies", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "abc123" {
+			t.Errorf("session_id query param = %q, want %q", got, "abc123")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          1,
+			"total_pages":   1,
+			"total_results": 1,
+			"results": []map[string]any{
+				{"id": 550, "title": "Fight Club"},
+			},
+		})
+	})
+
+	movies, err := client.Account.GetWatchlistMovies(context.Background(), 123, "abc123", 0)
+	if err != nil {
+		t.Fatalf("GetWatchlistMovies() error = %v", err)
+	}
+	if len(movies) != 1 || movies[0].ID != 550 {
+		t.Errorf("GetWatchlistMovies() = %+v, want one movie with ID=550", movies)
+	}
+}
+
+func TestGetWatchlistTV(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/account/123/watchlist/tv", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "abc123" {
+			t.Errorf("session_id query param = %q, want %q", got, "abc123")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          1,
+			"total_pages":   1,
+			"total_results": 1,
+			"results": []map[string]any{
+				{"id": 1396, "name": "Breaking Bad"},
+			},
+		})
+	})
+
+	shows, err := client.Account.GetWatchlistTV(context.Background(), 123, "abc123", 0)
+	if err != nil {
+		t.Fatalf("GetWatchlistTV() error = %v", err)
+	}
+	if len(shows) != 1 || shows[0].ID != 1396 {
+		t.Errorf("GetWatchlistTV() = %+v, want one show with ID=1396", shows)
+	}
+}

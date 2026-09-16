@@ -20,9 +20,9 @@ after the session-auth plumbing from phase 2 exists but before any account comma
 - [x] Get Lists — `GET /account/{account_id}/lists`
 - [x] Get Rated Movies — `GET /account/{account_id}/rated/movies`
 - [x] Get Rated TV Shows — `GET /account/{account_id}/rated/tv`
-- [ ] Get Rated TV Episodes — `GET /account/{account_id}/rated/tv/episodes`
-- [ ] Get Watchlist Movies — `GET /account/{account_id}/watchlist/movies`
-- [ ] Get Watchlist TV Shows — `GET /account/{account_id}/watchlist/tv`
+- [x] Get Rated TV Episodes — `GET /account/{account_id}/rated/tv/episodes`
+- [x] Get Watchlist Movies — `GET /account/{account_id}/watchlist/movies`
+- [x] Get Watchlist TV Shows — `GET /account/{account_id}/watchlist/tv`
 
 ## Authentication
 Used internally by the session flow (`internal/auth_service.go`, `cli/session.go`), not exposed as
