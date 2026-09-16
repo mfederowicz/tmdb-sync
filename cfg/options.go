@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/mfederowicz/tmdb-sync/consts"
 	"github.com/mfederowicz/tmdb-sync/internal"
 	"github.com/mfederowicz/tmdb-sync/str"
 
@@ -15,7 +16,7 @@ import (
 func OptionsFromConfig(fs afero.Fs, config *Config) (*str.Options, error) {
 	headers := map[string]any{}
 	if len(config.ReadAccessToken) > 0 {
-		headers["Authorization"] = fmt.Sprintf("Bearer %s", config.ReadAccessToken)
+		headers[consts.HeaderAuthorization] = fmt.Sprintf("Bearer %s", config.ReadAccessToken)
 	} else if len(config.APIKey) > 0 {
 		headers[internal.APIKeyParam] = config.APIKey
 	}
@@ -59,7 +60,7 @@ func WriteSession(fs afero.Fs, path string, session *str.Session) error {
 	if err != nil {
 		return err
 	}
-	return afero.WriteFile(fs, path, data, 0o644)
+	return afero.WriteFile(fs, path, data, consts.X644)
 }
 
 func readAccount(fs afero.Fs, path string) (*str.Account, error) {
@@ -84,5 +85,5 @@ func WriteAccount(fs afero.Fs, path string, account *str.Account) error {
 	if err != nil {
 		return err
 	}
-	return afero.WriteFile(fs, path, data, 0o644)
+	return afero.WriteFile(fs, path, data, consts.X644)
 }

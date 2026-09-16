@@ -7,6 +7,7 @@ import (
 
 	"github.com/mfederowicz/tmdb-sync/cfg"
 	"github.com/mfederowicz/tmdb-sync/cli"
+	"github.com/mfederowicz/tmdb-sync/consts"
 	"github.com/mfederowicz/tmdb-sync/handlers"
 	"github.com/mfederowicz/tmdb-sync/internal"
 	"github.com/spf13/afero"
@@ -58,7 +59,7 @@ func execAccount(fs afero.Fs, client *internal.Client, config *cfg.Config, optio
 		if id == 0 {
 			return fmt.Errorf("account: -i <account_id> is required for -a add-watchlist (or run -a details once to cache it)")
 		}
-		if *mediaType != "movie" && *mediaType != "tv" {
+		if *mediaType != consts.MediaTypeMovie && *mediaType != consts.MediaTypeTV {
 			return fmt.Errorf("account: -media-type must be movie or tv for -a add-watchlist")
 		}
 		if *mediaID == 0 {
@@ -76,7 +77,7 @@ func execAccount(fs afero.Fs, client *internal.Client, config *cfg.Config, optio
 		if id == 0 {
 			return fmt.Errorf("account: -i <account_id> is required for -a add-favorite (or run -a details once to cache it)")
 		}
-		if *mediaType != "movie" && *mediaType != "tv" {
+		if *mediaType != consts.MediaTypeMovie && *mediaType != consts.MediaTypeTV {
 			return fmt.Errorf("account: -media-type must be movie or tv for -a add-favorite")
 		}
 		if *mediaID == 0 {
