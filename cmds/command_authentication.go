@@ -24,10 +24,14 @@ var AuthenticationCmd = &Command{
 
 func execAuthentication(fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("authentication", flag.ContinueOnError)
-	action := flagSet.String("a", "validate-key", "action: validate-key, create-request-token, create-session, create-guest-session, delete-session")
+	action := flagSet.String("a", "", "action: validate-key, create-request-token, create-session, create-guest-session, delete-session (required)")
 	sessionID := flagSet.String("s", "", "session id, used by -a delete-session (default: the persisted session)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
+	}
+
+	if *action == "" {
+		return fmt.Errorf("authentication: -a is required (action: validate-key, create-request-token, create-session, create-guest-session, delete-session)")
 	}
 
 	// create-session and delete-session need fs/config/options beyond what

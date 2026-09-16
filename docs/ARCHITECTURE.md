@@ -41,7 +41,7 @@ If in doubt about a pattern, follow the existing shape rather than inventing som
   `browser.go` (best-effort OS-specific browser launch + "press enter" wait), `version.go`.
 - `cmds/` + `handlers/` — command dispatch.
   - `cmds.Command{Name, Abbrev, Short, Exec}`; `cmds.ModulesRuntime` resolves the first CLI arg to
-    a command by exact `Abbrev` or unambiguous `Name` prefix. `Commands` (the registry) is built
+    a command by exact `Name` or exact `Abbrev` match only (no prefix matching). `Commands` (the registry) is built
     inside `runtime.go`'s `init()`, **not** a package-level var literal — a literal creates an
     initialization-order cycle with `HelpCmd`/`HelpFunc` (`HelpFunc` prints `Commands`).
   - Each `cmds/command_<module>.go` owns its own `flag.FlagSet` for that module's action args
@@ -142,7 +142,7 @@ switch already reserved in `Config`), never edits to the v3 files above.
   `afero.NewMemMapFs()` — no real filesystem I/O.
 - `internal`: `httptest.Server`-backed tests per service method (request shape, header/query auth,
   JSON decoding, error mapping). This is the main safety net per new module.
-- `cmds`: dispatch resolution (`ModulesRuntime` exact/abbrev/prefix/ambiguous matching) using a
+- `cmds`: dispatch resolution (`ModulesRuntime` exact name/abbrev matching, unknown command) using a
   fake `Commands` slice and `printer.Stdout` swapped to a buffer.
 - No integration tests against the real TMDB API (would require a real key); rely on `httptest`
   mocks plus manual smoke testing during development.

@@ -23,13 +23,15 @@ var CertificationsCmd = &Command{
 
 func execCertifications(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("certifications", flag.ContinueOnError)
-	action := flagSet.String("a", "movie", "action: movie, tv")
+	action := flagSet.String("a", "", "action: movie, tv (required)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
 	var handler handlers.Handler
 	switch *action {
+	case "":
+		return fmt.Errorf("certifications: -a is required (action: movie, tv)")
 	case "movie":
 		handler = handlers.CertificationsMovieHandler{}
 	case "tv":

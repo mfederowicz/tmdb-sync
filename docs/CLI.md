@@ -40,8 +40,8 @@ pages_limit = 10       # cap on pages walked by -all; 0 = unlimited (bounded by 
 tmdb-sync <module> -a <action> [module-specific flags]
 ```
 
-`<module>` may be an unambiguous prefix of a module name. Running with no
-args, or `tmdb-sync help`, lists all modules.
+`<module>` must be a module's exact name or its abbreviation (see the table below). Running with
+no args, or `tmdb-sync help`, lists all modules.
 
 ## Modules (see API_COVERAGE.md for the full endpoint list per module)
 
