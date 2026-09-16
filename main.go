@@ -3,6 +3,7 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	"github.com/mfederowicz/tmdb-sync/cfg"
 	"github.com/mfederowicz/tmdb-sync/cli"
@@ -37,19 +38,21 @@ func main() {
 	config, err := cfg.InitConfig(fs)
 	if err != nil {
 		printer.Printf("Error: %v\n", err)
-		return
+		os.Exit(1)
 	}
 
 	options, err := cfg.OptionsFromConfig(fs, config)
 	if err != nil {
 		printer.Printf("Error: %v\n", err)
-		return
+		os.Exit(1)
 	}
 
 	client := internal.NewClient(nil)
 	client.UpdateHeaders(options.Headers)
 
-	cmds.ModulesRuntime(args, fs, config, client, options)
+	if !cmds.ModulesRuntime(args, fs, config, client, options) {
+		os.Exit(1)
+	}
 }
 
 func handleArgs() ([]string, bool) {

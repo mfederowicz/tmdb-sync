@@ -2,7 +2,6 @@ package cmds
 
 import (
 	"flag"
-	"strings"
 
 	"github.com/mfederowicz/tmdb-sync/cfg"
 	"github.com/mfederowicz/tmdb-sync/internal"
@@ -32,36 +31,27 @@ const (
 	notFound = 0
 )
 
-func runFoundedModule(cmd *Command, fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string) {
+func runFoundedModule(cmd *Command, fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string) bool {
 	if err := cmd.Exec(fs, client, config, options, args); err != nil {
 		printer.Println(err)
+		return false
 	}
+	return true
 }
 
-// ModulesRuntime core function for process commands
-func ModulesRuntime(args []string, fs afero.Fs, config *cfg.Config, client *internal.Client, options *str.Options) {
-	var found []*Command
+// ModulesRuntime core function for process commands. It returns false when
+// the command failed (unknown module or a module-level error), so main can
+// exit with a non-zero status.
+func ModulesRuntime(args []string, fs afero.Fs, config *cfg.Config, client *internal.Client, options *str.Options) bool {
 	sub, args := args[notFound], args[foundOne:]
 
-find:
 	for _, cmd := range Commands {
-		if sub == cmd.Abbrev {
-			found = []*Command{cmd}
-			break find
-		}
-		if strings.HasPrefix(cmd.Name, sub) {
-			found = append(found, cmd)
+		if sub == cmd.Name || sub == cmd.Abbrev {
+			return runFoundedModule(cmd, fs, client, config, options, args)
 		}
 	}
 
-	switch cnt := len(found); cnt {
-	case foundOne:
-		runFoundedModule(found[0], fs, client, config, options, args)
-	case notFound:
-		printer.Printf("error: unknown command %q\n\n", sub)
-		flag.Usage()
-	default:
-		printer.Printf("error: non-unique command prefix %q (matched %d commands)\n\n", sub, cnt)
-		flag.Usage()
-	}
+	printer.Printf("error: unknown command %q\n\n", sub)
+	flag.Usage()
+	return false
 }

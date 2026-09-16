@@ -43,21 +43,35 @@ func TestModulesRuntime_UnknownCommand(t *testing.T) {
 	}
 }
 
-func TestModulesRuntime_AmbiguousPrefix(t *testing.T) {
+func TestModulesRuntime_RejectsPartialPrefix(t *testing.T) {
 	old := flag.Usage
 	flag.Usage = func() {}
 	defer func() { flag.Usage = old }()
 
 	Commands = []*Command{
-		{Name: "movies", Abbrev: "m1", Exec: noopExec},
-		{Name: "moviesalt", Abbrev: "m2", Exec: noopExec},
+		{Name: "movies", Abbrev: "m", Exec: noopExec},
 	}
 
 	out := captureOutput(func() {
 		ModulesRuntime([]string{"movi"}, afero.NewMemMapFs(), nil, nil, nil)
 	})
 	if out == "" {
-		t.Fatal("expected a 'non-unique command prefix' message to be printed")
+		t.Fatal("expected an 'unknown command' message to be printed for a partial prefix")
+	}
+}
+
+func TestModulesRuntime_ResolvesByExactName(t *testing.T) {
+	var got []string
+	Commands = []*Command{
+		{Name: "movies", Abbrev: "m", Exec: func(_ afero.Fs, _ *internal.Client, _ *cfg.Config, _ *str.Options, args []string) error {
+			got = args
+			return nil
+		}},
+	}
+
+	ModulesRuntime([]string{"movies", "-a", "popular"}, afero.NewMemMapFs(), nil, nil, nil)
+	if len(got) != 2 || got[0] != "-a" || got[1] != "popular" {
+		t.Errorf("args passed to Exec = %v, want [-a popular]", got)
 	}
 }
 

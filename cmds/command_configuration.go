@@ -23,15 +23,27 @@ var ConfigurationCmd = &Command{
 
 func execConfiguration(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("configuration", flag.ContinueOnError)
-	action := flagSet.String("a", "details", "action: details")
+	action := flagSet.String("a", "", "action: details, countries, jobs, languages, primary-translations, timezones (required)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
 	var handler handlers.Handler
 	switch *action {
+	case "":
+		return fmt.Errorf("configuration: -a is required (action: details, countries, jobs, languages, primary-translations, timezones)")
 	case "details":
 		handler = handlers.ConfigurationDetailsHandler{}
+	case "countries":
+		handler = handlers.ConfigurationCountriesHandler{}
+	case "jobs":
+		handler = handlers.ConfigurationJobsHandler{}
+	case "languages":
+		handler = handlers.ConfigurationLanguagesHandler{}
+	case "primary-translations":
+		handler = handlers.ConfigurationPrimaryTranslationsHandler{}
+	case "timezones":
+		handler = handlers.ConfigurationTimezonesHandler{}
 	default:
 		return fmt.Errorf("configuration: unknown action %q", *action)
 	}
