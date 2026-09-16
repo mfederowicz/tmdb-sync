@@ -65,3 +65,26 @@ func (s *AccountService) AddToWatchlist(ctx context.Context, accountID int64, se
 
 	return status, resp, nil
 }
+
+// AddRemoveFavorite marks or unmarks a movie/TV show as one of an account's favorites.
+//
+// Api docs: https://developer.themoviedb.org/reference/account-add-favorite
+func (s *AccountService) AddRemoveFavorite(ctx context.Context, accountID int64, sessionID string, body *str.AccountFavoriteRequest) (*str.AuthStatus, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("account/%d/favorite", accountID), &uri.AccountOptions{SessionID: sessionID})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodPost, urlStr, body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	status := new(str.AuthStatus)
+	resp, err := s.client.Do(ctx, req, status)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return status, resp, nil
+}

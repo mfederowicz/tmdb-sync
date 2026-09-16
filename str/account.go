@@ -33,3 +33,10 @@ type AccountWatchlistRequest struct {
 	MediaID   int64  `json:"media_id"`
 	Watchlist bool   `json:"watchlist"`
 }
+
+// AccountFavoriteRequest is the body of POST /account/{account_id}/favorite.
+type AccountFavoriteRequest struct {
+	MediaType string `json:"media_type"`
+	MediaID   int64  `json:"media_id"`
+	Favorite  bool   `json:"favorite"`
+}

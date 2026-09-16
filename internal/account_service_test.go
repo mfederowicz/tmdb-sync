@@ -98,3 +98,41 @@ func TestAddToWatchlist(t *testing.T) {
 		t.Errorf("AddToWatchlist() Success = %v, want true", status.Success)
 	}
 }
+
+func TestAddRemoveFavorite(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/account/123/favorite", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "abc123" {
+			t.Errorf("session_id query param = %q, want %q", got, "abc123")
+		}
+		var body str.AccountFavoriteRequest
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if body.MediaType != "movie" || body.MediaID != 550 || !body.Favorite {
+			t.Errorf("body = %+v, want MediaType=movie MediaID=550 Favorite=true", body)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.Account.AddRemoveFavorite(context.Background(), 123, "abc123", &str.AccountFavoriteRequest{
+		MediaType: "movie",
+		MediaID:   550,
+		Favorite:  true,
+	})
+	if err != nil {
+		t.Fatalf("AddRemoveFavorite() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("AddRemoveFavorite() Success = %v, want true", status.Success)
+	}
+}
