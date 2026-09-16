@@ -1,0 +1,32 @@
+version: 2
+
+project_name: tmdb-sync
+
+before:
+  hooks:
+    - "go mod download"
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+      - BUILDER=GoReleaser
+    goos:
+      - linux
+    ldflags:
+      - -X "github.com/mfederowicz/tmdb-sync/cli.date={{ .Date }}"
+      - -X "github.com/mfederowicz/tmdb-sync/cli.builtBy=GoReleaser"
+      - -X "github.com/mfederowicz/tmdb-sync/cli.version={{ .Version }}"
+
+archives:
+  - id: tmdb-sync
+    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
