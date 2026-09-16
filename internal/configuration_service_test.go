@@ -50,8 +50,8 @@ func TestGetCountries(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetCountries() error = %v", err)
 	}
-	if len(countries) != 1 || countries[0].ISO3166_1 != "US" {
-		t.Errorf("Countries = %+v, want one entry with ISO3166_1=US", countries)
+	if len(countries) != 1 || countries[0].ISO31661 != "US" {
+		t.Errorf("Countries = %+v, want one entry with ISO31661=US", countries)
 	}
 }
 
@@ -94,8 +94,8 @@ func TestGetLanguages(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetLanguages() error = %v", err)
 	}
-	if len(languages) != 1 || languages[0].ISO639_1 != "en" {
-		t.Errorf("Languages = %+v, want one entry with ISO639_1=en", languages)
+	if len(languages) != 1 || languages[0].ISO6391 != "en" {
+		t.Errorf("Languages = %+v, want one entry with ISO6391=en", languages)
 	}
 }
 
@@ -136,7 +136,7 @@ func TestGetTimezones(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetTimezones() error = %v", err)
 	}
-	if len(timezones) != 1 || timezones[0].ISO3166_1 != "US" {
-		t.Errorf("Timezones = %+v, want one entry with ISO3166_1=US", timezones)
+	if len(timezones) != 1 || timezones[0].ISO31661 != "US" {
+		t.Errorf("Timezones = %+v, want one entry with ISO31661=US", timezones)
 	}
 }

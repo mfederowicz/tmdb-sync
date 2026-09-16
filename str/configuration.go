@@ -19,7 +19,7 @@ type ImagesConfiguration struct {
 
 // Country is an entry of GET /configuration/countries.
 type Country struct {
-	ISO3166_1   string `json:"iso_3166_1"`
+	ISO31661    string `json:"iso_3166_1"`
 	EnglishName string `json:"english_name"`
 	NativeName  string `json:"native_name"`
 }
@@ -32,13 +32,13 @@ type JobDepartment struct {
 
 // Language is an entry of GET /configuration/languages.
 type Language struct {
-	ISO639_1    string `json:"iso_639_1"`
+	ISO6391     string `json:"iso_639_1"`
 	EnglishName string `json:"english_name"`
 	Name        string `json:"name"`
 }
 
 // TimezoneRegion is an entry of GET /configuration/timezones.
 type TimezoneRegion struct {
-	ISO3166_1 string   `json:"iso_3166_1"`
-	Zones     []string `json:"zones"`
+	ISO31661 string   `json:"iso_3166_1"`
+	Zones    []string `json:"zones"`
 }
