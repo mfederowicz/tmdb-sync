@@ -92,6 +92,28 @@ type PersonMovieCredits struct {
 	Crew []PersonMovieCredit `json:"crew"`
 }
 
+// PopularPerson is a single entry in the popular-people list.
+type PopularPerson struct {
+	ID                 int64                  `json:"id"`
+	Adult              bool                   `json:"adult"`
+	Gender             int                    `json:"gender"`
+	KnownForDepartment string                 `json:"known_for_department"`
+	Name               string                 `json:"name"`
+	OriginalName       string                 `json:"original_name"`
+	Popularity         float64                `json:"popularity"`
+	ProfilePath        string                 `json:"profile_path"`
+	KnownFor           []PersonCombinedCredit `json:"known_for"`
+}
+
+// PopularPersons is a paginated list of people, as returned by
+// GET /person/popular.
+type PopularPersons struct {
+	Page         int             `json:"page"`
+	Results      []PopularPerson `json:"results"`
+	TotalPages   int             `json:"total_pages"`
+	TotalResults int             `json:"total_results"`
+}
+
 // PersonCombinedCredits is the response shape for
 // GET /person/{person_id}/combined_credits.
 type PersonCombinedCredits struct {

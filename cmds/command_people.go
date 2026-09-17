@@ -15,7 +15,7 @@ import (
 
 // peopleActionsHelp lists every people action, shared between the -a flag's
 // usage string and the "-a is required" error so both stay in sync.
-const peopleActionsHelp = "details, combined-credits, external-ids, images, latest, movie-credits"
+const peopleActionsHelp = "details, combined-credits, external-ids, images, latest, movie-credits, popular"
 
 // peopleIDActionsHelp lists the people actions that require -i.
 const peopleIDActionsHelp = "details, combined-credits, external-ids, images, movie-credits"
@@ -32,6 +32,7 @@ func execPeople(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 	flagSet := flag.NewFlagSet("people", flag.ContinueOnError)
 	action := flagSet.String("a", "", "action: "+peopleActionsHelp+" (required)")
 	personID := flagSet.Int64("i", 0, "person id, required for -a "+peopleIDActionsHelp)
+	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a popular (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -73,6 +74,8 @@ func execPeople(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 		}
 		handler = handlers.PeopleMovieCreditsHandler{PersonID: *personID}
 		params = []string{fmt.Sprintf("id-%d", *personID)}
+	case "popular":
+		handler = handlers.PeoplePopularHandler{PagesLimit: *pagesLimit}
 	default:
 		return fmt.Errorf("people: unknown action %q", *action)
 	}

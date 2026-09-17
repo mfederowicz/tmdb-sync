@@ -160,3 +160,30 @@ func TestGetPersonMovieCredits(t *testing.T) {
 		t.Errorf("GetPersonMovieCredits() crew = %+v, want one entry job Director", credits.Crew)
 	}
 }
+
+func TestGetPopularPeople(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/popular", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page": 1,
+			"results": []map[string]any{
+				{"id": 1, "name": "George Clooney"},
+			},
+			"total_pages":   1,
+			"total_results": 1,
+		})
+	})
+
+	persons, err := client.People.GetPopularPeople(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPopularPeople() error = %v", err)
+	}
+	if len(persons) != 1 || persons[0].Name != "George Clooney" {
+		t.Errorf("GetPopularPeople() = %+v, want one person named George Clooney", persons)
+	}
+}

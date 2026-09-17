@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/mfederowicz/tmdb-sync/str"
+	"github.com/mfederowicz/tmdb-sync/uri"
 )
 
 // PeopleService handles communication with the /person endpoints of the TMDB API.
@@ -118,4 +119,44 @@ func (s *PeopleService) GetPersonMovieCredits(ctx context.Context, personID int6
 	}
 
 	return credits, resp, nil
+}
+
+// getPopularPersonsPage fetches a single page of the popular-people list.
+func (s *PeopleService) getPopularPersonsPage(ctx context.Context, opts *uri.ListOptions) (*str.PopularPersons, *str.Response, error) {
+	urlStr, err := uri.AddQuery("person/popular", opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	persons := new(str.PopularPersons)
+	resp, err := s.client.Do(ctx, req, persons)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return persons, resp, nil
+}
+
+// GetPopularPeople returns the current popular-people list, walking pages
+// until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/person-popular-list
+func (s *PeopleService) GetPopularPeople(ctx context.Context, pagesLimit int) ([]str.PopularPerson, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.PopularPerson], error) {
+		persons, _, err := s.getPopularPersonsPage(ctx, &uri.ListOptions{Page: page})
+		if err != nil {
+			return PageResult[str.PopularPerson]{}, err
+		}
+		return PageResult[str.PopularPerson]{
+			Results:    persons.Results,
+			Page:       persons.Page,
+			TotalPages: persons.TotalPages,
+		}, nil
+	})
 }
