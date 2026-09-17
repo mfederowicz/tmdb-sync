@@ -23,7 +23,7 @@ var SearchCmd = &Command{
 
 func execSearch(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("search", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: collections (required)")
+	action := flagSet.String("a", "", "action: collections, companies (required)")
 	query := flagSet.String("query", "", "search query, required for all actions")
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a collections")
 	region := flagSet.String("region", "", "ISO 3166-1 region code, used by -a collections")
@@ -36,7 +36,7 @@ func execSearch(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 	var handler handlers.Handler
 	switch *action {
 	case "":
-		return fmt.Errorf("search: -a is required (action: collections)")
+		return fmt.Errorf("search: -a is required (action: collections, companies)")
 	case "collections":
 		if *query == "" {
 			return fmt.Errorf("search: -query is required for -a collections")
@@ -47,6 +47,14 @@ func execSearch(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 			Region:       *region,
 			IncludeAdult: *includeAdult,
 			PagesLimit:   *pagesLimit,
+		}
+	case "companies":
+		if *query == "" {
+			return fmt.Errorf("search: -query is required for -a companies")
+		}
+		handler = handlers.SearchCompaniesHandler{
+			Query:      *query,
+			PagesLimit: *pagesLimit,
 		}
 	default:
 		return fmt.Errorf("search: unknown action %q", *action)
