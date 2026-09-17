@@ -215,3 +215,21 @@ func (s *TVService) GetKeywords(ctx context.Context, seriesID int64) (*str.TVKey
 
 	return keywords, resp, nil
 }
+
+// GetLatest fetches the most recently created TV series on TMDB.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-latest-id
+func (s *TVService) GetLatest(ctx context.Context) (*str.TV, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, "tv/latest", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	tv := new(str.TV)
+	resp, err := s.client.Do(ctx, req, tv)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return tv, resp, nil
+}

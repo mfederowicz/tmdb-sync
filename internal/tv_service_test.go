@@ -288,3 +288,26 @@ func TestGetTVKeywords(t *testing.T) {
 		t.Errorf("GetKeywords() = %+v, want ID=1399 with 1 keyword %q", keywords, "based on novel or book")
 	}
 }
+
+func TestGetTVLatest(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/latest", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":   1000000,
+			"name": "brand new series",
+		})
+	})
+
+	tv, _, err := client.TV.GetLatest(context.Background())
+	if err != nil {
+		t.Fatalf("GetLatest() error = %v", err)
+	}
+	if tv.ID != 1000000 || tv.Name != "brand new series" {
+		t.Errorf("GetLatest() = %+v, want ID=1000000 Name=%q", tv, "brand new series")
+	}
+}
