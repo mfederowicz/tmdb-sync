@@ -33,6 +33,17 @@ type TVSeasonAccountStates struct {
 	Results []TVSeasonAccountState `json:"results"`
 }
 
+// TVSeasonExternalIDs is the response shape for
+// GET /tv/{series_id}/season/{season_number}/external_ids.
+type TVSeasonExternalIDs struct {
+	ID          int64  `json:"id"`
+	FreebaseMID string `json:"freebase_mid"`
+	FreebaseID  string `json:"freebase_id"`
+	TvdbID      int64  `json:"tvdb_id"`
+	TvrageID    int64  `json:"tvrage_id"`
+	WikidataID  string `json:"wikidata_id"`
+}
+
 // TVSeason is the response shape for GET /tv/{series_id}/season/{season_number}.
 type TVSeason struct {
 	ID           int64             `json:"id"`

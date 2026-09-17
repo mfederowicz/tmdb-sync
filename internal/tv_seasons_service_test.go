@@ -106,3 +106,27 @@ func TestTVSeasonsGetCredits(t *testing.T) {
 		t.Errorf("GetCredits() = %+v, want ID=3624 with 1 cast and 1 crew", credits)
 	}
 }
+
+func TestTVSeasonsGetExternalIDs(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/season/1/external_ids", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":          3624,
+			"tvdb_id":     3436,
+			"wikidata_id": "Q3629848",
+		})
+	})
+
+	ids, _, err := client.TVSeasons.GetExternalIDs(context.Background(), 1399, 1)
+	if err != nil {
+		t.Fatalf("GetExternalIDs() error = %v", err)
+	}
+	if ids.ID != 3624 || ids.TvdbID != 3436 || ids.WikidataID != "Q3629848" {
+		t.Errorf("GetExternalIDs() = %+v, want ID=3624 TvdbID=3436 WikidataID=Q3629848", ids)
+	}
+}

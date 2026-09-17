@@ -21,7 +21,7 @@ var tvSeasonsSessionActions = map[string]bool{
 
 // tvSeasonsActionsHelp lists every tv-seasons action, shared between the -a
 // flag's usage string and the "-a is required" error so both stay in sync.
-const tvSeasonsActionsHelp = "details, account-states, aggregate-credits, credits"
+const tvSeasonsActionsHelp = "details, account-states, aggregate-credits, credits, external-ids"
 
 // TVSeasonsCmd is the "tv-seasons" module.
 var TVSeasonsCmd = &Command{
@@ -82,6 +82,12 @@ func execTVSeasonsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Conf
 			return fmt.Errorf("tv-seasons: -i <series_id> is required for -a credits")
 		}
 		handler = handlers.TVSeasonsCreditsHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, Language: *language}
+		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber)}
+	case "external-ids":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv-seasons: -i <series_id> is required for -a external-ids")
+		}
+		handler = handlers.TVSeasonsExternalIDsHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber}
 		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber)}
 	default:
 		return fmt.Errorf("tv-seasons: unknown action %q (action: %s)", *action, tvSeasonsActionsHelp)

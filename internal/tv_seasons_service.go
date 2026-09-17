@@ -102,3 +102,21 @@ func (s *TVSeasonsService) GetCredits(ctx context.Context, seriesID int64, seaso
 
 	return credits, resp, nil
 }
+
+// GetExternalIDs fetches the external ids for a single TV season.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-season-external-ids
+func (s *TVSeasonsService) GetExternalIDs(ctx context.Context, seriesID int64, seasonNumber int) (*str.TVSeasonExternalIDs, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("tv/%d/season/%d/external_ids", seriesID, seasonNumber), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ids := new(str.TVSeasonExternalIDs)
+	resp, err := s.client.Do(ctx, req, ids)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return ids, resp, nil
+}
