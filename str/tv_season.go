@@ -18,6 +18,21 @@ type TVSeasonEpisode struct {
 	GuestStars     []TVCastMember `json:"guest_stars"`
 }
 
+// TVSeasonAccountState is a single episode's account state, as returned by
+// the tv season account_states endpoint.
+type TVSeasonAccountState struct {
+	ID            int64 `json:"id"`
+	EpisodeNumber int   `json:"episode_number"`
+	Rated         any   `json:"rated"`
+}
+
+// TVSeasonAccountStates is the response shape for
+// GET /tv/{series_id}/season/{season_number}/account_states.
+type TVSeasonAccountStates struct {
+	ID      int64                  `json:"id"`
+	Results []TVSeasonAccountState `json:"results"`
+}
+
 // TVSeason is the response shape for GET /tv/{series_id}/season/{season_number}.
 type TVSeason struct {
 	ID           int64             `json:"id"`
