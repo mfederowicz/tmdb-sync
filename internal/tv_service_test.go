@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"testing"
 
 	"github.com/mfederowicz/tmdb-sync/uri"
@@ -309,5 +310,88 @@ func TestGetTVLatest(t *testing.T) {
 	}
 	if tv.ID != 1000000 || tv.Name != "brand new series" {
 		t.Errorf("GetLatest() = %+v, want ID=1000000 Name=%q", tv, "brand new series")
+	}
+}
+
+func TestGetTVLists(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/lists", func(w http.ResponseWriter, r *http.Request) {
+		pageNum, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			pageNum = 1
+		}
+		results := []map[string]any{{"id": pageNum, "name": "a list"}}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":            1399,
+			"page":          pageNum,
+			"results":       results,
+			"total_pages":   2,
+			"total_results": 2,
+		})
+	})
+
+	lists, err := client.TV.GetLists(context.Background(), 1399, "", 0)
+	if err != nil {
+		t.Fatalf("GetLists() error = %v", err)
+	}
+	if len(lists) != 2 {
+		t.Fatalf("len(lists) = %d, want 2", len(lists))
+	}
+}
+
+func TestGetTVRecommendations(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/recommendations", func(w http.ResponseWriter, r *http.Request) {
+		pageNum, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			pageNum = 1
+		}
+		results := []map[string]any{{"id": pageNum, "name": "a show"}}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          pageNum,
+			"results":       results,
+			"total_pages":   2,
+			"total_results": 2,
+		})
+	})
+
+	shows, err := client.TV.GetRecommendations(context.Background(), 1399, "", 0)
+	if err != nil {
+		t.Fatalf("GetRecommendations() error = %v", err)
+	}
+	if len(shows) != 2 {
+		t.Fatalf("len(shows) = %d, want 2", len(shows))
+	}
+}
+
+func TestGetTVReviews(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/reviews", func(w http.ResponseWriter, r *http.Request) {
+		pageNum, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			pageNum = 1
+		}
+		results := []map[string]any{{"id": "abc", "author": "someone", "content": "great series"}}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":            1399,
+			"page":          pageNum,
+			"results":       results,
+			"total_pages":   2,
+			"total_results": 2,
+		})
+	})
+
+	reviews, err := client.TV.GetReviews(context.Background(), 1399, "", 0)
+	if err != nil {
+		t.Fatalf("GetReviews() error = %v", err)
+	}
+	if len(reviews) != 2 {
+		t.Fatalf("len(reviews) = %d, want 2", len(reviews))
 	}
 }

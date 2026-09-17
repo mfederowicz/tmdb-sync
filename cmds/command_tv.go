@@ -23,11 +23,11 @@ var tvSessionActions = map[string]bool{
 
 // tvActionsHelp lists every tv action, shared between the -a flag's usage
 // string and the "-a is required" error so both stay in sync.
-const tvActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords, latest"
+const tvActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords, latest, lists, recommendations, reviews"
 
 // tvIDActionsHelp lists the tv actions that require -i, shared between the
 // -i flag's usage string and the module doc.
-const tvIDActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords"
+const tvIDActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords, lists, recommendations, reviews"
 
 // TVCmd is the "tv" module.
 var TVCmd = &Command{
@@ -50,6 +50,7 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 	seriesID := flagSet.Int64("i", 0, "tv series id, required for -a "+tvIDActionsHelp)
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a aggregate-credits, credits, images")
 	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
+	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a lists, recommendations, reviews (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -127,6 +128,24 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 		params = []string{fmt.Sprintf("id-%d", *seriesID)}
 	case "latest":
 		handler = handlers.TVLatestHandler{}
+	case "lists":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv: -i <series_id> is required for -a lists")
+		}
+		handler = handlers.TVListsHandler{SeriesID: *seriesID, Language: *language, PagesLimit: *pagesLimit}
+		params = []string{fmt.Sprintf("id-%d", *seriesID)}
+	case "recommendations":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv: -i <series_id> is required for -a recommendations")
+		}
+		handler = handlers.TVRecommendationsHandler{SeriesID: *seriesID, Language: *language, PagesLimit: *pagesLimit}
+		params = []string{fmt.Sprintf("id-%d", *seriesID)}
+	case "reviews":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv: -i <series_id> is required for -a reviews")
+		}
+		handler = handlers.TVReviewsHandler{SeriesID: *seriesID, Language: *language, PagesLimit: *pagesLimit}
+		params = []string{fmt.Sprintf("id-%d", *seriesID)}
 	default:
 		return fmt.Errorf("tv: unknown action %q", *action)
 	}

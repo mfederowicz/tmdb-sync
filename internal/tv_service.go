@@ -216,6 +216,126 @@ func (s *TVService) GetKeywords(ctx context.Context, seriesID int64) (*str.TVKey
 	return keywords, resp, nil
 }
 
+// getListsPage fetches a single page of the lists a TV series belongs to.
+func (s *TVService) getListsPage(ctx context.Context, seriesID int64, opts *uri.ListOptions) (*str.TVLists, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/lists", seriesID), opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	lists := new(str.TVLists)
+	resp, err := s.client.Do(ctx, req, lists)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return lists, resp, nil
+}
+
+// GetLists returns the lists a TV series belongs to, walking pages until
+// TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-lists
+func (s *TVService) GetLists(ctx context.Context, seriesID int64, language string, pagesLimit int) ([]str.AccountList, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.AccountList], error) {
+		lists, _, err := s.getListsPage(ctx, seriesID, &uri.ListOptions{Page: page, Language: language})
+		if err != nil {
+			return PageResult[str.AccountList]{}, err
+		}
+		return PageResult[str.AccountList]{
+			Results:    lists.Results,
+			Page:       lists.Page,
+			TotalPages: lists.TotalPages,
+		}, nil
+	})
+}
+
+// getRecommendationsPage fetches a single page of a TV series'
+// recommendations.
+func (s *TVService) getRecommendationsPage(ctx context.Context, seriesID int64, opts *uri.ListOptions) (*str.TVShows, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/recommendations", seriesID), opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	shows := new(str.TVShows)
+	resp, err := s.client.Do(ctx, req, shows)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return shows, resp, nil
+}
+
+// GetRecommendations returns TV series recommended off a single series,
+// walking pages until TMDB reports no more (total_pages) or pagesLimit is
+// reached (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-recommendations
+func (s *TVService) GetRecommendations(ctx context.Context, seriesID int64, language string, pagesLimit int) ([]str.TV, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.TV], error) {
+		shows, _, err := s.getRecommendationsPage(ctx, seriesID, &uri.ListOptions{Page: page, Language: language})
+		if err != nil {
+			return PageResult[str.TV]{}, err
+		}
+		return PageResult[str.TV]{
+			Results:    shows.Results,
+			Page:       shows.Page,
+			TotalPages: shows.TotalPages,
+		}, nil
+	})
+}
+
+// getReviewsPage fetches a single page of a TV series' reviews.
+func (s *TVService) getReviewsPage(ctx context.Context, seriesID int64, opts *uri.ListOptions) (*str.TVReviews, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/reviews", seriesID), opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	reviews := new(str.TVReviews)
+	resp, err := s.client.Do(ctx, req, reviews)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return reviews, resp, nil
+}
+
+// GetReviews returns a TV series' reviews, walking pages until TMDB reports
+// no more (total_pages) or pagesLimit is reached (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-reviews
+func (s *TVService) GetReviews(ctx context.Context, seriesID int64, language string, pagesLimit int) ([]str.TVReview, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.TVReview], error) {
+		reviews, _, err := s.getReviewsPage(ctx, seriesID, &uri.ListOptions{Page: page, Language: language})
+		if err != nil {
+			return PageResult[str.TVReview]{}, err
+		}
+		return PageResult[str.TVReview]{
+			Results:    reviews.Results,
+			Page:       reviews.Page,
+			TotalPages: reviews.TotalPages,
+		}, nil
+	})
+}
+
 // GetLatest fetches the most recently created TV series on TMDB.
 //
 // Api docs: https://developer.themoviedb.org/reference/tv-series-latest-id

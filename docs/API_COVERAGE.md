@@ -172,9 +172,9 @@ Revisit both once that checkpoint is reached.
 - [x] Images — `GET /tv/{series_id}/images`
 - [x] Keywords — `GET /tv/{series_id}/keywords`
 - [x] Latest — `GET /tv/latest`
-- [ ] Lists — `GET /tv/{series_id}/lists`
-- [ ] Recommendations — `GET /tv/{series_id}/recommendations`
-- [ ] Reviews — `GET /tv/{series_id}/reviews`
+- [x] Lists — `GET /tv/{series_id}/lists`
+- [x] Recommendations — `GET /tv/{series_id}/recommendations`
+- [x] Reviews — `GET /tv/{series_id}/reviews`
 - [ ] Screened Theatrically — `GET /tv/{series_id}/screened_theatrically`
 - [ ] Similar — `GET /tv/{series_id}/similar`
 - [ ] Translations — `GET /tv/{series_id}/translations`

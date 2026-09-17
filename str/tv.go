@@ -250,3 +250,43 @@ type TVKeywords struct {
 	ID      int64     `json:"id"`
 	Results []Keyword `json:"results"`
 }
+
+// TVLists is a paginated page of the lists a TV series belongs to, as
+// returned by GET /tv/{series_id}/lists.
+type TVLists struct {
+	ID           int64         `json:"id"`
+	Page         int           `json:"page"`
+	Results      []AccountList `json:"results"`
+	TotalPages   int           `json:"total_pages"`
+	TotalResults int           `json:"total_results"`
+}
+
+// TVReviewAuthorDetails is the author metadata nested inside a TV review.
+type TVReviewAuthorDetails struct {
+	Name       string  `json:"name"`
+	Username   string  `json:"username"`
+	AvatarPath string  `json:"avatar_path"`
+	Rating     float64 `json:"rating"`
+}
+
+// TVReview is a single review, as returned by
+// GET /tv/{series_id}/reviews.
+type TVReview struct {
+	Author        string                `json:"author"`
+	AuthorDetails TVReviewAuthorDetails `json:"author_details"`
+	Content       string                `json:"content"`
+	CreatedAt     string                `json:"created_at"`
+	ID            string                `json:"id"`
+	UpdatedAt     string                `json:"updated_at"`
+	URL           string                `json:"url"`
+}
+
+// TVReviews is a paginated page of a TV series' reviews, as returned by
+// GET /tv/{series_id}/reviews.
+type TVReviews struct {
+	ID           int64      `json:"id"`
+	Page         int        `json:"page"`
+	Results      []TVReview `json:"results"`
+	TotalPages   int        `json:"total_pages"`
+	TotalResults int        `json:"total_results"`
+}
