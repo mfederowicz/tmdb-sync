@@ -23,7 +23,7 @@ var tvSessionActions = map[string]bool{
 
 // tvActionsHelp lists every tv action, shared between the -a flag's usage
 // string and the "-a is required" error so both stay in sync.
-const tvActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords, latest, lists, popular, recommendations, reviews, screened-theatrically, similar, top-rated, translations, videos, watch-providers"
+const tvActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords, latest, lists, on-the-air, popular, recommendations, reviews, screened-theatrically, similar, top-rated, translations, videos, watch-providers"
 
 // tvIDActionsHelp lists the tv actions that require -i, shared between the
 // -i flag's usage string and the module doc.
@@ -50,7 +50,7 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 	seriesID := flagSet.Int64("i", 0, "tv series id, required for -a "+tvIDActionsHelp)
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a aggregate-credits, credits, images, lists, recommendations, reviews, similar, videos")
 	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
-	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a lists, popular, recommendations, reviews, similar, top-rated (default: pages_limit from config, 0 = unlimited)")
+	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a lists, on-the-air, popular, recommendations, reviews, similar, top-rated (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -128,6 +128,8 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 		params = []string{fmt.Sprintf("id-%d", *seriesID)}
 	case "latest":
 		handler = handlers.TVLatestHandler{}
+	case "on-the-air":
+		handler = handlers.TVOnTheAirHandler{PagesLimit: *pagesLimit}
 	case "popular":
 		handler = handlers.TVPopularHandler{PagesLimit: *pagesLimit}
 	case "top-rated":

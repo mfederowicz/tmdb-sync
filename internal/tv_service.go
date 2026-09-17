@@ -536,6 +536,46 @@ func (s *TVService) GetTopRatedTV(ctx context.Context, pagesLimit int) ([]str.TV
 	})
 }
 
+// getOnTheAirTVPage fetches a single page of the on-the-air-tv-series list.
+func (s *TVService) getOnTheAirTVPage(ctx context.Context, opts *uri.ListOptions) (*str.TVShows, *str.Response, error) {
+	urlStr, err := uri.AddQuery("tv/on_the_air", opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	shows := new(str.TVShows)
+	resp, err := s.client.Do(ctx, req, shows)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return shows, resp, nil
+}
+
+// GetOnTheAirTV returns the current on-the-air-tv-series list, walking
+// pages until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-on-the-air-list
+func (s *TVService) GetOnTheAirTV(ctx context.Context, pagesLimit int) ([]str.TV, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.TV], error) {
+		shows, _, err := s.getOnTheAirTVPage(ctx, &uri.ListOptions{Page: page})
+		if err != nil {
+			return PageResult[str.TV]{}, err
+		}
+		return PageResult[str.TV]{
+			Results:    shows.Results,
+			Page:       shows.Page,
+			TotalPages: shows.TotalPages,
+		}, nil
+	})
+}
+
 // GetLatest fetches the most recently created TV series on TMDB.
 //
 // Api docs: https://developer.themoviedb.org/reference/tv-series-latest-id
