@@ -137,6 +137,36 @@ type MovieReleaseDates struct {
 	Results []MovieReleaseDatesResult `json:"results"`
 }
 
+// MovieReviewAuthorDetails is the author metadata nested inside a review.
+type MovieReviewAuthorDetails struct {
+	Name       string  `json:"name"`
+	Username   string  `json:"username"`
+	AvatarPath string  `json:"avatar_path"`
+	Rating     float64 `json:"rating"`
+}
+
+// MovieReview is a single review, as returned by
+// GET /movie/{movie_id}/reviews.
+type MovieReview struct {
+	Author        string                   `json:"author"`
+	AuthorDetails MovieReviewAuthorDetails `json:"author_details"`
+	Content       string                   `json:"content"`
+	CreatedAt     string                   `json:"created_at"`
+	ID            string                   `json:"id"`
+	UpdatedAt     string                   `json:"updated_at"`
+	URL           string                   `json:"url"`
+}
+
+// MovieReviews is a paginated page of a movie's reviews, as returned by
+// GET /movie/{movie_id}/reviews.
+type MovieReviews struct {
+	ID           int64         `json:"id"`
+	Page         int           `json:"page"`
+	Results      []MovieReview `json:"results"`
+	TotalPages   int           `json:"total_pages"`
+	TotalResults int           `json:"total_results"`
+}
+
 // MovieExternalIDs is the response shape for
 // GET /movie/{movie_id}/external_ids.
 type MovieExternalIDs struct {

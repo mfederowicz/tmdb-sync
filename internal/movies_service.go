@@ -316,6 +316,45 @@ func (s *MoviesService) GetReleaseDates(ctx context.Context, movieID int64) (*st
 	return dates, resp, nil
 }
 
+// getReviewsPage fetches a single page of a movie's reviews.
+func (s *MoviesService) getReviewsPage(ctx context.Context, movieID int64, opts *uri.ListOptions) (*str.MovieReviews, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("movie/%d/reviews", movieID), opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	reviews := new(str.MovieReviews)
+	resp, err := s.client.Do(ctx, req, reviews)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return reviews, resp, nil
+}
+
+// GetReviews returns a movie's reviews, walking pages until TMDB reports no
+// more (total_pages) or pagesLimit is reached (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-reviews
+func (s *MoviesService) GetReviews(ctx context.Context, movieID int64, language string, pagesLimit int) ([]str.MovieReview, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.MovieReview], error) {
+		reviews, _, err := s.getReviewsPage(ctx, movieID, &uri.ListOptions{Page: page, Language: language})
+		if err != nil {
+			return PageResult[str.MovieReview]{}, err
+		}
+		return PageResult[str.MovieReview]{
+			Results:    reviews.Results,
+			Page:       reviews.Page,
+			TotalPages: reviews.TotalPages,
+		}, nil
+	})
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)

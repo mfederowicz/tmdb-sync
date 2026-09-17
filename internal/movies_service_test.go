@@ -321,6 +321,34 @@ func TestGetReleaseDates(t *testing.T) {
 	}
 }
 
+func TestGetReviews(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/reviews", func(w http.ResponseWriter, r *http.Request) {
+		pageNum, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			pageNum = 1
+		}
+		results := []map[string]any{{"id": "abc", "author": "someone", "content": "great movie"}}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":            550,
+			"page":          pageNum,
+			"results":       results,
+			"total_pages":   2,
+			"total_results": 2,
+		})
+	})
+
+	reviews, err := client.Movies.GetReviews(context.Background(), 550, "", 0)
+	if err != nil {
+		t.Fatalf("GetReviews() error = %v", err)
+	}
+	if len(reviews) != 2 {
+		t.Fatalf("len(reviews) = %d, want 2", len(reviews))
+	}
+}
+
 func TestGetRecommendations(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
