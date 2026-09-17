@@ -127,7 +127,7 @@ Revisit both once that checkpoint is reached.
 - [x] Delete Rating 🔒 — `DELETE /movie/{movie_id}/rating`
 
 ## Networks
-- [ ] Details — `GET /network/{network_id}`
+- [x] Details — `GET /network/{network_id}`
 - [ ] Alternative Names — `GET /network/{network_id}/alternative_names`
 - [ ] Images — `GET /network/{network_id}/images`
 

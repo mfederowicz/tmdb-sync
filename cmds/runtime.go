@@ -30,6 +30,7 @@ func init() {
 		KeywordsCmd,
 		ListsCmd,
 		MoviesCmd,
+		NetworksCmd,
 		HelpCmd,
 	}
 }
