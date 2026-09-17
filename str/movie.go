@@ -95,3 +95,14 @@ type MovieCredits struct {
 	Cast []MovieCastMember `json:"cast"`
 	Crew []MovieCrewMember `json:"crew"`
 }
+
+// MovieExternalIDs is the response shape for
+// GET /movie/{movie_id}/external_ids.
+type MovieExternalIDs struct {
+	ID          int64  `json:"id"`
+	ImdbID      string `json:"imdb_id"`
+	WikidataID  string `json:"wikidata_id"`
+	FacebookID  string `json:"facebook_id"`
+	InstagramID string `json:"instagram_id"`
+	TwitterID   string `json:"twitter_id"`
+}

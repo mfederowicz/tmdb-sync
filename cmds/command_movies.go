@@ -36,8 +36,8 @@ func execMovies(fs afero.Fs, client *internal.Client, config *cfg.Config, option
 // retry instead of failing outright.
 func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string, retried bool) error {
 	flagSet := flag.NewFlagSet("movies", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: details, popular, account-states, alternative-titles, credits (required)")
-	movieID := flagSet.Int64("i", 0, "movie id, required for -a details, account-states, alternative-titles, credits")
+	action := flagSet.String("a", "", "action: details, popular, account-states, alternative-titles, credits, external-ids (required)")
+	movieID := flagSet.Int64("i", 0, "movie id, required for -a details, account-states, alternative-titles, credits, external-ids")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a popular (default: pages_limit from config, 0 = unlimited)")
 	country := flagSet.String("country", "", "ISO 3166-1 country code, used by -a alternative-titles")
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a credits")
@@ -55,7 +55,7 @@ func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config,
 	var params []string
 	switch *action {
 	case "":
-		return fmt.Errorf("movies: -a is required (action: details, popular, account-states, alternative-titles, credits)")
+		return fmt.Errorf("movies: -a is required (action: details, popular, account-states, alternative-titles, credits, external-ids)")
 	case "details":
 		if *movieID == 0 {
 			return fmt.Errorf("movies: -i <movie_id> is required for -a details")
@@ -84,6 +84,12 @@ func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config,
 			return fmt.Errorf("movies: -i <movie_id> is required for -a credits")
 		}
 		handler = handlers.MoviesCreditsHandler{MovieID: *movieID, Language: *language}
+		params = []string{fmt.Sprintf("id-%d", *movieID)}
+	case "external-ids":
+		if *movieID == 0 {
+			return fmt.Errorf("movies: -i <movie_id> is required for -a external-ids")
+		}
+		handler = handlers.MoviesExternalIDsHandler{MovieID: *movieID}
 		params = []string{fmt.Sprintf("id-%d", *movieID)}
 	default:
 		return fmt.Errorf("movies: unknown action %q", *action)

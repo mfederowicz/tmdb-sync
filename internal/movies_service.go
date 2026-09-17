@@ -101,6 +101,24 @@ func (s *MoviesService) GetCredits(ctx context.Context, movieID int64, language 
 	return credits, resp, nil
 }
 
+// GetExternalIDs fetches a single movie's external ids (IMDb, Wikidata, ...).
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-external-ids
+func (s *MoviesService) GetExternalIDs(ctx context.Context, movieID int64) (*str.MovieExternalIDs, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("movie/%d/external_ids", movieID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ids := new(str.MovieExternalIDs)
+	resp, err := s.client.Do(ctx, req, ids)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return ids, resp, nil
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)

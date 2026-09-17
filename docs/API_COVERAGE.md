@@ -107,7 +107,7 @@ Revisit both once that checkpoint is reached.
 - [x] Account States 🔒 — `GET /movie/{movie_id}/account_states`
 - [x] Alternative Titles — `GET /movie/{movie_id}/alternative_titles`
 - [x] Credits — `GET /movie/{movie_id}/credits`
-- [ ] External IDs — `GET /movie/{movie_id}/external_ids`
+- [x] External IDs — `GET /movie/{movie_id}/external_ids`
 - [ ] Images — `GET /movie/{movie_id}/images`
 - [ ] Keywords — `GET /movie/{movie_id}/keywords`
 - [ ] Latest — `GET /movie/latest`

@@ -140,3 +140,26 @@ func TestGetCredits(t *testing.T) {
 		t.Errorf("GetCredits() = %+v, want ID=550 with 1 cast and 1 crew", credits)
 	}
 }
+
+func TestGetExternalIDs(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/external_ids", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":      550,
+			"imdb_id": "tt0137523",
+		})
+	})
+
+	ids, _, err := client.Movies.GetExternalIDs(context.Background(), 550)
+	if err != nil {
+		t.Fatalf("GetExternalIDs() error = %v", err)
+	}
+	if ids.ID != 550 || ids.ImdbID != "tt0137523" {
+		t.Errorf("GetExternalIDs() = %+v, want ID=550 ImdbID=%q", ids, "tt0137523")
+	}
+}
