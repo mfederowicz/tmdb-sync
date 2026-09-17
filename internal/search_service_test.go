@@ -98,3 +98,33 @@ func TestSearchKeywords(t *testing.T) {
 		t.Errorf("SearchKeywords() = %+v, want one result named space", results)
 	}
 }
+
+func TestSearchMovies(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/search/movie", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("query"); got != "matrix" {
+			t.Errorf("query = %q, want %q", got, "matrix")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page": 1,
+			"results": []map[string]any{
+				{"id": 603, "title": "The Matrix"},
+			},
+			"total_pages":   1,
+			"total_results": 1,
+		})
+	})
+
+	results, err := client.Search.SearchMovies(context.Background(), uri.SearchMovieOptions{Query: "matrix"}, 0)
+	if err != nil {
+		t.Fatalf("SearchMovies() error = %v", err)
+	}
+	if len(results) != 1 || results[0].Title != "The Matrix" {
+		t.Errorf("SearchMovies() = %+v, want one result titled The Matrix", results)
+	}
+}

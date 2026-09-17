@@ -108,6 +108,18 @@ type SearchKeywordOptions struct {
 	Page  int    `url:"page,omitempty"`
 }
 
+// SearchMovieOptions carries the query parameters accepted by
+// GET /search/movie.
+type SearchMovieOptions struct {
+	Query              string `url:"query,omitempty"`
+	Page               int    `url:"page,omitempty"`
+	Language           string `url:"language,omitempty"`
+	IncludeAdult       bool   `url:"include_adult,omitempty"`
+	Region             string `url:"region,omitempty"`
+	Year               int    `url:"year,omitempty"`
+	PrimaryReleaseYear int    `url:"primary_release_year,omitempty"`
+}
+
 // LanguageOptions carries the optional language query parameter accepted by
 // several per-resource endpoints (e.g. movie/{id}/credits, /videos, ...).
 type LanguageOptions struct {

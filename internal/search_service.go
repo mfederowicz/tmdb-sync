@@ -133,3 +133,44 @@ func (s *SearchService) SearchKeywords(ctx context.Context, opts uri.SearchKeywo
 		}, nil
 	})
 }
+
+// getSearchMoviesPage fetches a single page of the search/movie list.
+func (s *SearchService) getSearchMoviesPage(ctx context.Context, opts *uri.SearchMovieOptions) (*str.Movies, *str.Response, error) {
+	urlStr, err := uri.AddQuery("search/movie", opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	movies := new(str.Movies)
+	resp, err := s.client.Do(ctx, req, movies)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return movies, resp, nil
+}
+
+// SearchMovies returns movies matching opts, walking pages until TMDB
+// reports no more (total_pages) or pagesLimit is reached (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/search-movie
+func (s *SearchService) SearchMovies(ctx context.Context, opts uri.SearchMovieOptions, pagesLimit int) ([]str.Movie, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.Movie], error) {
+		o := opts
+		o.Page = page
+		movies, _, err := s.getSearchMoviesPage(ctx, &o)
+		if err != nil {
+			return PageResult[str.Movie]{}, err
+		}
+		return PageResult[str.Movie]{
+			Results:    movies.Results,
+			Page:       movies.Page,
+			TotalPages: movies.TotalPages,
+		}, nil
+	})
+}
