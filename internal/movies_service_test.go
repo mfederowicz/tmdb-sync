@@ -370,6 +370,31 @@ func TestGetTranslations(t *testing.T) {
 	}
 }
 
+func TestGetVideos(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/videos", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 550,
+			"results": []map[string]any{
+				{"id": "abc", "key": "SUXWAEX2jlg", "site": "YouTube", "type": "Trailer"},
+			},
+		})
+	})
+
+	videos, _, err := client.Movies.GetVideos(context.Background(), 550, "")
+	if err != nil {
+		t.Fatalf("GetVideos() error = %v", err)
+	}
+	if videos.ID != 550 || len(videos.Results) != 1 || videos.Results[0].Site != "YouTube" {
+		t.Errorf("GetVideos() = %+v, want ID=550 with 1 result on YouTube", videos)
+	}
+}
+
 func TestGetReleaseDates(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()

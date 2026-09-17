@@ -167,6 +167,27 @@ type MovieReviews struct {
 	TotalResults int           `json:"total_results"`
 }
 
+// MovieVideo is a single video entry, as returned by
+// GET /movie/{movie_id}/videos.
+type MovieVideo struct {
+	Iso6391     string `json:"iso_639_1"`
+	Iso31661    string `json:"iso_3166_1"`
+	Name        string `json:"name"`
+	Key         string `json:"key"`
+	Site        string `json:"site"`
+	Size        int    `json:"size"`
+	Type        string `json:"type"`
+	Official    bool   `json:"official"`
+	PublishedAt string `json:"published_at"`
+	ID          string `json:"id"`
+}
+
+// MovieVideos is the response shape for GET /movie/{movie_id}/videos.
+type MovieVideos struct {
+	ID      int64        `json:"id"`
+	Results []MovieVideo `json:"results"`
+}
+
 // MovieExternalIDs is the response shape for
 // GET /movie/{movie_id}/external_ids.
 type MovieExternalIDs struct {

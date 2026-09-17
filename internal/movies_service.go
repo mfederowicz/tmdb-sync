@@ -493,6 +493,29 @@ func (s *MoviesService) GetUpcomingMovies(ctx context.Context, pagesLimit int) (
 	})
 }
 
+// GetVideos fetches the videos (trailers, teasers, ...) for a single movie.
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-videos
+func (s *MoviesService) GetVideos(ctx context.Context, movieID int64, language string) (*str.MovieVideos, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("movie/%d/videos", movieID), &uri.LanguageOptions{Language: language})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	videos := new(str.MovieVideos)
+	resp, err := s.client.Do(ctx, req, videos)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return videos, resp, nil
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)

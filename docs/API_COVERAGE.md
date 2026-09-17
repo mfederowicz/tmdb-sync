@@ -121,7 +121,7 @@ Revisit both once that checkpoint is reached.
 - [x] Top Rated — `GET /movie/top_rated`
 - [x] Translations — `GET /movie/{movie_id}/translations`
 - [x] Upcoming — `GET /movie/upcoming`
-- [ ] Videos — `GET /movie/{movie_id}/videos`
+- [x] Videos — `GET /movie/{movie_id}/videos`
 - [ ] Watch Providers — `GET /movie/{movie_id}/watch/providers`
 - [ ] Add Rating 🔒 — `POST /movie/{movie_id}/rating`
 - [ ] Delete Rating 🔒 — `DELETE /movie/{movie_id}/rating`
