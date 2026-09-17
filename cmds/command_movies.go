@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/mfederowicz/tmdb-sync/cfg"
+	"github.com/mfederowicz/tmdb-sync/cli"
 	"github.com/mfederowicz/tmdb-sync/handlers"
 	"github.com/mfederowicz/tmdb-sync/internal"
 	"github.com/mfederowicz/tmdb-sync/str"
@@ -13,28 +14,46 @@ import (
 	"github.com/spf13/afero"
 )
 
+// moviesSessionActions are the actions that require a v3 session.
+var moviesSessionActions = map[string]bool{
+	"account-states": true,
+}
+
 // MoviesCmd is the "movies" module.
 var MoviesCmd = &Command{
 	Name:   "movies",
 	Abbrev: "m",
-	Short:  "movie details, popular, ...",
+	Short:  "movie details, popular, 🔒 account-states, ...",
 	Exec:   execMovies,
 }
 
-func execMovies(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
+func execMovies(fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string) error {
+	return execMoviesAttempt(fs, client, config, options, args, false)
+}
+
+// execMoviesAttempt is execMovies's body, split out so a stale session
+// (detected via isSessionInvalid) can trigger one transparent re-login and
+// retry instead of failing outright.
+func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string, retried bool) error {
 	flagSet := flag.NewFlagSet("movies", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: details, popular (required)")
-	movieID := flagSet.Int64("i", 0, "movie id, required for -a details")
+	action := flagSet.String("a", "", "action: details, popular, account-states (required)")
+	movieID := flagSet.Int64("i", 0, "movie id, required for -a details, account-states")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a popular (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
+	}
+
+	if moviesSessionActions[*action] {
+		if err := cli.HandleToken(fs, config, client, options); err != nil {
+			return fmt.Errorf("movies: %w", err)
+		}
 	}
 
 	var handler handlers.Handler
 	var params []string
 	switch *action {
 	case "":
-		return fmt.Errorf("movies: -a is required (action: details, popular)")
+		return fmt.Errorf("movies: -a is required (action: details, popular, account-states)")
 	case "details":
 		if *movieID == 0 {
 			return fmt.Errorf("movies: -i <movie_id> is required for -a details")
@@ -46,12 +65,24 @@ func execMovies(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 		// TMDB's total_pages) - see internal.FetchAllPages. Defaults to
 		// config.PagesLimit, overridable per-invocation via -pages-limit.
 		handler = handlers.MoviesPopularHandler{PagesLimit: *pagesLimit}
+	case "account-states":
+		if *movieID == 0 {
+			return fmt.Errorf("movies: -i <movie_id> is required for -a account-states")
+		}
+		handler = handlers.MoviesAccountStatesHandler{MovieID: *movieID, SessionID: options.Session.SessionID}
+		params = []string{fmt.Sprintf("id-%d", *movieID)}
 	default:
 		return fmt.Errorf("movies: unknown action %q", *action)
 	}
 
 	result, err := handler.Handle(context.Background(), client)
 	if err != nil {
+		if !retried && moviesSessionActions[*action] && isSessionInvalid(err) {
+			if newSession, refreshErr := refreshSession(fs, config, client); refreshErr == nil {
+				options.Session = newSession
+				return execMoviesAttempt(fs, client, config, options, args, true)
+			}
+		}
 		return err
 	}
 

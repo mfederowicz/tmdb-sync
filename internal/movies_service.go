@@ -30,6 +30,30 @@ func (s *MoviesService) GetMovie(ctx context.Context, movieID int64) (*str.Movie
 	return movie, resp, nil
 }
 
+// GetAccountStates fetches an account's favorite/rated/watchlist status for
+// a single movie.
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-account-states
+func (s *MoviesService) GetAccountStates(ctx context.Context, movieID int64, sessionID string) (*str.MovieAccountStates, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("movie/%d/account_states", movieID), &uri.AccountOptions{SessionID: sessionID})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	states := new(str.MovieAccountStates)
+	resp, err := s.client.Do(ctx, req, states)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return states, resp, nil
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)
