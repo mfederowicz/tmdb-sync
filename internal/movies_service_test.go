@@ -84,3 +84,31 @@ func TestGetAccountStates(t *testing.T) {
 		t.Errorf("GetAccountStates() = %+v, want ID=550 Favorite=true Watchlist=false", states)
 	}
 }
+
+func TestGetAlternativeTitles(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/alternative_titles", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("country"); got != "US" {
+			t.Errorf("country = %s, want US", got)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 550,
+			"titles": []map[string]any{
+				{"iso_3166_1": "US", "title": "Fight Club", "type": ""},
+			},
+		})
+	})
+
+	titles, _, err := client.Movies.GetAlternativeTitles(context.Background(), 550, "US")
+	if err != nil {
+		t.Fatalf("GetAlternativeTitles() error = %v", err)
+	}
+	if titles.ID != 550 || len(titles.Titles) != 1 || titles.Titles[0].Title != "Fight Club" {
+		t.Errorf("GetAlternativeTitles() = %+v, want ID=550 with 1 title %q", titles, "Fight Club")
+	}
+}

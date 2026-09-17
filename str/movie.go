@@ -40,3 +40,18 @@ type MovieAccountStates struct {
 	Rated     any   `json:"rated"`
 	Watchlist bool  `json:"watchlist"`
 }
+
+// MovieAlternativeTitle is one alternative title, as returned inline on the
+// movie alternative-titles endpoint.
+type MovieAlternativeTitle struct {
+	Iso31661 string `json:"iso_3166_1"`
+	Title    string `json:"title"`
+	Type     string `json:"type"`
+}
+
+// MovieAlternativeTitles is the response shape for
+// GET /movie/{movie_id}/alternative_titles.
+type MovieAlternativeTitles struct {
+	ID     int64                   `json:"id"`
+	Titles []MovieAlternativeTitle `json:"titles"`
+}

@@ -54,6 +54,30 @@ func (s *MoviesService) GetAccountStates(ctx context.Context, movieID int64, ses
 	return states, resp, nil
 }
 
+// GetAlternativeTitles fetches the alternative titles for a single movie,
+// optionally filtered to a single country (ISO 3166-1).
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-alternative-titles
+func (s *MoviesService) GetAlternativeTitles(ctx context.Context, movieID int64, country string) (*str.MovieAlternativeTitles, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("movie/%d/alternative_titles", movieID), &uri.MovieAlternativeTitlesOptions{Country: country})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	titles := new(str.MovieAlternativeTitles)
+	resp, err := s.client.Do(ctx, req, titles)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return titles, resp, nil
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)

@@ -78,6 +78,12 @@ type ListClearOptions struct {
 	Confirm   bool   `url:"confirm,omitempty"`
 }
 
+// MovieAlternativeTitlesOptions carries the optional query parameter
+// accepted by GET /movie/{movie_id}/alternative_titles.
+type MovieAlternativeTitlesOptions struct {
+	Country string `url:"country,omitempty"`
+}
+
 // ImagesOptions carries the optional query parameters accepted by
 // per-resource images endpoints.
 type ImagesOptions struct {
