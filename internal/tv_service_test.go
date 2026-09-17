@@ -609,3 +609,30 @@ func TestGetOnTheAirTV(t *testing.T) {
 		t.Fatalf("len(shows) = %d, want 2", len(shows))
 	}
 }
+
+func TestGetAiringTodayTV(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/airing_today", func(w http.ResponseWriter, r *http.Request) {
+		pageNum, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			pageNum = 1
+		}
+		results := []map[string]any{{"id": pageNum, "name": "a show"}}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          pageNum,
+			"results":       results,
+			"total_pages":   2,
+			"total_results": 2,
+		})
+	})
+
+	shows, err := client.TV.GetAiringTodayTV(context.Background(), 0)
+	if err != nil {
+		t.Fatalf("GetAiringTodayTV() error = %v", err)
+	}
+	if len(shows) != 2 {
+		t.Fatalf("len(shows) = %d, want 2", len(shows))
+	}
+}
