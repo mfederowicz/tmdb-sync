@@ -25,6 +25,7 @@ func init() {
 		ConfigurationCmd,
 		CreditsCmd,
 		DiscoverCmd,
+		FindCmd,
 		MoviesCmd,
 		HelpCmd,
 	}

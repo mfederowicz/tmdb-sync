@@ -77,7 +77,7 @@ Revisit both once that checkpoint is reached.
 - [x] TV — `GET /discover/tv`
 
 ## Find
-- [ ] By external ID — `GET /find/{external_id}`
+- [x] By external ID — `GET /find/{external_id}`
 
 ## Genres
 - [ ] Movie List — `GET /genre/movie/list`
