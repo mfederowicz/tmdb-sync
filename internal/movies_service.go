@@ -142,6 +142,24 @@ func (s *MoviesService) GetImages(ctx context.Context, movieID int64, opts *uri.
 	return images, resp, nil
 }
 
+// GetKeywords fetches the keywords for a single movie.
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-keywords
+func (s *MoviesService) GetKeywords(ctx context.Context, movieID int64) (*str.MovieKeywords, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("movie/%d/keywords", movieID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	keywords := new(str.MovieKeywords)
+	resp, err := s.client.Do(ctx, req, keywords)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return keywords, resp, nil
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)

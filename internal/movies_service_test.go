@@ -189,3 +189,26 @@ func TestGetImages(t *testing.T) {
 		t.Errorf("GetImages() = %+v, want ID=550 with 1 backdrop and 1 poster", images)
 	}
 }
+
+func TestGetKeywords(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/keywords", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":       550,
+			"keywords": []map[string]any{{"id": 1701, "name": "hero"}},
+		})
+	})
+
+	keywords, _, err := client.Movies.GetKeywords(context.Background(), 550)
+	if err != nil {
+		t.Fatalf("GetKeywords() error = %v", err)
+	}
+	if keywords.ID != 550 || len(keywords.Keywords) != 1 || keywords.Keywords[0].Name != "hero" {
+		t.Errorf("GetKeywords() = %+v, want ID=550 with 1 keyword %q", keywords, "hero")
+	}
+}

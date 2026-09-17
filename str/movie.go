@@ -96,6 +96,12 @@ type MovieCredits struct {
 	Crew []MovieCrewMember `json:"crew"`
 }
 
+// MovieKeywords is the response shape for GET /movie/{movie_id}/keywords.
+type MovieKeywords struct {
+	ID       int64     `json:"id"`
+	Keywords []Keyword `json:"keywords"`
+}
+
 // MovieExternalIDs is the response shape for
 // GET /movie/{movie_id}/external_ids.
 type MovieExternalIDs struct {
