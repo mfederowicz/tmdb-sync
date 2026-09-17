@@ -22,6 +22,14 @@ schedule.
 
 ### Fixed
 
+## [0.10.0] - 2026-09-17
+
+### Added
+
+- `keywords` module: `details` action (`GET /keyword/{keyword_id}`), returning a keyword's id
+  and name. TMDB's "Movies by keyword" endpoint is deprecated in favor of `discover -a movie`
+  with `with_keywords` and is not implemented.
+
 ## [0.9.0] - 2026-09-17
 
 ### Added
