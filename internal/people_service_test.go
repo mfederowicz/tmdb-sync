@@ -83,3 +83,26 @@ func TestGetPersonExternalIDs(t *testing.T) {
 		t.Errorf("GetPersonExternalIDs() = %+v, want ID=1 ImdbID=%q", ids, "nm0000123")
 	}
 }
+
+func TestGetPersonImages(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/1/images", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":       1,
+			"profiles": []map[string]any{{"file_path": "/profile.jpg"}},
+		})
+	})
+
+	images, _, err := client.People.GetPersonImages(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPersonImages() error = %v", err)
+	}
+	if len(images.Profiles) != 1 {
+		t.Errorf("GetPersonImages() = %+v, want one profile", images)
+	}
+}

@@ -65,3 +65,21 @@ func (s *PeopleService) GetPersonExternalIDs(ctx context.Context, personID int64
 
 	return ids, resp, nil
 }
+
+// GetPersonImages fetches the profile images for a single person by TMDB id.
+//
+// Api docs: https://developer.themoviedb.org/reference/person-images
+func (s *PeopleService) GetPersonImages(ctx context.Context, personID int64) (*str.PersonImages, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("person/%d/images", personID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	images := new(str.PersonImages)
+	resp, err := s.client.Do(ctx, req, images)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return images, resp, nil
+}

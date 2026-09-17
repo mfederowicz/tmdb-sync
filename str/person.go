@@ -59,6 +59,12 @@ type PersonExternalIDs struct {
 	YoutubeID   string `json:"youtube_id"`
 }
 
+// PersonImages is the response shape for GET /person/{person_id}/images.
+type PersonImages struct {
+	ID       int64   `json:"id"`
+	Profiles []Image `json:"profiles"`
+}
+
 // PersonCombinedCredits is the response shape for
 // GET /person/{person_id}/combined_credits.
 type PersonCombinedCredits struct {
