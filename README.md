@@ -18,6 +18,8 @@ aiming for full TMDB v3 API coverage, one module at a time.
 - [`find`](docs/find.md) ✅ — find TMDB movies/TV/people by an external id (IMDb, TVDB, ...).
 - [`genres`](docs/genres.md) ✅ — official movie/tv genre lists.
 - [`keywords`](docs/keywords.md) ✅ — keyword details.
+- [`lists`](docs/lists.md) ✅ — list details, item status, and 🔒 create/add-movie/remove-movie/
+  clear/delete.
 - `movies` 🚧 — `details`, `popular` implemented; the rest of the module is still planned.
 
 See:

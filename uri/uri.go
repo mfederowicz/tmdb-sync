@@ -57,6 +57,27 @@ type ListOptions struct {
 	IncludeAdult bool   `url:"include_adult,omitempty"`
 }
 
+// ListItemStatusOptions carries the query parameters accepted by
+// GET /list/{list_id}/item_status.
+type ListItemStatusOptions struct {
+	MovieID  int64  `url:"movie_id,omitempty"`
+	Language string `url:"language,omitempty"`
+}
+
+// ListMutationOptions carries the session_id query parameter required by
+// the list create/add-item/remove-item/delete (🔒) endpoints.
+type ListMutationOptions struct {
+	SessionID string `url:"session_id,omitempty"`
+}
+
+// ListClearOptions carries the query parameters required by
+// POST /list/{list_id}/clear (🔒) — TMDB requires an explicit confirm=true
+// alongside the session_id to guard against accidental clears.
+type ListClearOptions struct {
+	SessionID string `url:"session_id,omitempty"`
+	Confirm   bool   `url:"confirm,omitempty"`
+}
+
 // ImagesOptions carries the optional query parameters accepted by
 // per-resource images endpoints.
 type ImagesOptions struct {

@@ -22,6 +22,19 @@ schedule.
 
 ### Fixed
 
+## [0.11.0] - 2026-09-17
+
+### Added
+
+- `lists` module, complete: `details` and `item-status` (public reads); `create`, `add-movie`,
+  `remove-movie`, `clear`, `delete` (🔒, requiring a v3 session, with the same transparent
+  re-login on a stale session as the `account` module).
+
+### Changed
+
+- Raised the per-PR module-size threshold from ~3 to ~10 endpoints (see `CLAUDE.md`), so a module
+  of this size can land as one PR.
+
 ## [0.10.0] - 2026-09-17
 
 ### Added

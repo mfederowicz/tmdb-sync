@@ -12,8 +12,9 @@ Key decisions already made (don't relitigate without asking):
 - v3 API fully, then v4 later, as an additive phase (see `docs/ARCHITECTURE.md`'s auth section).
 - TOML config, `<module> -a <action>` command dispatch, one `internal/<x>_service.go` +
   `handlers/<x>_handler.go` + `str/<x>.go` per endpoint area (see `docs/ARCHITECTURE.md`).
-- One module per branch/PR; if a module has more than ~3 endpoints, split it into smaller
-  branches rather than landing it all at once.
+- One module per branch/PR. Before starting a module with more than a couple endpoints, ask the
+  user how many endpoints to tackle in this session/branch rather than assuming a fixed count —
+  available token budget varies per session, so split into smaller branches when the user says so.
 - Modules are implemented in TMDB's own reference-nav order (see `docs/API_COVERAGE.md`'s section
   order and `docs/CLI.md`'s module table).
 - `main` is pushed to a public GitHub remote now — commit and push only when asked.

@@ -55,6 +55,7 @@ type Client struct {
 	Find           *FindService
 	Genre          *GenreService
 	Keywords       *KeywordsService
+	Lists          *ListsService
 	Movies         *MoviesService
 	rateMu         sync.Mutex
 	RateLimitReset time.Time
@@ -100,6 +101,7 @@ func (c *Client) initialize() {
 	c.Find = (*FindService)(&c.common)
 	c.Genre = (*GenreService)(&c.common)
 	c.Keywords = (*KeywordsService)(&c.common)
+	c.Lists = (*ListsService)(&c.common)
 	c.Movies = (*MoviesService)(&c.common)
 }
 
