@@ -9,3 +9,9 @@ type Network struct {
 	Name          string `json:"name"`
 	OriginCountry string `json:"origin_country"`
 }
+
+// NetworkAlternativeNames is the response shape for the network alternative-names endpoint.
+type NetworkAlternativeNames struct {
+	ID      int64             `json:"id"`
+	Results []AlternativeName `json:"results"`
+}

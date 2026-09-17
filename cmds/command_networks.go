@@ -23,7 +23,7 @@ var NetworksCmd = &Command{
 
 func execNetworks(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("networks", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: details (required)")
+	action := flagSet.String("a", "", "action: details, alternative-names (required)")
 	networkID := flagSet.Int64("i", 0, "network id, required for all actions")
 	if err := flagSet.Parse(args); err != nil {
 		return err
@@ -32,12 +32,17 @@ func execNetworks(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *s
 	var handler handlers.Handler
 	switch *action {
 	case "":
-		return fmt.Errorf("networks: -a is required (action: details)")
+		return fmt.Errorf("networks: -a is required (action: details, alternative-names)")
 	case "details":
 		if *networkID == 0 {
 			return fmt.Errorf("networks: -i <network_id> is required for -a details")
 		}
 		handler = handlers.NetworksDetailsHandler{NetworkID: *networkID}
+	case "alternative-names":
+		if *networkID == 0 {
+			return fmt.Errorf("networks: -i <network_id> is required for -a alternative-names")
+		}
+		handler = handlers.NetworksAlternativeNamesHandler{NetworkID: *networkID}
 	default:
 		return fmt.Errorf("networks: unknown action %q", *action)
 	}
