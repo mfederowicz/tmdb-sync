@@ -291,6 +291,36 @@ func TestGetNowPlayingMovies(t *testing.T) {
 	}
 }
 
+func TestGetReleaseDates(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/release_dates", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 550,
+			"results": []map[string]any{
+				{
+					"iso_3166_1": "US",
+					"release_dates": []map[string]any{
+						{"certification": "R", "release_date": "1999-10-15T00:00:00.000Z", "type": 3},
+					},
+				},
+			},
+		})
+	})
+
+	dates, _, err := client.Movies.GetReleaseDates(context.Background(), 550)
+	if err != nil {
+		t.Fatalf("GetReleaseDates() error = %v", err)
+	}
+	if dates.ID != 550 || len(dates.Results) != 1 || dates.Results[0].Iso31661 != "US" {
+		t.Errorf("GetReleaseDates() = %+v, want ID=550 with 1 result for US", dates)
+	}
+}
+
 func TestGetRecommendations(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()

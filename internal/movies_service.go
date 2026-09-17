@@ -297,6 +297,25 @@ func (s *MoviesService) GetRecommendations(ctx context.Context, movieID int64, l
 	})
 }
 
+// GetReleaseDates fetches the per-country release dates and certifications
+// for a single movie.
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-release-dates
+func (s *MoviesService) GetReleaseDates(ctx context.Context, movieID int64) (*str.MovieReleaseDates, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("movie/%d/release_dates", movieID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	dates := new(str.MovieReleaseDates)
+	resp, err := s.client.Do(ctx, req, dates)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return dates, resp, nil
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)

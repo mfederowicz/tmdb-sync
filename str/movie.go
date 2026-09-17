@@ -112,6 +112,31 @@ type MovieKeywords struct {
 	Keywords []Keyword `json:"keywords"`
 }
 
+// MovieReleaseDate is one release date entry within a country's release
+// dates, as returned inline on the movie release-dates endpoint.
+type MovieReleaseDate struct {
+	Certification string   `json:"certification"`
+	Descriptors   []string `json:"descriptors"`
+	Iso6391       string   `json:"iso_639_1"`
+	Note          string   `json:"note"`
+	ReleaseDate   string   `json:"release_date"`
+	Type          int      `json:"type"`
+}
+
+// MovieReleaseDatesResult is a single country's release dates, as returned
+// inline on the movie release-dates endpoint.
+type MovieReleaseDatesResult struct {
+	Iso31661     string             `json:"iso_3166_1"`
+	ReleaseDates []MovieReleaseDate `json:"release_dates"`
+}
+
+// MovieReleaseDates is the response shape for
+// GET /movie/{movie_id}/release_dates.
+type MovieReleaseDates struct {
+	ID      int64                     `json:"id"`
+	Results []MovieReleaseDatesResult `json:"results"`
+}
+
 // MovieExternalIDs is the response shape for
 // GET /movie/{movie_id}/external_ids.
 type MovieExternalIDs struct {

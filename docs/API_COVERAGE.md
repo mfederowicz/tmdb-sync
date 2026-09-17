@@ -115,7 +115,7 @@ Revisit both once that checkpoint is reached.
 - [x] Now Playing — `GET /movie/now_playing`
 - [x] Popular — `GET /movie/popular`
 - [x] Recommendations — `GET /movie/{movie_id}/recommendations`
-- [ ] Release Dates — `GET /movie/{movie_id}/release_dates`
+- [x] Release Dates — `GET /movie/{movie_id}/release_dates`
 - [ ] Reviews — `GET /movie/{movie_id}/reviews`
 - [ ] Similar — `GET /movie/{movie_id}/similar`
 - [ ] Top Rated — `GET /movie/top_rated`
