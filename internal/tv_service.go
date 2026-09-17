@@ -96,3 +96,22 @@ func (s *TVService) GetAlternativeTitles(ctx context.Context, seriesID int64) (*
 
 	return titles, resp, nil
 }
+
+// GetContentRatings fetches the per-country content ratings for a single
+// TV series.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-content-ratings
+func (s *TVService) GetContentRatings(ctx context.Context, seriesID int64) (*str.TVContentRatings, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("tv/%d/content_ratings", seriesID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ratings := new(str.TVContentRatings)
+	resp, err := s.client.Do(ctx, req, ratings)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return ratings, resp, nil
+}

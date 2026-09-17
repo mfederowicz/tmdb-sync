@@ -100,6 +100,21 @@ type TVAlternativeTitles struct {
 	Results []TVAlternativeTitle `json:"results"`
 }
 
+// TVContentRating is one country's content rating (certification), as
+// returned inline on the tv content-ratings endpoint.
+type TVContentRating struct {
+	Iso31661    string   `json:"iso_3166_1"`
+	Rating      string   `json:"rating"`
+	Descriptors []string `json:"descriptors"`
+}
+
+// TVContentRatings is the response shape for
+// GET /tv/{series_id}/content_ratings.
+type TVContentRatings struct {
+	ID      int64             `json:"id"`
+	Results []TVContentRating `json:"results"`
+}
+
 // TVShows is a paginated list of TV shows.
 type TVShows struct {
 	Page         int  `json:"page"`

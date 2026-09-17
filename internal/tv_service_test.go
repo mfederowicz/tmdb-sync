@@ -124,3 +124,28 @@ func TestGetTVAlternativeTitles(t *testing.T) {
 		t.Errorf("GetAlternativeTitles() = %+v, want ID=1399 with 1 title %q", titles, "Game of Thrones")
 	}
 }
+
+func TestGetContentRatings(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/content_ratings", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1399,
+			"results": []map[string]any{
+				{"iso_3166_1": "US", "rating": "TV-MA"},
+			},
+		})
+	})
+
+	ratings, _, err := client.TV.GetContentRatings(context.Background(), 1399)
+	if err != nil {
+		t.Fatalf("GetContentRatings() error = %v", err)
+	}
+	if ratings.ID != 1399 || len(ratings.Results) != 1 || ratings.Results[0].Rating != "TV-MA" {
+		t.Errorf("GetContentRatings() = %+v, want ID=1399 with 1 rating %q", ratings, "TV-MA")
+	}
+}
