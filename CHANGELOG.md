@@ -22,6 +22,13 @@ schedule.
 
 ### Fixed
 
+## [0.8.0] - 2026-09-17
+
+### Added
+
+- `find` module: `by-id` action (`GET /find/{external_id}`), looking up an external id (IMDb,
+  TVDB, ...) and returning matching movie/tv/person/episode/season results.
+
 ## [0.7.0] - 2026-09-17
 
 ### Added
