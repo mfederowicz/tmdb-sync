@@ -197,3 +197,21 @@ func (s *TVService) GetImages(ctx context.Context, seriesID int64, opts *uri.Ima
 
 	return images, resp, nil
 }
+
+// GetKeywords fetches the keywords for a single TV series.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-keywords
+func (s *TVService) GetKeywords(ctx context.Context, seriesID int64) (*str.TVKeywords, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("tv/%d/keywords", seriesID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	keywords := new(str.TVKeywords)
+	resp, err := s.client.Do(ctx, req, keywords)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return keywords, resp, nil
+}

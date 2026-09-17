@@ -263,3 +263,28 @@ func TestGetTVImages(t *testing.T) {
 		t.Errorf("GetImages() = %+v, want 1 backdrop and 1 poster", images)
 	}
 }
+
+func TestGetTVKeywords(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/keywords", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1399,
+			"results": []map[string]any{
+				{"id": 818, "name": "based on novel or book"},
+			},
+		})
+	})
+
+	keywords, _, err := client.TV.GetKeywords(context.Background(), 1399)
+	if err != nil {
+		t.Fatalf("GetKeywords() error = %v", err)
+	}
+	if keywords.ID != 1399 || len(keywords.Results) != 1 || keywords.Results[0].Name != "based on novel or book" {
+		t.Errorf("GetKeywords() = %+v, want ID=1399 with 1 keyword %q", keywords, "based on novel or book")
+	}
+}

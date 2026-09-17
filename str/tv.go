@@ -244,3 +244,9 @@ type RatedTVEpisodes struct {
 	TotalPages   int              `json:"total_pages"`
 	TotalResults int              `json:"total_results"`
 }
+
+// TVKeywords is the response shape for GET /tv/{series_id}/keywords.
+type TVKeywords struct {
+	ID      int64     `json:"id"`
+	Results []Keyword `json:"results"`
+}
