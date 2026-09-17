@@ -22,6 +22,16 @@ schedule.
 
 ### Fixed
 
+## [0.18.0] - 2026-09-18
+
+### Added
+
+- `tv` module: `details`, `account-states`, `aggregate-credits`, `alternative-titles`,
+  `content-ratings`, `credits`, `episode-groups`, `external-ids`, `images`, `keywords`, `latest`,
+  `lists`, `recommendations`, `reviews`, `screened-theatrically`, `similar`, `translations`,
+  `videos`, `watch-providers`, `popular`, `top-rated`, `on-the-air`, `airing-today`,
+  `add-rating`, and `delete-rating` actions.
+
 ## [0.17.0] - 2026-09-17
 
 ### Added

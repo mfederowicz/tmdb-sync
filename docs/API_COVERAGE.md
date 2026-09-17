@@ -161,31 +161,31 @@ Revisit both once that checkpoint is reached.
 - [x] TV Shows — `GET /trending/tv/{time_window}`
 
 ## TV Series
-- [ ] Details — `GET /tv/{series_id}`
-- [ ] Account States 🔒 — `GET /tv/{series_id}/account_states`
-- [ ] Aggregate Credits — `GET /tv/{series_id}/aggregate_credits`
-- [ ] Alternative Titles — `GET /tv/{series_id}/alternative_titles`
-- [ ] Content Ratings — `GET /tv/{series_id}/content_ratings`
-- [ ] Credits — `GET /tv/{series_id}/credits`
-- [ ] Episode Groups — `GET /tv/{series_id}/episode_groups`
-- [ ] External IDs — `GET /tv/{series_id}/external_ids`
-- [ ] Images — `GET /tv/{series_id}/images`
-- [ ] Keywords — `GET /tv/{series_id}/keywords`
-- [ ] Latest — `GET /tv/latest`
-- [ ] Lists — `GET /tv/{series_id}/lists`
-- [ ] Recommendations — `GET /tv/{series_id}/recommendations`
-- [ ] Reviews — `GET /tv/{series_id}/reviews`
-- [ ] Screened Theatrically — `GET /tv/{series_id}/screened_theatrically`
-- [ ] Similar — `GET /tv/{series_id}/similar`
-- [ ] Translations — `GET /tv/{series_id}/translations`
-- [ ] Videos — `GET /tv/{series_id}/videos`
-- [ ] Watch Providers — `GET /tv/{series_id}/watch/providers`
-- [ ] Popular — `GET /tv/popular`
-- [ ] Top Rated — `GET /tv/top_rated`
-- [ ] On The Air — `GET /tv/on_the_air`
-- [ ] Airing Today — `GET /tv/airing_today`
-- [ ] Add Rating 🔒 — `POST /tv/{series_id}/rating`
-- [ ] Delete Rating 🔒 — `DELETE /tv/{series_id}/rating`
+- [x] Details — `GET /tv/{series_id}`
+- [x] Account States 🔒 — `GET /tv/{series_id}/account_states`
+- [x] Aggregate Credits — `GET /tv/{series_id}/aggregate_credits`
+- [x] Alternative Titles — `GET /tv/{series_id}/alternative_titles`
+- [x] Content Ratings — `GET /tv/{series_id}/content_ratings`
+- [x] Credits — `GET /tv/{series_id}/credits`
+- [x] Episode Groups — `GET /tv/{series_id}/episode_groups`
+- [x] External IDs — `GET /tv/{series_id}/external_ids`
+- [x] Images — `GET /tv/{series_id}/images`
+- [x] Keywords — `GET /tv/{series_id}/keywords`
+- [x] Latest — `GET /tv/latest`
+- [x] Lists — `GET /tv/{series_id}/lists`
+- [x] Recommendations — `GET /tv/{series_id}/recommendations`
+- [x] Reviews — `GET /tv/{series_id}/reviews`
+- [x] Screened Theatrically — `GET /tv/{series_id}/screened_theatrically`
+- [x] Similar — `GET /tv/{series_id}/similar`
+- [x] Translations — `GET /tv/{series_id}/translations`
+- [x] Videos — `GET /tv/{series_id}/videos`
+- [x] Watch Providers — `GET /tv/{series_id}/watch/providers`
+- [x] Popular — `GET /tv/popular`
+- [x] Top Rated — `GET /tv/top_rated`
+- [x] On The Air — `GET /tv/on_the_air`
+- [x] Airing Today — `GET /tv/airing_today`
+- [x] Add Rating 🔒 — `POST /tv/{series_id}/rating`
+- [x] Delete Rating 🔒 — `DELETE /tv/{series_id}/rating`
 
 ## TV Seasons
 - [ ] Details — `GET /tv/{series_id}/season/{season_number}`
