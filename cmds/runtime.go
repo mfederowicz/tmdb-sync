@@ -34,6 +34,7 @@ func init() {
 		PeopleCmd,
 		ReviewsCmd,
 		SearchCmd,
+		TrendingCmd,
 		HelpCmd,
 	}
 }

@@ -155,10 +155,10 @@ Revisit both once that checkpoint is reached.
 - [x] TV Shows — `GET /search/tv`
 
 ## Trending
-- [ ] All — `GET /trending/all/{time_window}`
-- [ ] Movies — `GET /trending/movie/{time_window}`
-- [ ] People — `GET /trending/person/{time_window}`
-- [ ] TV Shows — `GET /trending/tv/{time_window}`
+- [x] All — `GET /trending/all/{time_window}`
+- [x] Movies — `GET /trending/movie/{time_window}`
+- [x] People — `GET /trending/person/{time_window}`
+- [x] TV Shows — `GET /trending/tv/{time_window}`
 
 ## TV Series
 - [ ] Details — `GET /tv/{series_id}`
