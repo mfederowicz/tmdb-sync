@@ -58,6 +58,7 @@ type Client struct {
 	Lists          *ListsService
 	Movies         *MoviesService
 	Networks       *NetworksService
+	People         *PeopleService
 	rateMu         sync.Mutex
 	RateLimitReset time.Time
 }
@@ -105,6 +106,7 @@ func (c *Client) initialize() {
 	c.Lists = (*ListsService)(&c.common)
 	c.Movies = (*MoviesService)(&c.common)
 	c.Networks = (*NetworksService)(&c.common)
+	c.People = (*PeopleService)(&c.common)
 }
 
 // NewRequest creates an API request.

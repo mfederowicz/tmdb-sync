@@ -132,15 +132,15 @@ Revisit both once that checkpoint is reached.
 - [x] Images — `GET /network/{network_id}/images`
 
 ## People
-- [ ] Details — `GET /person/{person_id}`
-- [ ] Combined Credits — `GET /person/{person_id}/combined_credits`
-- [ ] External IDs — `GET /person/{person_id}/external_ids`
-- [ ] Images — `GET /person/{person_id}/images`
-- [ ] Latest — `GET /person/latest`
-- [ ] Movie Credits — `GET /person/{person_id}/movie_credits`
-- [ ] Popular — `GET /person/popular`
-- [ ] TV Credits — `GET /person/{person_id}/tv_credits`
-- [ ] Translations — `GET /person/{person_id}/translations`
+- [x] Details — `GET /person/{person_id}`
+- [x] Combined Credits — `GET /person/{person_id}/combined_credits`
+- [x] External IDs — `GET /person/{person_id}/external_ids`
+- [x] Images — `GET /person/{person_id}/images`
+- [x] Latest — `GET /person/latest`
+- [x] Movie Credits — `GET /person/{person_id}/movie_credits`
+- [x] Popular — `GET /person/popular`
+- [x] TV Credits — `GET /person/{person_id}/tv_credits`
+- [x] Translations — `GET /person/{person_id}/translations`
 
 ## Reviews
 - [ ] Details — `GET /review/{review_id}`

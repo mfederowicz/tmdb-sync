@@ -1,0 +1,250 @@
+package internal
+
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"testing"
+)
+
+func TestGetPerson(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/1", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":   1,
+			"name": "George Clooney",
+		})
+	})
+
+	person, _, err := client.People.GetPerson(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPerson() error = %v", err)
+	}
+	if person.ID != 1 || person.Name != "George Clooney" {
+		t.Errorf("GetPerson() = %+v, want ID=1 Name=%q", person, "George Clooney")
+	}
+}
+
+func TestGetPersonCombinedCredits(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/1/combined_credits", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1,
+			"cast": []map[string]any{
+				{"id": 100, "media_type": "movie", "title": "Ocean's Eleven", "character": "Danny Ocean"},
+			},
+			"crew": []map[string]any{
+				{"id": 200, "media_type": "tv", "name": "Unscripted", "job": "Director"},
+			},
+		})
+	})
+
+	credits, _, err := client.People.GetPersonCombinedCredits(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPersonCombinedCredits() error = %v", err)
+	}
+	if len(credits.Cast) != 1 || credits.Cast[0].Title != "Ocean's Eleven" {
+		t.Errorf("GetPersonCombinedCredits() cast = %+v, want one entry titled Ocean's Eleven", credits.Cast)
+	}
+	if len(credits.Crew) != 1 || credits.Crew[0].Job != "Director" {
+		t.Errorf("GetPersonCombinedCredits() crew = %+v, want one entry job Director", credits.Crew)
+	}
+}
+
+func TestGetPersonExternalIDs(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/1/external_ids", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":      1,
+			"imdb_id": "nm0000123",
+		})
+	})
+
+	ids, _, err := client.People.GetPersonExternalIDs(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPersonExternalIDs() error = %v", err)
+	}
+	if ids.ID != 1 || ids.ImdbID != "nm0000123" {
+		t.Errorf("GetPersonExternalIDs() = %+v, want ID=1 ImdbID=%q", ids, "nm0000123")
+	}
+}
+
+func TestGetPersonImages(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/1/images", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":       1,
+			"profiles": []map[string]any{{"file_path": "/profile.jpg"}},
+		})
+	})
+
+	images, _, err := client.People.GetPersonImages(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPersonImages() error = %v", err)
+	}
+	if len(images.Profiles) != 1 {
+		t.Errorf("GetPersonImages() = %+v, want one profile", images)
+	}
+}
+
+func TestPeopleGetLatest(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/latest", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":   2,
+			"name": "Jane Doe",
+		})
+	})
+
+	person, _, err := client.People.GetLatest(context.Background())
+	if err != nil {
+		t.Fatalf("GetLatest() error = %v", err)
+	}
+	if person.ID != 2 || person.Name != "Jane Doe" {
+		t.Errorf("GetLatest() = %+v, want ID=2 Name=%q", person, "Jane Doe")
+	}
+}
+
+func TestGetPersonMovieCredits(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/1/movie_credits", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1,
+			"cast": []map[string]any{
+				{"id": 100, "title": "Ocean's Eleven", "character": "Danny Ocean"},
+			},
+			"crew": []map[string]any{
+				{"id": 300, "title": "Good Night, and Good Luck", "job": "Director"},
+			},
+		})
+	})
+
+	credits, _, err := client.People.GetPersonMovieCredits(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPersonMovieCredits() error = %v", err)
+	}
+	if len(credits.Cast) != 1 || credits.Cast[0].Title != "Ocean's Eleven" {
+		t.Errorf("GetPersonMovieCredits() cast = %+v, want one entry titled Ocean's Eleven", credits.Cast)
+	}
+	if len(credits.Crew) != 1 || credits.Crew[0].Job != "Director" {
+		t.Errorf("GetPersonMovieCredits() crew = %+v, want one entry job Director", credits.Crew)
+	}
+}
+
+func TestGetPopularPeople(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/popular", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page": 1,
+			"results": []map[string]any{
+				{"id": 1, "name": "George Clooney"},
+			},
+			"total_pages":   1,
+			"total_results": 1,
+		})
+	})
+
+	persons, err := client.People.GetPopularPeople(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPopularPeople() error = %v", err)
+	}
+	if len(persons) != 1 || persons[0].Name != "George Clooney" {
+		t.Errorf("GetPopularPeople() = %+v, want one person named George Clooney", persons)
+	}
+}
+
+func TestGetPersonTVCredits(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/1/tv_credits", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1,
+			"cast": []map[string]any{
+				{"id": 100, "name": "Unscripted", "character": "Himself"},
+			},
+			"crew": []map[string]any{
+				{"id": 200, "name": "Unscripted", "job": "Director"},
+			},
+		})
+	})
+
+	credits, _, err := client.People.GetPersonTVCredits(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPersonTVCredits() error = %v", err)
+	}
+	if len(credits.Cast) != 1 || credits.Cast[0].Name != "Unscripted" {
+		t.Errorf("GetPersonTVCredits() cast = %+v, want one entry named Unscripted", credits.Cast)
+	}
+	if len(credits.Crew) != 1 || credits.Crew[0].Job != "Director" {
+		t.Errorf("GetPersonTVCredits() crew = %+v, want one entry job Director", credits.Crew)
+	}
+}
+
+func TestGetPersonTranslations(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/1/translations", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1,
+			"translations": []map[string]any{
+				{
+					"iso_3166_1":   "US",
+					"iso_639_1":    "en",
+					"english_name": "English",
+					"data":         map[string]any{"biography": "An actor."},
+				},
+			},
+		})
+	})
+
+	translations, _, err := client.People.GetPersonTranslations(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPersonTranslations() error = %v", err)
+	}
+	if len(translations.Translations) != 1 || translations.Translations[0].Data.Biography != "An actor." {
+		t.Errorf("GetPersonTranslations() = %+v, want one translation with biography %q", translations, "An actor.")
+	}
+}
