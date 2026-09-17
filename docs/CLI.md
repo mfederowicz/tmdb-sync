@@ -53,7 +53,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | `certifications` ✅ ([docs](certifications.md)) | `movie`, `tv` |
 | `changes` ✅ ([docs](changes.md)) | `movie`, `tv`, `person` |
 | `collections` ✅ ([docs](collections.md)) | `details -i <id>`, `images -i <id>`, `translations -i <id>` |
-| `companies`       | `details -i <id>`, `images -i <id>` |
+| `companies` ✅ ([docs](companies.md)) | `details -i <id>`, `alternative-names -i <id>`, `images -i <id>` |
 | `configuration` ✅ ([docs](configuration.md)) | `details`, `countries`, `languages`, `jobs`, `timezones`, `primary-translations` |
 | `credits`         | `details -i <credit_id>` |
 | `discover`        | `movie [filters]`, `tv [filters]` |
