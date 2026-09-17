@@ -1,6 +1,6 @@
 package str
 
-// TV is a TV show as returned by TMDB TV endpoints (e.g. account favorite/rated TV).
+// TV is the response of GET /tv/{series_id}.
 type TV struct {
 	ID               int64   `json:"id"`
 	Name             string  `json:"name"`
@@ -11,6 +11,9 @@ type TV struct {
 	VoteCount        int     `json:"vote_count"`
 	Popularity       float64 `json:"popularity"`
 	Adult            bool    `json:"adult"`
+	InProduction     bool    `json:"in_production"`
+	NumberOfEpisodes int     `json:"number_of_episodes"`
+	NumberOfSeasons  int     `json:"number_of_seasons"`
 	OriginalLanguage string  `json:"original_language"`
 }
 
