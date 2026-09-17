@@ -169,7 +169,7 @@ Revisit both once that checkpoint is reached.
 - [x] Credits — `GET /tv/{series_id}/credits`
 - [x] Episode Groups — `GET /tv/{series_id}/episode_groups`
 - [x] External IDs — `GET /tv/{series_id}/external_ids`
-- [ ] Images — `GET /tv/{series_id}/images`
+- [x] Images — `GET /tv/{series_id}/images`
 - [ ] Keywords — `GET /tv/{series_id}/keywords`
 - [ ] Latest — `GET /tv/latest`
 - [ ] Lists — `GET /tv/{series_id}/lists`
