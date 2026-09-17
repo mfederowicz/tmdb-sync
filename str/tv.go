@@ -290,3 +290,18 @@ type TVReviews struct {
 	TotalPages   int        `json:"total_pages"`
 	TotalResults int        `json:"total_results"`
 }
+
+// TVScreenedTheatricallyEpisode is one episode that had a theatrical
+// screening, as returned inline on the tv screened-theatrically endpoint.
+type TVScreenedTheatricallyEpisode struct {
+	ID            int64 `json:"id"`
+	EpisodeNumber int   `json:"episode_number"`
+	SeasonNumber  int   `json:"season_number"`
+}
+
+// TVScreenedTheatrically is the response shape for
+// GET /tv/{series_id}/screened_theatrically.
+type TVScreenedTheatrically struct {
+	ID      int64                           `json:"id"`
+	Results []TVScreenedTheatricallyEpisode `json:"results"`
+}

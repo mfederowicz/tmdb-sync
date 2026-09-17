@@ -336,6 +336,83 @@ func (s *TVService) GetReviews(ctx context.Context, seriesID int64, language str
 	})
 }
 
+// GetScreenedTheatrically fetches the episodes of a TV series that had a
+// theatrical screening.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-screened-theatrically
+func (s *TVService) GetScreenedTheatrically(ctx context.Context, seriesID int64) (*str.TVScreenedTheatrically, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("tv/%d/screened_theatrically", seriesID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	screened := new(str.TVScreenedTheatrically)
+	resp, err := s.client.Do(ctx, req, screened)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return screened, resp, nil
+}
+
+// getSimilarPage fetches a single page of a TV series' similar-shows list.
+func (s *TVService) getSimilarPage(ctx context.Context, seriesID int64, opts *uri.ListOptions) (*str.TVShows, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/similar", seriesID), opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	shows := new(str.TVShows)
+	resp, err := s.client.Do(ctx, req, shows)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return shows, resp, nil
+}
+
+// GetSimilar returns TV series similar to a single series, walking pages
+// until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-similar
+func (s *TVService) GetSimilar(ctx context.Context, seriesID int64, language string, pagesLimit int) ([]str.TV, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.TV], error) {
+		shows, _, err := s.getSimilarPage(ctx, seriesID, &uri.ListOptions{Page: page, Language: language})
+		if err != nil {
+			return PageResult[str.TV]{}, err
+		}
+		return PageResult[str.TV]{
+			Results:    shows.Results,
+			Page:       shows.Page,
+			TotalPages: shows.TotalPages,
+		}, nil
+	})
+}
+
+// GetTranslations fetches the translated fields for a single TV series.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-translations
+func (s *TVService) GetTranslations(ctx context.Context, seriesID int64) (*str.Translations, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("tv/%d/translations", seriesID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	translations := new(str.Translations)
+	resp, err := s.client.Do(ctx, req, translations)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return translations, resp, nil
+}
+
 // GetLatest fetches the most recently created TV series on TMDB.
 //
 // Api docs: https://developer.themoviedb.org/reference/tv-series-latest-id

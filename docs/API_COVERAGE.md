@@ -175,9 +175,9 @@ Revisit both once that checkpoint is reached.
 - [x] Lists — `GET /tv/{series_id}/lists`
 - [x] Recommendations — `GET /tv/{series_id}/recommendations`
 - [x] Reviews — `GET /tv/{series_id}/reviews`
-- [ ] Screened Theatrically — `GET /tv/{series_id}/screened_theatrically`
-- [ ] Similar — `GET /tv/{series_id}/similar`
-- [ ] Translations — `GET /tv/{series_id}/translations`
+- [x] Screened Theatrically — `GET /tv/{series_id}/screened_theatrically`
+- [x] Similar — `GET /tv/{series_id}/similar`
+- [x] Translations — `GET /tv/{series_id}/translations`
 - [ ] Videos — `GET /tv/{series_id}/videos`
 - [ ] Watch Providers — `GET /tv/{series_id}/watch/providers`
 - [ ] Popular — `GET /tv/popular`

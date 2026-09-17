@@ -395,3 +395,80 @@ func TestGetTVReviews(t *testing.T) {
 		t.Fatalf("len(reviews) = %d, want 2", len(reviews))
 	}
 }
+
+func TestGetTVScreenedTheatrically(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/screened_theatrically", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1399,
+			"results": []map[string]any{
+				{"id": 12345, "episode_number": 1, "season_number": 1},
+			},
+		})
+	})
+
+	screened, _, err := client.TV.GetScreenedTheatrically(context.Background(), 1399)
+	if err != nil {
+		t.Fatalf("GetScreenedTheatrically() error = %v", err)
+	}
+	if screened.ID != 1399 || len(screened.Results) != 1 || screened.Results[0].EpisodeNumber != 1 {
+		t.Errorf("GetScreenedTheatrically() = %+v, want ID=1399 with 1 result EpisodeNumber=1", screened)
+	}
+}
+
+func TestGetTVSimilar(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/similar", func(w http.ResponseWriter, r *http.Request) {
+		pageNum, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			pageNum = 1
+		}
+		results := []map[string]any{{"id": pageNum, "name": "a show"}}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          pageNum,
+			"results":       results,
+			"total_pages":   2,
+			"total_results": 2,
+		})
+	})
+
+	shows, err := client.TV.GetSimilar(context.Background(), 1399, "", 0)
+	if err != nil {
+		t.Fatalf("GetSimilar() error = %v", err)
+	}
+	if len(shows) != 2 {
+		t.Fatalf("len(shows) = %d, want 2", len(shows))
+	}
+}
+
+func TestGetTVTranslations(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/translations", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1399,
+			"translations": []map[string]any{
+				{"iso_3166_1": "US", "iso_639_1": "en", "name": "English", "english_name": "English", "data": map[string]any{"name": "Game of Thrones", "overview": "", "homepage": ""}},
+			},
+		})
+	})
+
+	translations, _, err := client.TV.GetTranslations(context.Background(), 1399)
+	if err != nil {
+		t.Fatalf("GetTranslations() error = %v", err)
+	}
+	if translations.ID != 1399 || len(translations.Translations) != 1 {
+		t.Errorf("GetTranslations() = %+v, want ID=1399 with 1 translation", translations)
+	}
+}
