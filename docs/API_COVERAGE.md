@@ -164,7 +164,7 @@ Revisit both once that checkpoint is reached.
 - [x] Details — `GET /tv/{series_id}`
 - [x] Account States 🔒 — `GET /tv/{series_id}/account_states`
 - [x] Aggregate Credits — `GET /tv/{series_id}/aggregate_credits`
-- [ ] Alternative Titles — `GET /tv/{series_id}/alternative_titles`
+- [x] Alternative Titles — `GET /tv/{series_id}/alternative_titles`
 - [ ] Content Ratings — `GET /tv/{series_id}/content_ratings`
 - [ ] Credits — `GET /tv/{series_id}/credits`
 - [ ] Episode Groups — `GET /tv/{series_id}/episode_groups`
