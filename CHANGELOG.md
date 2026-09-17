@@ -22,6 +22,18 @@ schedule.
 
 ### Fixed
 
+## [0.19.0] - 2026-09-18
+
+### Added
+
+- `tv-seasons` module: `details`, `account-states`, `aggregate-credits`, `credits`,
+  `external-ids`, `images`, `translations`, `videos`.
+
+### Changed
+
+- Wrapped two overly long action-help consts in `cmds/command_tv.go` to satisfy revive's
+  line-length lint rule.
+
 ## [0.18.0] - 2026-09-18
 
 ### Added

@@ -30,6 +30,8 @@ aiming for full TMDB v3 API coverage, one module at a time.
 - [`trending`](docs/trending.md) ✅ — trending movies, TV shows, and people, by day or week.
 - [`tv`](docs/tv.md) ✅ — full TV series module: details, lists, credits, images, videos,
   watch providers, and 🔒 account-states/add-rating/delete-rating.
+- [`tv-seasons`](docs/tv-seasons.md) ✅ — TV season details, aggregate-credits, credits,
+  external-ids, images, translations, videos, and 🔒 account-states.
 
 See:
 
