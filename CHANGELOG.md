@@ -18,11 +18,15 @@ schedule.
 
 ### Added
 
-- `networks` module: `details`, `alternative-names`, `images` actions.
-
 ### Changed
 
 ### Fixed
+
+## [0.13.0] - 2026-09-17
+
+### Added
+
+- `networks` module: `details`, `alternative-names`, `images` actions.
 
 ## [0.12.1] - 2026-09-17
 
