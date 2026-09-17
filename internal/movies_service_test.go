@@ -318,6 +318,31 @@ func TestGetTopRatedMovies(t *testing.T) {
 	}
 }
 
+func TestGetTranslations(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/translations", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 550,
+			"translations": []map[string]any{
+				{"iso_3166_1": "US", "iso_639_1": "en", "name": "", "english_name": "English"},
+			},
+		})
+	})
+
+	translations, _, err := client.Movies.GetTranslations(context.Background(), 550)
+	if err != nil {
+		t.Fatalf("GetTranslations() error = %v", err)
+	}
+	if translations.ID != 550 || len(translations.Translations) != 1 {
+		t.Errorf("GetTranslations() = %+v, want ID=550 with 1 translation", translations)
+	}
+}
+
 func TestGetReleaseDates(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()

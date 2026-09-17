@@ -435,6 +435,24 @@ func (s *MoviesService) GetTopRatedMovies(ctx context.Context, pagesLimit int) (
 	})
 }
 
+// GetTranslations fetches the translated fields for a single movie.
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-translations
+func (s *MoviesService) GetTranslations(ctx context.Context, movieID int64) (*str.Translations, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("movie/%d/translations", movieID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	translations := new(str.Translations)
+	resp, err := s.client.Do(ctx, req, translations)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return translations, resp, nil
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)
