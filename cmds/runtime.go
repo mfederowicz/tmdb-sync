@@ -36,6 +36,7 @@ func init() {
 		SearchCmd,
 		TrendingCmd,
 		TVCmd,
+		TVSeasonsCmd,
 		HelpCmd,
 	}
 }

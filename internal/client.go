@@ -63,6 +63,7 @@ type Client struct {
 	Search         *SearchService
 	Trending       *TrendingService
 	TV             *TVService
+	TVSeasons      *TVSeasonsService
 	rateMu         sync.Mutex
 	RateLimitReset time.Time
 }
@@ -115,6 +116,7 @@ func (c *Client) initialize() {
 	c.Search = (*SearchService)(&c.common)
 	c.Trending = (*TrendingService)(&c.common)
 	c.TV = (*TVService)(&c.common)
+	c.TVSeasons = (*TVSeasonsService)(&c.common)
 }
 
 // NewRequest creates an API request.

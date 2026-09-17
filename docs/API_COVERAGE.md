@@ -188,7 +188,7 @@ Revisit both once that checkpoint is reached.
 - [x] Delete Rating 🔒 — `DELETE /tv/{series_id}/rating`
 
 ## TV Seasons
-- [ ] Details — `GET /tv/{series_id}/season/{season_number}`
+- [x] Details — `GET /tv/{series_id}/season/{season_number}`
 - [ ] Account States 🔒 — `GET /tv/{series_id}/season/{season_number}/account_states`
 - [ ] Aggregate Credits — `GET /tv/{series_id}/season/{season_number}/aggregate_credits`
 - [ ] Credits — `GET /tv/{series_id}/season/{season_number}/credits`
