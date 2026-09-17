@@ -22,6 +22,17 @@ schedule.
 
 ### Fixed
 
+## [0.4.0] - 2026-09-17
+
+### Added
+
+- `changes` module: `movie`, `tv`, `person` actions, with optional `-start-date`/`-end-date`
+  filters and `-pages-limit` pagination.
+- `main.go` validates the configured `api_key`/`read_access_token` at startup and exits with a
+  clear error before running any command if it's invalid.
+- `account` actions now automatically re-run the login flow and retry once on an HTTP 401
+  (expired/revoked session), instead of failing outright.
+
 ## [0.3.0] - 2026-09-17
 
 ### Added
