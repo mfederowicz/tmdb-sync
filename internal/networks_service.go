@@ -46,3 +46,21 @@ func (s *NetworksService) GetNetworkAlternativeNames(ctx context.Context, networ
 
 	return names, resp, nil
 }
+
+// GetNetworkImages fetches the logos for a single network by TMDB id.
+//
+// Api docs: https://developer.themoviedb.org/reference/network-images
+func (s *NetworksService) GetNetworkImages(ctx context.Context, networkID int64) (*str.Images, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("network/%d/images", networkID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	images := new(str.Images)
+	resp, err := s.client.Do(ctx, req, images)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return images, resp, nil
+}

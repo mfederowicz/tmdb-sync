@@ -54,3 +54,26 @@ func TestGetNetworkAlternativeNames(t *testing.T) {
 		t.Errorf("GetNetworkAlternativeNames() = %+v, want one result named Home Box Office", names)
 	}
 }
+
+func TestGetNetworkImages(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/network/1/images", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":    1,
+			"logos": []map[string]any{{"file_path": "/logo.png"}},
+		})
+	})
+
+	images, _, err := client.Networks.GetNetworkImages(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetNetworkImages() error = %v", err)
+	}
+	if len(images.Logos) != 1 {
+		t.Errorf("GetNetworkImages() = %+v, want one logo", images)
+	}
+}
