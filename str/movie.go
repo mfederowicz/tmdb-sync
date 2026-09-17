@@ -96,6 +96,16 @@ type MovieCredits struct {
 	Crew []MovieCrewMember `json:"crew"`
 }
 
+// MovieLists is a paginated page of the lists a movie belongs to, as
+// returned by GET /movie/{movie_id}/lists.
+type MovieLists struct {
+	ID           int64         `json:"id"`
+	Page         int           `json:"page"`
+	Results      []AccountList `json:"results"`
+	TotalPages   int           `json:"total_pages"`
+	TotalResults int           `json:"total_results"`
+}
+
 // MovieKeywords is the response shape for GET /movie/{movie_id}/keywords.
 type MovieKeywords struct {
 	ID       int64     `json:"id"`

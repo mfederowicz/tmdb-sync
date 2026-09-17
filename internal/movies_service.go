@@ -178,6 +178,45 @@ func (s *MoviesService) GetLatest(ctx context.Context) (*str.Movie, *str.Respons
 	return movie, resp, nil
 }
 
+// getMovieListsPage fetches a single page of the lists a movie belongs to.
+func (s *MoviesService) getMovieListsPage(ctx context.Context, movieID int64, opts *uri.ListOptions) (*str.MovieLists, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("movie/%d/lists", movieID), opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	lists := new(str.MovieLists)
+	resp, err := s.client.Do(ctx, req, lists)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return lists, resp, nil
+}
+
+// GetLists returns the lists a movie belongs to, walking pages until TMDB
+// reports no more (total_pages) or pagesLimit is reached (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-lists
+func (s *MoviesService) GetLists(ctx context.Context, movieID int64, language string, pagesLimit int) ([]str.AccountList, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.AccountList], error) {
+		lists, _, err := s.getMovieListsPage(ctx, movieID, &uri.ListOptions{Page: page, Language: language})
+		if err != nil {
+			return PageResult[str.AccountList]{}, err
+		}
+		return PageResult[str.AccountList]{
+			Results:    lists.Results,
+			Page:       lists.Page,
+			TotalPages: lists.TotalPages,
+		}, nil
+	})
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)

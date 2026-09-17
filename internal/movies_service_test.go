@@ -235,3 +235,31 @@ func TestGetLatest(t *testing.T) {
 		t.Errorf("GetLatest() = %+v, want ID=1000000 Title=%q", movie, "brand new movie")
 	}
 }
+
+func TestGetMovieLists(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/lists", func(w http.ResponseWriter, r *http.Request) {
+		pageNum, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			pageNum = 1
+		}
+		results := []map[string]any{{"id": pageNum, "name": "list"}}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":            550,
+			"page":          pageNum,
+			"results":       results,
+			"total_pages":   2,
+			"total_results": 2,
+		})
+	})
+
+	lists, err := client.Movies.GetLists(context.Background(), 550, "", 0)
+	if err != nil {
+		t.Fatalf("GetLists() error = %v", err)
+	}
+	if len(lists) != 2 {
+		t.Fatalf("len(lists) = %d, want 2", len(lists))
+	}
+}
