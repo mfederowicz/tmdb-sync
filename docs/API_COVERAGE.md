@@ -148,7 +148,7 @@ Revisit both once that checkpoint is reached.
 ## Search
 - [x] Collections — `GET /search/collection`
 - [x] Companies — `GET /search/company`
-- [ ] Keywords — `GET /search/keyword`
+- [x] Keywords — `GET /search/keyword`
 - [ ] Movies — `GET /search/movie`
 - [ ] Multi — `GET /search/multi`
 - [ ] People — `GET /search/person`

@@ -92,3 +92,44 @@ func (s *SearchService) SearchCompanies(ctx context.Context, opts uri.SearchComp
 		}, nil
 	})
 }
+
+// getSearchKeywordsPage fetches a single page of the search/keyword list.
+func (s *SearchService) getSearchKeywordsPage(ctx context.Context, opts *uri.SearchKeywordOptions) (*str.SearchKeywords, *str.Response, error) {
+	urlStr, err := uri.AddQuery("search/keyword", opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	keywords := new(str.SearchKeywords)
+	resp, err := s.client.Do(ctx, req, keywords)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return keywords, resp, nil
+}
+
+// SearchKeywords returns keywords matching opts, walking pages until
+// TMDB reports no more (total_pages) or pagesLimit is reached (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/search-keyword
+func (s *SearchService) SearchKeywords(ctx context.Context, opts uri.SearchKeywordOptions, pagesLimit int) ([]str.SearchKeywordResult, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.SearchKeywordResult], error) {
+		o := opts
+		o.Page = page
+		keywords, _, err := s.getSearchKeywordsPage(ctx, &o)
+		if err != nil {
+			return PageResult[str.SearchKeywordResult]{}, err
+		}
+		return PageResult[str.SearchKeywordResult]{
+			Results:    keywords.Results,
+			Page:       keywords.Page,
+			TotalPages: keywords.TotalPages,
+		}, nil
+	})
+}

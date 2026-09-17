@@ -101,6 +101,13 @@ type SearchCompanyOptions struct {
 	Page  int    `url:"page,omitempty"`
 }
 
+// SearchKeywordOptions carries the query parameters accepted by
+// GET /search/keyword.
+type SearchKeywordOptions struct {
+	Query string `url:"query,omitempty"`
+	Page  int    `url:"page,omitempty"`
+}
+
 // LanguageOptions carries the optional language query parameter accepted by
 // several per-resource endpoints (e.g. movie/{id}/credits, /videos, ...).
 type LanguageOptions struct {

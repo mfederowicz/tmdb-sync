@@ -68,3 +68,33 @@ func TestSearchCompanies(t *testing.T) {
 		t.Errorf("SearchCompanies() = %+v, want one result named Pixar", results)
 	}
 }
+
+func TestSearchKeywords(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/search/keyword", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("query"); got != "space" {
+			t.Errorf("query = %q, want %q", got, "space")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page": 1,
+			"results": []map[string]any{
+				{"id": 9882, "name": "space"},
+			},
+			"total_pages":   1,
+			"total_results": 1,
+		})
+	})
+
+	results, err := client.Search.SearchKeywords(context.Background(), uri.SearchKeywordOptions{Query: "space"}, 0)
+	if err != nil {
+		t.Fatalf("SearchKeywords() error = %v", err)
+	}
+	if len(results) != 1 || results[0].Name != "space" {
+		t.Errorf("SearchKeywords() = %+v, want one result named space", results)
+	}
+}
