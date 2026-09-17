@@ -70,7 +70,7 @@ Revisit both once that checkpoint is reached.
 - [x] Timezones — `GET /configuration/timezones`
 
 ## Credits
-- [ ] Details — `GET /credit/{credit_id}`
+- [x] Details — `GET /credit/{credit_id}`
 
 ## Discover
 - [ ] Movie — `GET /discover/movie`
