@@ -52,9 +52,9 @@ Revisit both once that checkpoint is reached.
 - [x] TV Change List — `GET /tv/changes`
 
 ## Collections
-- [ ] Details — `GET /collection/{collection_id}`
-- [ ] Images — `GET /collection/{collection_id}/images`
-- [ ] Translations — `GET /collection/{collection_id}/translations`
+- [x] Details — `GET /collection/{collection_id}`
+- [x] Images — `GET /collection/{collection_id}/images`
+- [x] Translations — `GET /collection/{collection_id}/translations`
 
 ## Companies
 - [ ] Details — `GET /company/{company_id}`

@@ -57,6 +57,13 @@ type ListOptions struct {
 	IncludeAdult bool   `url:"include_adult,omitempty"`
 }
 
+// ImagesOptions carries the optional query parameters accepted by
+// per-resource images endpoints.
+type ImagesOptions struct {
+	Language             string `url:"language,omitempty"`
+	IncludeImageLanguage string `url:"include_image_language,omitempty"`
+}
+
 // AddQuery adds opts' non-zero fields to s as URL query parameters, sorted by
 // key. opts may be a struct or pointer to struct (including nil, which adds
 // nothing).
