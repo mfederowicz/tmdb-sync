@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
+
+	"github.com/mfederowicz/tmdb-sync/str"
 )
 
 func TestGetList(t *testing.T) {
@@ -59,5 +61,132 @@ func TestGetItemStatus(t *testing.T) {
 	}
 	if status.ID != 1 || !status.ItemPresent {
 		t.Errorf("GetItemStatus() = %+v, want ID=1 ItemPresent=true", status)
+	}
+}
+
+func TestCreateList(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "sess" {
+			t.Errorf("session_id = %s, want sess", got)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+			"list_id":        42,
+		})
+	})
+
+	created, _, err := client.Lists.CreateList(context.Background(), "sess", &str.ListCreateRequest{Name: "watch later"})
+	if err != nil {
+		t.Fatalf("CreateList() error = %v", err)
+	}
+	if created.ListID != 42 || !created.Success {
+		t.Errorf("CreateList() = %+v, want ListID=42 Success=true", created)
+	}
+}
+
+func TestAddMovie(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/list/1/add_item", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.Lists.AddMovie(context.Background(), "1", "sess", 100)
+	if err != nil {
+		t.Fatalf("AddMovie() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("AddMovie() = %+v, want Success=true", status)
+	}
+}
+
+func TestRemoveMovie(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/list/1/remove_item", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.Lists.RemoveMovie(context.Background(), "1", "sess", 100)
+	if err != nil {
+		t.Fatalf("RemoveMovie() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("RemoveMovie() = %+v, want Success=true", status)
+	}
+}
+
+func TestClearList(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/list/1/clear", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if got := r.URL.Query().Get("confirm"); got != "true" {
+			t.Errorf("confirm = %s, want true", got)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.Lists.ClearList(context.Background(), "1", "sess")
+	if err != nil {
+		t.Fatalf("ClearList() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("ClearList() = %+v, want Success=true", status)
+	}
+}
+
+func TestDeleteList(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/list/1", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.Lists.DeleteList(context.Background(), "1", "sess")
+	if err != nil {
+		t.Fatalf("DeleteList() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("DeleteList() = %+v, want Success=true", status)
 	}
 }

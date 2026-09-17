@@ -96,11 +96,11 @@ Revisit both once that checkpoint is reached.
 ## Lists (v3) 🔒 for mutation, public for read
 - [x] Details — `GET /list/{list_id}`
 - [x] Check Item Status — `GET /list/{list_id}/item_status`
-- [ ] Create — `POST /list`
-- [ ] Add Movie — `POST /list/{list_id}/add_item`
-- [ ] Remove Movie — `POST /list/{list_id}/remove_item`
-- [ ] Clear — `POST /list/{list_id}/clear`
-- [ ] Delete — `DELETE /list/{list_id}`
+- [x] Create — `POST /list`
+- [x] Add Movie — `POST /list/{list_id}/add_item`
+- [x] Remove Movie — `POST /list/{list_id}/remove_item`
+- [x] Clear — `POST /list/{list_id}/clear`
+- [x] Delete — `DELETE /list/{list_id}`
 
 ## Movies
 - [x] Details — `GET /movie/{movie_id}`
