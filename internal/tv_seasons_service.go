@@ -143,3 +143,21 @@ func (s *TVSeasonsService) GetImages(ctx context.Context, seriesID int64, season
 
 	return images, resp, nil
 }
+
+// GetTranslations fetches the translations for a single TV season.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-season-translations
+func (s *TVSeasonsService) GetTranslations(ctx context.Context, seriesID int64, seasonNumber int) (*str.Translations, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("tv/%d/season/%d/translations", seriesID, seasonNumber), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	translations := new(str.Translations)
+	resp, err := s.client.Do(ctx, req, translations)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return translations, resp, nil
+}
