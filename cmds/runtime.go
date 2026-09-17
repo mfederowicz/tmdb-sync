@@ -20,6 +20,7 @@ func init() {
 		AccountCmd,
 		CertificationsCmd,
 		ChangesCmd,
+		CollectionsCmd,
 		ConfigurationCmd,
 		MoviesCmd,
 		HelpCmd,

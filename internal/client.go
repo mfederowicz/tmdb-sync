@@ -47,6 +47,7 @@ type Client struct {
 	Auth           *AuthService
 	Certifications *CertificationsService
 	Changes        *ChangesService
+	Collections    *CollectionsService
 	Configuration  *ConfigurationService
 	Movies         *MoviesService
 	rateMu         sync.Mutex
@@ -85,6 +86,7 @@ func (c *Client) initialize() {
 	c.Auth = (*AuthService)(&c.common)
 	c.Certifications = (*CertificationsService)(&c.common)
 	c.Changes = (*ChangesService)(&c.common)
+	c.Collections = (*CollectionsService)(&c.common)
 	c.Configuration = (*ConfigurationService)(&c.common)
 	c.Movies = (*MoviesService)(&c.common)
 }
