@@ -57,9 +57,9 @@ Revisit both once that checkpoint is reached.
 - [x] Translations — `GET /collection/{collection_id}/translations`
 
 ## Companies
-- [ ] Details — `GET /company/{company_id}`
-- [ ] Alternative Names — `GET /company/{company_id}/alternative_names`
-- [ ] Images — `GET /company/{company_id}/images`
+- [x] Details — `GET /company/{company_id}`
+- [x] Alternative Names — `GET /company/{company_id}/alternative_names`
+- [x] Images — `GET /company/{company_id}/images`
 
 ## Configuration
 - [x] Details — `GET /configuration`

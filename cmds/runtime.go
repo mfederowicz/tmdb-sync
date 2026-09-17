@@ -21,6 +21,7 @@ func init() {
 		CertificationsCmd,
 		ChangesCmd,
 		CollectionsCmd,
+		CompaniesCmd,
 		ConfigurationCmd,
 		MoviesCmd,
 		HelpCmd,
