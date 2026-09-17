@@ -413,6 +413,30 @@ func (s *TVService) GetTranslations(ctx context.Context, seriesID int64) (*str.T
 	return translations, resp, nil
 }
 
+// GetVideos fetches the videos (trailers, teasers, ...) for a single TV
+// series.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-videos
+func (s *TVService) GetVideos(ctx context.Context, seriesID int64, language string) (*str.TVVideos, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/videos", seriesID), &uri.LanguageOptions{Language: language})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	videos := new(str.TVVideos)
+	resp, err := s.client.Do(ctx, req, videos)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return videos, resp, nil
+}
+
 // GetLatest fetches the most recently created TV series on TMDB.
 //
 // Api docs: https://developer.themoviedb.org/reference/tv-series-latest-id

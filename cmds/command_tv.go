@@ -23,11 +23,11 @@ var tvSessionActions = map[string]bool{
 
 // tvActionsHelp lists every tv action, shared between the -a flag's usage
 // string and the "-a is required" error so both stay in sync.
-const tvActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords, latest, lists, recommendations, reviews, screened-theatrically, similar, translations"
+const tvActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords, latest, lists, recommendations, reviews, screened-theatrically, similar, translations, videos"
 
 // tvIDActionsHelp lists the tv actions that require -i, shared between the
 // -i flag's usage string and the module doc.
-const tvIDActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords, lists, recommendations, reviews, screened-theatrically, similar, translations"
+const tvIDActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords, lists, recommendations, reviews, screened-theatrically, similar, translations, videos"
 
 // TVCmd is the "tv" module.
 var TVCmd = &Command{
@@ -48,7 +48,7 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 	flagSet := flag.NewFlagSet("tv", flag.ContinueOnError)
 	action := flagSet.String("a", "", "action: "+tvActionsHelp+" (required)")
 	seriesID := flagSet.Int64("i", 0, "tv series id, required for -a "+tvIDActionsHelp)
-	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a aggregate-credits, credits, images")
+	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a aggregate-credits, credits, images, lists, recommendations, reviews, similar, videos")
 	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a lists, recommendations, reviews, similar (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
@@ -163,6 +163,12 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 			return fmt.Errorf("tv: -i <series_id> is required for -a translations")
 		}
 		handler = handlers.TVTranslationsHandler{SeriesID: *seriesID}
+		params = []string{fmt.Sprintf("id-%d", *seriesID)}
+	case "videos":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv: -i <series_id> is required for -a videos")
+		}
+		handler = handlers.TVVideosHandler{SeriesID: *seriesID, Language: *language}
 		params = []string{fmt.Sprintf("id-%d", *seriesID)}
 	default:
 		return fmt.Errorf("tv: unknown action %q", *action)

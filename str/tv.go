@@ -291,6 +291,27 @@ type TVReviews struct {
 	TotalResults int        `json:"total_results"`
 }
 
+// TVVideo is a single video entry, as returned by
+// GET /tv/{series_id}/videos.
+type TVVideo struct {
+	Iso6391     string `json:"iso_639_1"`
+	Iso31661    string `json:"iso_3166_1"`
+	Name        string `json:"name"`
+	Key         string `json:"key"`
+	Site        string `json:"site"`
+	Size        int    `json:"size"`
+	Type        string `json:"type"`
+	Official    bool   `json:"official"`
+	PublishedAt string `json:"published_at"`
+	ID          string `json:"id"`
+}
+
+// TVVideos is the response shape for GET /tv/{series_id}/videos.
+type TVVideos struct {
+	ID      int64     `json:"id"`
+	Results []TVVideo `json:"results"`
+}
+
 // TVScreenedTheatricallyEpisode is one episode that had a theatrical
 // screening, as returned inline on the tv screened-theatrically endpoint.
 type TVScreenedTheatricallyEpisode struct {

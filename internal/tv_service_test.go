@@ -472,3 +472,28 @@ func TestGetTVTranslations(t *testing.T) {
 		t.Errorf("GetTranslations() = %+v, want ID=1399 with 1 translation", translations)
 	}
 }
+
+func TestGetTVVideos(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/videos", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1399,
+			"results": []map[string]any{
+				{"id": "abc", "key": "xyz", "name": "Trailer", "site": "YouTube", "type": "Trailer"},
+			},
+		})
+	})
+
+	videos, _, err := client.TV.GetVideos(context.Background(), 1399, "")
+	if err != nil {
+		t.Fatalf("GetVideos() error = %v", err)
+	}
+	if videos.ID != 1399 || len(videos.Results) != 1 || videos.Results[0].Name != "Trailer" {
+		t.Errorf("GetVideos() = %+v, want ID=1399 with 1 video named %q", videos, "Trailer")
+	}
+}
