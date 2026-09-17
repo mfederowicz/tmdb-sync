@@ -23,14 +23,15 @@ var SearchCmd = &Command{
 
 func execSearch(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("search", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: collections, companies, keywords, movies, multi, people (required)")
+	action := flagSet.String("a", "", "action: collections, companies, keywords, movies, multi, people, tv (required)")
 	query := flagSet.String("query", "", "search query, required for all actions")
-	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a collections, movies")
+	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a collections, movies, multi, people, tv")
 	region := flagSet.String("region", "", "ISO 3166-1 region code, used by -a collections, movies")
-	includeAdult := flagSet.Bool("include-adult", false, "include adult results, used by -a collections, movies")
-	year := flagSet.Int("year", 0, "release year, used by -a movies")
+	includeAdult := flagSet.Bool("include-adult", false, "include adult results, used by -a collections, movies, multi, people, tv")
+	year := flagSet.Int("year", 0, "release year, used by -a movies, tv")
 	primaryReleaseYear := flagSet.Int("primary-release-year", 0, "primary release year, used by -a movies")
-	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a collections, companies, keywords, movies, multi, people (default: pages_limit from config, 0 = unlimited)")
+	firstAirDateYear := flagSet.Int("first-air-date-year", 0, "first air date year, used by -a tv")
+	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a collections, companies, keywords, movies, multi, people, tv (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -38,7 +39,7 @@ func execSearch(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 	var handler handlers.Handler
 	switch *action {
 	case "":
-		return fmt.Errorf("search: -a is required (action: collections, companies, keywords, movies, multi, people)")
+		return fmt.Errorf("search: -a is required (action: collections, companies, keywords, movies, multi, people, tv)")
 	case "collections":
 		if *query == "" {
 			return fmt.Errorf("search: -query is required for -a collections")
@@ -98,6 +99,18 @@ func execSearch(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 			Language:     *language,
 			IncludeAdult: *includeAdult,
 			PagesLimit:   *pagesLimit,
+		}
+	case "tv":
+		if *query == "" {
+			return fmt.Errorf("search: -query is required for -a tv")
+		}
+		handler = handlers.SearchTVHandler{
+			Query:            *query,
+			Language:         *language,
+			IncludeAdult:     *includeAdult,
+			Year:             *year,
+			FirstAirDateYear: *firstAirDateYear,
+			PagesLimit:       *pagesLimit,
 		}
 	default:
 		return fmt.Errorf("search: unknown action %q", *action)

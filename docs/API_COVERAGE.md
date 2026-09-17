@@ -152,7 +152,7 @@ Revisit both once that checkpoint is reached.
 - [x] Movies — `GET /search/movie`
 - [x] Multi — `GET /search/multi`
 - [x] People — `GET /search/person`
-- [ ] TV Shows — `GET /search/tv`
+- [x] TV Shows — `GET /search/tv`
 
 ## Trending
 - [ ] All — `GET /trending/all/{time_window}`

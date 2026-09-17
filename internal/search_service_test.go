@@ -189,3 +189,33 @@ func TestSearchPeople(t *testing.T) {
 		t.Errorf("SearchPeople() = %+v, want one result named Keanu Reeves", results)
 	}
 }
+
+func TestSearchTV(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/search/tv", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("query"); got != "breaking bad" {
+			t.Errorf("query = %q, want %q", got, "breaking bad")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page": 1,
+			"results": []map[string]any{
+				{"id": 1396, "name": "Breaking Bad"},
+			},
+			"total_pages":   1,
+			"total_results": 1,
+		})
+	})
+
+	results, err := client.Search.SearchTV(context.Background(), uri.SearchTVOptions{Query: "breaking bad"}, 0)
+	if err != nil {
+		t.Fatalf("SearchTV() error = %v", err)
+	}
+	if len(results) != 1 || results[0].Name != "Breaking Bad" {
+		t.Errorf("SearchTV() = %+v, want one result named Breaking Bad", results)
+	}
+}
