@@ -159,3 +159,33 @@ func TestSearchMulti(t *testing.T) {
 		t.Errorf("SearchMulti() = %+v, want one movie and one person result", results)
 	}
 }
+
+func TestSearchPeople(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/search/person", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("query"); got != "keanu" {
+			t.Errorf("query = %q, want %q", got, "keanu")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page": 1,
+			"results": []map[string]any{
+				{"id": 6384, "name": "Keanu Reeves"},
+			},
+			"total_pages":   1,
+			"total_results": 1,
+		})
+	})
+
+	results, err := client.Search.SearchPeople(context.Background(), uri.SearchPersonOptions{Query: "keanu"}, 0)
+	if err != nil {
+		t.Fatalf("SearchPeople() error = %v", err)
+	}
+	if len(results) != 1 || results[0].Name != "Keanu Reeves" {
+		t.Errorf("SearchPeople() = %+v, want one result named Keanu Reeves", results)
+	}
+}

@@ -129,6 +129,15 @@ type SearchMultiOptions struct {
 	IncludeAdult bool   `url:"include_adult,omitempty"`
 }
 
+// SearchPersonOptions carries the query parameters accepted by
+// GET /search/person.
+type SearchPersonOptions struct {
+	Query        string `url:"query,omitempty"`
+	Page         int    `url:"page,omitempty"`
+	Language     string `url:"language,omitempty"`
+	IncludeAdult bool   `url:"include_adult,omitempty"`
+}
+
 // LanguageOptions carries the optional language query parameter accepted by
 // several per-resource endpoints (e.g. movie/{id}/credits, /videos, ...).
 type LanguageOptions struct {

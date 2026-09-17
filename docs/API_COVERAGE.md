@@ -151,7 +151,7 @@ Revisit both once that checkpoint is reached.
 - [x] Keywords — `GET /search/keyword`
 - [x] Movies — `GET /search/movie`
 - [x] Multi — `GET /search/multi`
-- [ ] People — `GET /search/person`
+- [x] People — `GET /search/person`
 - [ ] TV Shows — `GET /search/tv`
 
 ## Trending

@@ -216,3 +216,44 @@ func (s *SearchService) SearchMulti(ctx context.Context, opts uri.SearchMultiOpt
 		}, nil
 	})
 }
+
+// getSearchPeoplePage fetches a single page of the search/person list.
+func (s *SearchService) getSearchPeoplePage(ctx context.Context, opts *uri.SearchPersonOptions) (*str.PopularPersons, *str.Response, error) {
+	urlStr, err := uri.AddQuery("search/person", opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	people := new(str.PopularPersons)
+	resp, err := s.client.Do(ctx, req, people)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return people, resp, nil
+}
+
+// SearchPeople returns people matching opts, walking pages until TMDB
+// reports no more (total_pages) or pagesLimit is reached (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/search-person
+func (s *SearchService) SearchPeople(ctx context.Context, opts uri.SearchPersonOptions, pagesLimit int) ([]str.PopularPerson, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.PopularPerson], error) {
+		o := opts
+		o.Page = page
+		people, _, err := s.getSearchPeoplePage(ctx, &o)
+		if err != nil {
+			return PageResult[str.PopularPerson]{}, err
+		}
+		return PageResult[str.PopularPerson]{
+			Results:    people.Results,
+			Page:       people.Page,
+			TotalPages: people.TotalPages,
+		}, nil
+	})
+}
