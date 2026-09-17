@@ -148,6 +148,12 @@ type SearchTVOptions struct {
 	Year             int    `url:"year,omitempty"`
 }
 
+// TrendingOptions carries the query parameters accepted by the
+// GET /trending/{media_type}/{time_window} endpoints.
+type TrendingOptions struct {
+	Page int `url:"page,omitempty"`
+}
+
 // LanguageOptions carries the optional language query parameter accepted by
 // several per-resource endpoints (e.g. movie/{id}/credits, /videos, ...).
 type LanguageOptions struct {
