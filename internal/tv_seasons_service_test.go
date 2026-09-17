@@ -182,3 +182,28 @@ func TestTVSeasonsGetTranslations(t *testing.T) {
 		t.Errorf("GetTranslations() = %+v, want ID=3624 with 1 translation", translations)
 	}
 }
+
+func TestTVSeasonsGetVideos(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/season/1/videos", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 3624,
+			"results": []map[string]any{
+				{"id": "533ec6b7c3a3685c4c0004a7", "key": "abc123", "site": "YouTube"},
+			},
+		})
+	})
+
+	videos, _, err := client.TVSeasons.GetVideos(context.Background(), 1399, 1, "")
+	if err != nil {
+		t.Fatalf("GetVideos() error = %v", err)
+	}
+	if videos.ID != 3624 || len(videos.Results) != 1 {
+		t.Errorf("GetVideos() = %+v, want ID=3624 with 1 result", videos)
+	}
+}

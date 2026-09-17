@@ -195,7 +195,7 @@ Revisit both once that checkpoint is reached.
 - [x] External IDs — `GET /tv/{series_id}/season/{season_number}/external_ids`
 - [x] Images — `GET /tv/{series_id}/season/{season_number}/images`
 - [x] Translations — `GET /tv/{series_id}/season/{season_number}/translations`
-- [ ] Videos — `GET /tv/{series_id}/season/{season_number}/videos`
+- [x] Videos — `GET /tv/{series_id}/season/{season_number}/videos`
 
 ## TV Episodes
 - [ ] Details — `GET /tv/{series_id}/season/{season_number}/episode/{episode_number}`
