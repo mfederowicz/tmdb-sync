@@ -23,6 +23,7 @@ aiming for full TMDB v3 API coverage, one module at a time.
 - [`movies`](docs/movies.md) ✅ — full movie module: details, lists, credits, images, videos,
   watch providers, and 🔒 account-states/add-rating/delete-rating.
 - [`networks`](docs/networks.md) ✅ — network details, alternative names, images.
+- [`people`](docs/people.md) ✅ — person details, credits, images, translations, popular/latest.
 
 See:
 

@@ -218,3 +218,33 @@ func TestGetPersonTVCredits(t *testing.T) {
 		t.Errorf("GetPersonTVCredits() crew = %+v, want one entry job Director", credits.Crew)
 	}
 }
+
+func TestGetPersonTranslations(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/1/translations", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1,
+			"translations": []map[string]any{
+				{
+					"iso_3166_1":   "US",
+					"iso_639_1":    "en",
+					"english_name": "English",
+					"data":         map[string]any{"biography": "An actor."},
+				},
+			},
+		})
+	})
+
+	translations, _, err := client.People.GetPersonTranslations(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPersonTranslations() error = %v", err)
+	}
+	if len(translations.Translations) != 1 || translations.Translations[0].Data.Biography != "An actor." {
+		t.Errorf("GetPersonTranslations() = %+v, want one translation with biography %q", translations, "An actor.")
+	}
+}

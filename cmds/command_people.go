@@ -15,10 +15,10 @@ import (
 
 // peopleActionsHelp lists every people action, shared between the -a flag's
 // usage string and the "-a is required" error so both stay in sync.
-const peopleActionsHelp = "details, combined-credits, external-ids, images, latest, movie-credits, popular, tv-credits"
+const peopleActionsHelp = "details, combined-credits, external-ids, images, latest, movie-credits, popular, tv-credits, translations"
 
 // peopleIDActionsHelp lists the people actions that require -i.
-const peopleIDActionsHelp = "details, combined-credits, external-ids, images, movie-credits, tv-credits"
+const peopleIDActionsHelp = "details, combined-credits, external-ids, images, movie-credits, tv-credits, translations"
 
 // PeopleCmd is the "people" module.
 var PeopleCmd = &Command{
@@ -81,6 +81,12 @@ func execPeople(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 			return fmt.Errorf("people: -i <person_id> is required for -a tv-credits")
 		}
 		handler = handlers.PeopleTVCreditsHandler{PersonID: *personID}
+		params = []string{fmt.Sprintf("id-%d", *personID)}
+	case "translations":
+		if *personID == 0 {
+			return fmt.Errorf("people: -i <person_id> is required for -a translations")
+		}
+		handler = handlers.PeopleTranslationsHandler{PersonID: *personID}
 		params = []string{fmt.Sprintf("id-%d", *personID)}
 	default:
 		return fmt.Errorf("people: unknown action %q", *action)

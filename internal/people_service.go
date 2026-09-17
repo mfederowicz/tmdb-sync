@@ -139,6 +139,24 @@ func (s *PeopleService) GetPersonTVCredits(ctx context.Context, personID int64) 
 	return credits, resp, nil
 }
 
+// GetPersonTranslations fetches the translations for a single person by TMDB id.
+//
+// Api docs: https://developer.themoviedb.org/reference/person-translations
+func (s *PeopleService) GetPersonTranslations(ctx context.Context, personID int64) (*str.PersonTranslations, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("person/%d/translations", personID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	translations := new(str.PersonTranslations)
+	resp, err := s.client.Do(ctx, req, translations)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return translations, resp, nil
+}
+
 // getPopularPersonsPage fetches a single page of the popular-people list.
 func (s *PeopleService) getPopularPersonsPage(ctx context.Context, opts *uri.ListOptions) (*str.PopularPersons, *str.Response, error) {
 	urlStr, err := uri.AddQuery("person/popular", opts)

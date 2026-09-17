@@ -140,7 +140,7 @@ Revisit both once that checkpoint is reached.
 - [x] Movie Credits — `GET /person/{person_id}/movie_credits`
 - [x] Popular — `GET /person/popular`
 - [x] TV Credits — `GET /person/{person_id}/tv_credits`
-- [ ] Translations — `GET /person/{person_id}/translations`
+- [x] Translations — `GET /person/{person_id}/translations`
 
 ## Reviews
 - [ ] Details — `GET /review/{review_id}`

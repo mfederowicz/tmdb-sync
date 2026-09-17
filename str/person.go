@@ -140,6 +140,29 @@ type PersonTVCredits struct {
 	Crew []PersonTVCredit `json:"crew"`
 }
 
+// PersonTranslationData is the translated-field payload nested inside a
+// PersonTranslation.
+type PersonTranslationData struct {
+	Biography string `json:"biography"`
+}
+
+// PersonTranslation is a single language's translation, as returned by
+// GET /person/{person_id}/translations.
+type PersonTranslation struct {
+	Iso31661    string                `json:"iso_3166_1"`
+	Iso6391     string                `json:"iso_639_1"`
+	Name        string                `json:"name"`
+	EnglishName string                `json:"english_name"`
+	Data        PersonTranslationData `json:"data"`
+}
+
+// PersonTranslations is the response shape for
+// GET /person/{person_id}/translations.
+type PersonTranslations struct {
+	ID           int64               `json:"id"`
+	Translations []PersonTranslation `json:"translations"`
+}
+
 // PersonCombinedCredits is the response shape for
 // GET /person/{person_id}/combined_credits.
 type PersonCombinedCredits struct {
