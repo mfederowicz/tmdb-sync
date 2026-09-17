@@ -23,6 +23,7 @@ func init() {
 		CollectionsCmd,
 		CompaniesCmd,
 		ConfigurationCmd,
+		CreditsCmd,
 		MoviesCmd,
 		HelpCmd,
 	}
