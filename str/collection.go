@@ -12,7 +12,7 @@ type CollectionPart struct {
 	Overview         string  `json:"overview"`
 	PosterPath       string  `json:"poster_path"`
 	MediaType        string  `json:"media_type"`
-	GenreIds         []int64 `json:"genre_ids"`
+	GenreIDs         []int64 `json:"genre_ids"`
 	Popularity       float64 `json:"popularity"`
 	ReleaseDate      string  `json:"release_date"`
 	Video            bool    `json:"video"`
