@@ -22,6 +22,12 @@ schedule.
 
 ### Fixed
 
+## [0.15.0] - 2026-09-17
+
+### Added
+
+- `reviews` module: `details` action.
+
 ## [0.14.0] - 2026-09-17
 
 ### Added
