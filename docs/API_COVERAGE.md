@@ -161,7 +161,7 @@ Revisit both once that checkpoint is reached.
 - [x] TV Shows — `GET /trending/tv/{time_window}`
 
 ## TV Series
-- [ ] Details — `GET /tv/{series_id}`
+- [x] Details — `GET /tv/{series_id}`
 - [ ] Account States 🔒 — `GET /tv/{series_id}/account_states`
 - [ ] Aggregate Credits — `GET /tv/{series_id}/aggregate_credits`
 - [ ] Alternative Titles — `GET /tv/{series_id}/alternative_titles`
