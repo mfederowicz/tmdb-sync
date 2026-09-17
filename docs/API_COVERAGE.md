@@ -171,7 +171,7 @@ Revisit both once that checkpoint is reached.
 - [x] External IDs — `GET /tv/{series_id}/external_ids`
 - [x] Images — `GET /tv/{series_id}/images`
 - [x] Keywords — `GET /tv/{series_id}/keywords`
-- [ ] Latest — `GET /tv/latest`
+- [x] Latest — `GET /tv/latest`
 - [ ] Lists — `GET /tv/{series_id}/lists`
 - [ ] Recommendations — `GET /tv/{series_id}/recommendations`
 - [ ] Reviews — `GET /tv/{series_id}/reviews`
