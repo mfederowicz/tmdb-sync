@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
+
+	"github.com/mfederowicz/tmdb-sync/uri"
 )
 
 func TestGetPopularMovies_WalksEveryPage(t *testing.T) {
@@ -161,5 +163,29 @@ func TestGetExternalIDs(t *testing.T) {
 	}
 	if ids.ID != 550 || ids.ImdbID != "tt0137523" {
 		t.Errorf("GetExternalIDs() = %+v, want ID=550 ImdbID=%q", ids, "tt0137523")
+	}
+}
+
+func TestGetImages(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/images", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":        550,
+			"backdrops": []map[string]any{{"file_path": "/a.jpg"}},
+			"posters":   []map[string]any{{"file_path": "/b.jpg"}},
+		})
+	})
+
+	images, _, err := client.Movies.GetImages(context.Background(), 550, &uri.ImagesOptions{})
+	if err != nil {
+		t.Fatalf("GetImages() error = %v", err)
+	}
+	if images.ID != 550 || len(images.Backdrops) != 1 || len(images.Posters) != 1 {
+		t.Errorf("GetImages() = %+v, want ID=550 with 1 backdrop and 1 poster", images)
 	}
 }
