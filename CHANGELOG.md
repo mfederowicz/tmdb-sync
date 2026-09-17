@@ -18,6 +18,8 @@ schedule.
 
 ### Added
 
+- `networks` module: `details`, `alternative-names`, `images` actions.
+
 ### Changed
 
 ### Fixed
