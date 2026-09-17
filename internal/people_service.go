@@ -101,3 +101,21 @@ func (s *PeopleService) GetLatest(ctx context.Context) (*str.PersonDetails, *str
 
 	return person, resp, nil
 }
+
+// GetPersonMovieCredits fetches the movie credits for a single person by TMDB id.
+//
+// Api docs: https://developer.themoviedb.org/reference/person-movie-credits
+func (s *PeopleService) GetPersonMovieCredits(ctx context.Context, personID int64) (*str.PersonMovieCredits, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("person/%d/movie_credits", personID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	credits := new(str.PersonMovieCredits)
+	resp, err := s.client.Do(ctx, req, credits)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return credits, resp, nil
+}

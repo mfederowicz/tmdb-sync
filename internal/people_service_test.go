@@ -129,3 +129,34 @@ func TestPeopleGetLatest(t *testing.T) {
 		t.Errorf("GetLatest() = %+v, want ID=2 Name=%q", person, "Jane Doe")
 	}
 }
+
+func TestGetPersonMovieCredits(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/1/movie_credits", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1,
+			"cast": []map[string]any{
+				{"id": 100, "title": "Ocean's Eleven", "character": "Danny Ocean"},
+			},
+			"crew": []map[string]any{
+				{"id": 300, "title": "Good Night, and Good Luck", "job": "Director"},
+			},
+		})
+	})
+
+	credits, _, err := client.People.GetPersonMovieCredits(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPersonMovieCredits() error = %v", err)
+	}
+	if len(credits.Cast) != 1 || credits.Cast[0].Title != "Ocean's Eleven" {
+		t.Errorf("GetPersonMovieCredits() cast = %+v, want one entry titled Ocean's Eleven", credits.Cast)
+	}
+	if len(credits.Crew) != 1 || credits.Crew[0].Job != "Director" {
+		t.Errorf("GetPersonMovieCredits() crew = %+v, want one entry job Director", credits.Crew)
+	}
+}

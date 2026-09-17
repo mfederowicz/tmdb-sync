@@ -65,6 +65,33 @@ type PersonImages struct {
 	Profiles []Image `json:"profiles"`
 }
 
+// PersonMovieCredit is a single cast/crew entry in a person's movie credits.
+type PersonMovieCredit struct {
+	ID            int64   `json:"id"`
+	Adult         bool    `json:"adult"`
+	Title         string  `json:"title"`
+	OriginalTitle string  `json:"original_title"`
+	Overview      string  `json:"overview"`
+	PosterPath    string  `json:"poster_path"`
+	ReleaseDate   string  `json:"release_date"`
+	Popularity    float64 `json:"popularity"`
+	VoteAverage   float64 `json:"vote_average"`
+	VoteCount     int64   `json:"vote_count"`
+	Character     string  `json:"character"`
+	CreditID      string  `json:"credit_id"`
+	Department    string  `json:"department"`
+	Job           string  `json:"job"`
+	Order         int     `json:"order"`
+}
+
+// PersonMovieCredits is the response shape for
+// GET /person/{person_id}/movie_credits.
+type PersonMovieCredits struct {
+	ID   int64               `json:"id"`
+	Cast []PersonMovieCredit `json:"cast"`
+	Crew []PersonMovieCredit `json:"crew"`
+}
+
 // PersonCombinedCredits is the response shape for
 // GET /person/{person_id}/combined_credits.
 type PersonCombinedCredits struct {
