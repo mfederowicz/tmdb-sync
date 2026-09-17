@@ -146,7 +146,7 @@ Revisit both once that checkpoint is reached.
 - [x] Details — `GET /review/{review_id}`
 
 ## Search
-- [ ] Collections — `GET /search/collection`
+- [x] Collections — `GET /search/collection`
 - [ ] Companies — `GET /search/company`
 - [ ] Keywords — `GET /search/keyword`
 - [ ] Movies — `GET /search/movie`

@@ -33,6 +33,7 @@ func init() {
 		NetworksCmd,
 		PeopleCmd,
 		ReviewsCmd,
+		SearchCmd,
 		HelpCmd,
 	}
 }

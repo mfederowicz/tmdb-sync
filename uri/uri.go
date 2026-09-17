@@ -84,6 +84,16 @@ type MovieAlternativeTitlesOptions struct {
 	Country string `url:"country,omitempty"`
 }
 
+// SearchCollectionOptions carries the query parameters accepted by
+// GET /search/collection.
+type SearchCollectionOptions struct {
+	Query        string `url:"query,omitempty"`
+	Page         int    `url:"page,omitempty"`
+	Language     string `url:"language,omitempty"`
+	IncludeAdult bool   `url:"include_adult,omitempty"`
+	Region       string `url:"region,omitempty"`
+}
+
 // LanguageOptions carries the optional language query parameter accepted by
 // several per-resource endpoints (e.g. movie/{id}/credits, /videos, ...).
 type LanguageOptions struct {
