@@ -82,3 +82,27 @@ func TestTVSeasonsGetAggregateCredits(t *testing.T) {
 		t.Errorf("GetAggregateCredits() = %+v, want ID=3624 with 1 cast and 1 crew", credits)
 	}
 }
+
+func TestTVSeasonsGetCredits(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/season/1/credits", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":   3624,
+			"cast": []map[string]any{{"id": 22970, "name": "Emilia Clarke"}},
+			"crew": []map[string]any{{"id": 9813, "name": "David Benioff"}},
+		})
+	})
+
+	credits, _, err := client.TVSeasons.GetCredits(context.Background(), 1399, 1, "")
+	if err != nil {
+		t.Fatalf("GetCredits() error = %v", err)
+	}
+	if credits.ID != 3624 || len(credits.Cast) != 1 || len(credits.Crew) != 1 {
+		t.Errorf("GetCredits() = %+v, want ID=3624 with 1 cast and 1 crew", credits)
+	}
+}

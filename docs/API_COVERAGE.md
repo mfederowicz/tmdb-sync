@@ -191,7 +191,7 @@ Revisit both once that checkpoint is reached.
 - [x] Details — `GET /tv/{series_id}/season/{season_number}`
 - [x] Account States 🔒 — `GET /tv/{series_id}/season/{season_number}/account_states`
 - [x] Aggregate Credits — `GET /tv/{series_id}/season/{season_number}/aggregate_credits`
-- [ ] Credits — `GET /tv/{series_id}/season/{season_number}/credits`
+- [x] Credits — `GET /tv/{series_id}/season/{season_number}/credits`
 - [ ] External IDs — `GET /tv/{series_id}/season/{season_number}/external_ids`
 - [ ] Images — `GET /tv/{series_id}/season/{season_number}/images`
 - [ ] Translations — `GET /tv/{series_id}/season/{season_number}/translations`
