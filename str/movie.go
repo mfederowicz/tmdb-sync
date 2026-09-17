@@ -31,6 +31,11 @@ type RatedMovies struct {
 	TotalResults int          `json:"total_results"`
 }
 
+// MovieRatingRequest is the body of POST /movie/{movie_id}/rating.
+type MovieRatingRequest struct {
+	Value float64 `json:"value"`
+}
+
 // MovieAccountStates is the response shape for GET /movie/{movie_id}/account_states.
 // Rated is `any` because TMDB returns either `false` (not rated) or an object
 // like {"value": 8} (rated) for the same field.

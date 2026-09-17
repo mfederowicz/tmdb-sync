@@ -17,6 +17,7 @@ import (
 // moviesSessionActions are the actions that require a v3 session.
 var moviesSessionActions = map[string]bool{
 	"account-states": true,
+	"add-rating":     true,
 }
 
 // MoviesCmd is the "movies" module.
@@ -36,8 +37,9 @@ func execMovies(fs afero.Fs, client *internal.Client, config *cfg.Config, option
 // retry instead of failing outright.
 func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string, retried bool) error {
 	flagSet := flag.NewFlagSet("movies", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: details, popular, account-states, alternative-titles, credits, external-ids, images, keywords, latest, lists, now-playing, recommendations, release-dates, reviews, similar, top-rated, translations, upcoming, videos, watch-providers (required)")
-	movieID := flagSet.Int64("i", 0, "movie id, required for -a details, account-states, alternative-titles, credits, external-ids, images, keywords, release-dates, translations, videos, watch-providers")
+	action := flagSet.String("a", "", "action: details, popular, account-states, alternative-titles, credits, external-ids, images, keywords, latest, lists, now-playing, recommendations, release-dates, reviews, similar, top-rated, translations, upcoming, videos, watch-providers, add-rating (required)")
+	movieID := flagSet.Int64("i", 0, "movie id, required for -a details, account-states, alternative-titles, credits, external-ids, images, keywords, release-dates, translations, videos, watch-providers, add-rating")
+	value := flagSet.Float64("value", 0, "rating value (0.5-10.0, in 0.5 increments), required for -a add-rating")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a popular, lists, now-playing, recommendations, reviews, similar, top-rated, upcoming (default: pages_limit from config, 0 = unlimited)")
 	country := flagSet.String("country", "", "ISO 3166-1 country code, used by -a alternative-titles")
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a credits, images, videos")
@@ -56,7 +58,7 @@ func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config,
 	var params []string
 	switch *action {
 	case "":
-		return fmt.Errorf("movies: -a is required (action: details, popular, account-states, alternative-titles, credits, external-ids, images, keywords, latest, lists, now-playing, recommendations, release-dates, reviews, similar, top-rated, translations, upcoming, videos, watch-providers)")
+		return fmt.Errorf("movies: -a is required (action: details, popular, account-states, alternative-titles, credits, external-ids, images, keywords, latest, lists, now-playing, recommendations, release-dates, reviews, similar, top-rated, translations, upcoming, videos, watch-providers, add-rating)")
 	case "details":
 		if *movieID == 0 {
 			return fmt.Errorf("movies: -i <movie_id> is required for -a details")
@@ -159,6 +161,15 @@ func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config,
 			return fmt.Errorf("movies: -i <movie_id> is required for -a watch-providers")
 		}
 		handler = handlers.MoviesWatchProvidersHandler{MovieID: *movieID}
+		params = []string{fmt.Sprintf("id-%d", *movieID)}
+	case "add-rating":
+		if *movieID == 0 {
+			return fmt.Errorf("movies: -i <movie_id> is required for -a add-rating")
+		}
+		if *value == 0 {
+			return fmt.Errorf("movies: -value <rating> is required for -a add-rating")
+		}
+		handler = handlers.MoviesAddRatingHandler{MovieID: *movieID, SessionID: options.Session.SessionID, Value: *value}
 		params = []string{fmt.Sprintf("id-%d", *movieID)}
 	default:
 		return fmt.Errorf("movies: unknown action %q", *action)

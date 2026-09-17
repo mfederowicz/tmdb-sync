@@ -123,7 +123,7 @@ Revisit both once that checkpoint is reached.
 - [x] Upcoming — `GET /movie/upcoming`
 - [x] Videos — `GET /movie/{movie_id}/videos`
 - [x] Watch Providers — `GET /movie/{movie_id}/watch/providers`
-- [ ] Add Rating 🔒 — `POST /movie/{movie_id}/rating`
+- [x] Add Rating 🔒 — `POST /movie/{movie_id}/rating`
 - [ ] Delete Rating 🔒 — `DELETE /movie/{movie_id}/rating`
 
 ## Networks

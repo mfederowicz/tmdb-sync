@@ -535,6 +535,29 @@ func (s *MoviesService) GetWatchProviders(ctx context.Context, movieID int64) (*
 	return providers, resp, nil
 }
 
+// AddRating rates a movie on behalf of the session's account.
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-add-rating
+func (s *MoviesService) AddRating(ctx context.Context, movieID int64, sessionID string, value float64) (*str.AuthStatus, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("movie/%d/rating", movieID), &uri.AccountOptions{SessionID: sessionID})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodPost, urlStr, &str.MovieRatingRequest{Value: value})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	status := new(str.AuthStatus)
+	resp, err := s.client.Do(ctx, req, status)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return status, resp, nil
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)

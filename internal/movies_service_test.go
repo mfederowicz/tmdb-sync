@@ -424,6 +424,33 @@ func TestGetWatchProviders(t *testing.T) {
 	}
 }
 
+func TestAddRating(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/rating", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "sess" {
+			t.Errorf("session_id = %s, want sess", got)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.Movies.AddRating(context.Background(), 550, "sess", 8.5)
+	if err != nil {
+		t.Fatalf("AddRating() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("AddRating() = %+v, want Success=true", status)
+	}
+}
+
 func TestGetReleaseDates(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
