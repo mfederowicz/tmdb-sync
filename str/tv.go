@@ -181,6 +181,20 @@ type TVEpisodeGroups struct {
 	ID      int64            `json:"id"`
 }
 
+// TVExternalIDs is the response shape for GET /tv/{series_id}/external_ids.
+type TVExternalIDs struct {
+	ID          int64  `json:"id"`
+	ImdbID      string `json:"imdb_id"`
+	FreebaseMID string `json:"freebase_mid"`
+	FreebaseID  string `json:"freebase_id"`
+	TvdbID      int64  `json:"tvdb_id"`
+	TvrageID    int64  `json:"tvrage_id"`
+	WikidataID  string `json:"wikidata_id"`
+	FacebookID  string `json:"facebook_id"`
+	InstagramID string `json:"instagram_id"`
+	TwitterID   string `json:"twitter_id"`
+}
+
 // TVShows is a paginated list of TV shows.
 type TVShows struct {
 	Page         int  `json:"page"`

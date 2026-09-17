@@ -96,6 +96,24 @@ func (s *TVService) GetEpisodeGroups(ctx context.Context, seriesID int64) (*str.
 	return groups, resp, nil
 }
 
+// GetExternalIDs fetches a single TV series's external ids (IMDb, TVDB, ...).
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-external-ids
+func (s *TVService) GetExternalIDs(ctx context.Context, seriesID int64) (*str.TVExternalIDs, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("tv/%d/external_ids", seriesID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ids := new(str.TVExternalIDs)
+	resp, err := s.client.Do(ctx, req, ids)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return ids, resp, nil
+}
+
 // GetAlternativeTitles fetches the alternative titles for a single TV
 // series.
 //

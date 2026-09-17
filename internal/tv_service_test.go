@@ -210,3 +210,26 @@ func TestGetEpisodeGroups(t *testing.T) {
 		t.Errorf("GetEpisodeGroups() = %+v, want ID=1399 with 1 group %q", groups, "Seasons")
 	}
 }
+
+func TestGetTVExternalIDs(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/external_ids", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":      1399,
+			"imdb_id": "tt0944947",
+		})
+	})
+
+	ids, _, err := client.TV.GetExternalIDs(context.Background(), 1399)
+	if err != nil {
+		t.Fatalf("GetExternalIDs() error = %v", err)
+	}
+	if ids.ID != 1399 || ids.ImdbID != "tt0944947" {
+		t.Errorf("GetExternalIDs() = %+v, want ID=1399 ImdbID=%q", ids, "tt0944947")
+	}
+}
