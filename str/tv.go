@@ -17,6 +17,16 @@ type TV struct {
 	OriginalLanguage string  `json:"original_language"`
 }
 
+// TVAccountStates is the response shape for GET /tv/{series_id}/account_states.
+// Rated is `any` because TMDB returns either `false` (not rated) or an object
+// like {"value": 8} (rated) for the same field.
+type TVAccountStates struct {
+	ID        int64 `json:"id"`
+	Favorite  bool  `json:"favorite"`
+	Rated     any   `json:"rated"`
+	Watchlist bool  `json:"watchlist"`
+}
+
 // TVShows is a paginated list of TV shows.
 type TVShows struct {
 	Page         int  `json:"page"`

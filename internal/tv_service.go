@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/mfederowicz/tmdb-sync/str"
+	"github.com/mfederowicz/tmdb-sync/uri"
 )
 
 // TVService handles communication with the /tv endpoints of the TMDB API.
@@ -27,4 +28,28 @@ func (s *TVService) GetTV(ctx context.Context, seriesID int64) (*str.TV, *str.Re
 	}
 
 	return tv, resp, nil
+}
+
+// GetAccountStates fetches an account's favorite/rated/watchlist status for
+// a single TV series.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-account-states
+func (s *TVService) GetAccountStates(ctx context.Context, seriesID int64, sessionID string) (*str.TVAccountStates, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/account_states", seriesID), &uri.AccountOptions{SessionID: sessionID})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	states := new(str.TVAccountStates)
+	resp, err := s.client.Do(ctx, req, states)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return states, resp, nil
 }
