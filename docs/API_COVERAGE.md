@@ -110,7 +110,7 @@ Revisit both once that checkpoint is reached.
 - [x] External IDs — `GET /movie/{movie_id}/external_ids`
 - [x] Images — `GET /movie/{movie_id}/images`
 - [x] Keywords — `GET /movie/{movie_id}/keywords`
-- [ ] Latest — `GET /movie/latest`
+- [x] Latest — `GET /movie/latest`
 - [ ] Lists — `GET /movie/{movie_id}/lists`
 - [ ] Now Playing — `GET /movie/now_playing`
 - [x] Popular — `GET /movie/popular`

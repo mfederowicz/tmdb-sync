@@ -212,3 +212,26 @@ func TestGetKeywords(t *testing.T) {
 		t.Errorf("GetKeywords() = %+v, want ID=550 with 1 keyword %q", keywords, "hero")
 	}
 }
+
+func TestGetLatest(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/latest", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":    1000000,
+			"title": "brand new movie",
+		})
+	})
+
+	movie, _, err := client.Movies.GetLatest(context.Background())
+	if err != nil {
+		t.Fatalf("GetLatest() error = %v", err)
+	}
+	if movie.ID != 1000000 || movie.Title != "brand new movie" {
+		t.Errorf("GetLatest() = %+v, want ID=1000000 Title=%q", movie, "brand new movie")
+	}
+}

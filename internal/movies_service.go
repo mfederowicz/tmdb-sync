@@ -160,6 +160,24 @@ func (s *MoviesService) GetKeywords(ctx context.Context, movieID int64) (*str.Mo
 	return keywords, resp, nil
 }
 
+// GetLatest fetches the most recently created movie on TMDB.
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-latest-id
+func (s *MoviesService) GetLatest(ctx context.Context) (*str.Movie, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, "movie/latest", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	movie := new(str.Movie)
+	resp, err := s.client.Do(ctx, req, movie)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return movie, resp, nil
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)
