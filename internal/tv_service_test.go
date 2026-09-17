@@ -149,3 +149,31 @@ func TestGetContentRatings(t *testing.T) {
 		t.Errorf("GetContentRatings() = %+v, want ID=1399 with 1 rating %q", ratings, "TV-MA")
 	}
 }
+
+func TestGetTVCredits(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/credits", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1399,
+			"cast": []map[string]any{
+				{"id": 22970, "name": "Peter Dinklage", "character": "Tyrion Lannister", "credit_id": "abc"},
+			},
+			"crew": []map[string]any{
+				{"id": 1, "name": "David Benioff", "job": "Executive Producer", "credit_id": "def"},
+			},
+		})
+	})
+
+	credits, _, err := client.TV.GetCredits(context.Background(), 1399, "")
+	if err != nil {
+		t.Fatalf("GetCredits() error = %v", err)
+	}
+	if credits.ID != 1399 || len(credits.Cast) != 1 || len(credits.Crew) != 1 {
+		t.Errorf("GetCredits() = %+v, want ID=1399 with 1 cast and 1 crew", credits)
+	}
+}

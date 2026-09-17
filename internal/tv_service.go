@@ -115,3 +115,26 @@ func (s *TVService) GetContentRatings(ctx context.Context, seriesID int64) (*str
 
 	return ratings, resp, nil
 }
+
+// GetCredits fetches the cast and crew for a single TV series.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-credits
+func (s *TVService) GetCredits(ctx context.Context, seriesID int64, language string) (*str.TVCredits, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/credits", seriesID), &uri.LanguageOptions{Language: language})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	credits := new(str.TVCredits)
+	resp, err := s.client.Do(ctx, req, credits)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return credits, resp, nil
+}

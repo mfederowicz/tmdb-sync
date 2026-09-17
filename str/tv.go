@@ -115,6 +115,45 @@ type TVContentRatings struct {
 	Results []TVContentRating `json:"results"`
 }
 
+// TVCastMember is one cast entry, as returned inline on the tv credits
+// endpoint.
+type TVCastMember struct {
+	Adult              bool    `json:"adult"`
+	Gender             int     `json:"gender"`
+	ID                 int64   `json:"id"`
+	KnownForDepartment string  `json:"known_for_department"`
+	Name               string  `json:"name"`
+	OriginalName       string  `json:"original_name"`
+	Popularity         float64 `json:"popularity"`
+	ProfilePath        string  `json:"profile_path"`
+	Character          string  `json:"character"`
+	CreditID           string  `json:"credit_id"`
+	Order              int     `json:"order"`
+}
+
+// TVCrewMember is one crew entry, as returned inline on the tv credits
+// endpoint.
+type TVCrewMember struct {
+	Adult              bool    `json:"adult"`
+	Gender             int     `json:"gender"`
+	ID                 int64   `json:"id"`
+	KnownForDepartment string  `json:"known_for_department"`
+	Name               string  `json:"name"`
+	OriginalName       string  `json:"original_name"`
+	Popularity         float64 `json:"popularity"`
+	ProfilePath        string  `json:"profile_path"`
+	CreditID           string  `json:"credit_id"`
+	Department         string  `json:"department"`
+	Job                string  `json:"job"`
+}
+
+// TVCredits is the response shape for GET /tv/{series_id}/credits.
+type TVCredits struct {
+	ID   int64          `json:"id"`
+	Cast []TVCastMember `json:"cast"`
+	Crew []TVCrewMember `json:"crew"`
+}
+
 // TVShows is a paginated list of TV shows.
 type TVShows struct {
 	Page         int  `json:"page"`
