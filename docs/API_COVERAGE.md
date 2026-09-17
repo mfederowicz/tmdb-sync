@@ -150,7 +150,7 @@ Revisit both once that checkpoint is reached.
 - [x] Companies — `GET /search/company`
 - [x] Keywords — `GET /search/keyword`
 - [x] Movies — `GET /search/movie`
-- [ ] Multi — `GET /search/multi`
+- [x] Multi — `GET /search/multi`
 - [ ] People — `GET /search/person`
 - [ ] TV Shows — `GET /search/tv`
 

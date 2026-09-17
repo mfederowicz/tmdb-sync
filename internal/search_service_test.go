@@ -128,3 +128,34 @@ func TestSearchMovies(t *testing.T) {
 		t.Errorf("SearchMovies() = %+v, want one result titled The Matrix", results)
 	}
 }
+
+func TestSearchMulti(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/search/multi", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.URL.Query().Get("query"); got != "matrix" {
+			t.Errorf("query = %q, want %q", got, "matrix")
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page": 1,
+			"results": []map[string]any{
+				{"id": 603, "title": "The Matrix", "media_type": "movie"},
+				{"id": 6384, "name": "Keanu Reeves", "media_type": "person"},
+			},
+			"total_pages":   1,
+			"total_results": 2,
+		})
+	})
+
+	results, err := client.Search.SearchMulti(context.Background(), uri.SearchMultiOptions{Query: "matrix"}, 0)
+	if err != nil {
+		t.Fatalf("SearchMulti() error = %v", err)
+	}
+	if len(results) != 2 || results[0].MediaType != "movie" || results[1].MediaType != "person" {
+		t.Errorf("SearchMulti() = %+v, want one movie and one person result", results)
+	}
+}

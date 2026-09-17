@@ -174,3 +174,45 @@ func (s *SearchService) SearchMovies(ctx context.Context, opts uri.SearchMovieOp
 		}, nil
 	})
 }
+
+// getSearchMultiPage fetches a single page of the search/multi list.
+func (s *SearchService) getSearchMultiPage(ctx context.Context, opts *uri.SearchMultiOptions) (*str.SearchMulti, *str.Response, error) {
+	urlStr, err := uri.AddQuery("search/multi", opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	multi := new(str.SearchMulti)
+	resp, err := s.client.Do(ctx, req, multi)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return multi, resp, nil
+}
+
+// SearchMulti returns movies, tv shows, and people matching opts, walking
+// pages until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/search-multi
+func (s *SearchService) SearchMulti(ctx context.Context, opts uri.SearchMultiOptions, pagesLimit int) ([]str.SearchMultiResult, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.SearchMultiResult], error) {
+		o := opts
+		o.Page = page
+		multi, _, err := s.getSearchMultiPage(ctx, &o)
+		if err != nil {
+			return PageResult[str.SearchMultiResult]{}, err
+		}
+		return PageResult[str.SearchMultiResult]{
+			Results:    multi.Results,
+			Page:       multi.Page,
+			TotalPages: multi.TotalPages,
+		}, nil
+	})
+}
