@@ -112,7 +112,7 @@ Revisit both once that checkpoint is reached.
 - [x] Keywords — `GET /movie/{movie_id}/keywords`
 - [x] Latest — `GET /movie/latest`
 - [x] Lists — `GET /movie/{movie_id}/lists`
-- [ ] Now Playing — `GET /movie/now_playing`
+- [x] Now Playing — `GET /movie/now_playing`
 - [x] Popular — `GET /movie/popular`
 - [ ] Recommendations — `GET /movie/{movie_id}/recommendations`
 - [ ] Release Dates — `GET /movie/{movie_id}/release_dates`

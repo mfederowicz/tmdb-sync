@@ -263,3 +263,30 @@ func TestGetMovieLists(t *testing.T) {
 		t.Fatalf("len(lists) = %d, want 2", len(lists))
 	}
 }
+
+func TestGetNowPlayingMovies(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/now_playing", func(w http.ResponseWriter, r *http.Request) {
+		pageNum, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			pageNum = 1
+		}
+		results := []map[string]any{{"id": pageNum, "title": "movie"}}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          pageNum,
+			"results":       results,
+			"total_pages":   2,
+			"total_results": 2,
+		})
+	})
+
+	movies, err := client.Movies.GetNowPlayingMovies(context.Background(), 0)
+	if err != nil {
+		t.Fatalf("GetNowPlayingMovies() error = %v", err)
+	}
+	if len(movies) != 2 {
+		t.Fatalf("len(movies) = %d, want 2", len(movies))
+	}
+}
