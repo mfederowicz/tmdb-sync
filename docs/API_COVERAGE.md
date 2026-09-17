@@ -73,8 +73,8 @@ Revisit both once that checkpoint is reached.
 - [x] Details — `GET /credit/{credit_id}`
 
 ## Discover
-- [ ] Movie — `GET /discover/movie`
-- [ ] TV — `GET /discover/tv`
+- [x] Movie — `GET /discover/movie`
+- [x] TV — `GET /discover/tv`
 
 ## Find
 - [ ] By external ID — `GET /find/{external_id}`

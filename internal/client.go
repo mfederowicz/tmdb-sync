@@ -51,6 +51,7 @@ type Client struct {
 	Companies      *CompaniesService
 	Configuration  *ConfigurationService
 	Credits        *CreditsService
+	Discover       *DiscoverService
 	Movies         *MoviesService
 	rateMu         sync.Mutex
 	RateLimitReset time.Time
@@ -92,6 +93,7 @@ func (c *Client) initialize() {
 	c.Companies = (*CompaniesService)(&c.common)
 	c.Configuration = (*ConfigurationService)(&c.common)
 	c.Credits = (*CreditsService)(&c.common)
+	c.Discover = (*DiscoverService)(&c.common)
 	c.Movies = (*MoviesService)(&c.common)
 }
 
