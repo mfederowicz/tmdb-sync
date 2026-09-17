@@ -22,6 +22,13 @@ schedule.
 
 ### Fixed
 
+## [0.14.0] - 2026-09-17
+
+### Added
+
+- `people` module: `details`, `combined-credits`, `external-ids`, `images`, `latest`,
+  `movie-credits`, `popular` (paginated), `tv-credits`, `translations` actions.
+
 ## [0.13.0] - 2026-09-17
 
 ### Added
