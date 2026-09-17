@@ -15,10 +15,10 @@ import (
 
 // peopleActionsHelp lists every people action, shared between the -a flag's
 // usage string and the "-a is required" error so both stay in sync.
-const peopleActionsHelp = "details, combined-credits"
+const peopleActionsHelp = "details, combined-credits, external-ids"
 
 // peopleIDActionsHelp lists the people actions that require -i.
-const peopleIDActionsHelp = "details, combined-credits"
+const peopleIDActionsHelp = "details, combined-credits, external-ids"
 
 // PeopleCmd is the "people" module.
 var PeopleCmd = &Command{
@@ -50,6 +50,11 @@ func execPeople(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 			return fmt.Errorf("people: -i <person_id> is required for -a combined-credits")
 		}
 		handler = handlers.PeopleCombinedCreditsHandler{PersonID: *personID}
+	case "external-ids":
+		if *personID == 0 {
+			return fmt.Errorf("people: -i <person_id> is required for -a external-ids")
+		}
+		handler = handlers.PeopleExternalIDsHandler{PersonID: *personID}
 	default:
 		return fmt.Errorf("people: unknown action %q", *action)
 	}

@@ -60,3 +60,26 @@ func TestGetPersonCombinedCredits(t *testing.T) {
 		t.Errorf("GetPersonCombinedCredits() crew = %+v, want one entry job Director", credits.Crew)
 	}
 }
+
+func TestGetPersonExternalIDs(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/1/external_ids", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":      1,
+			"imdb_id": "nm0000123",
+		})
+	})
+
+	ids, _, err := client.People.GetPersonExternalIDs(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("GetPersonExternalIDs() error = %v", err)
+	}
+	if ids.ID != 1 || ids.ImdbID != "nm0000123" {
+		t.Errorf("GetPersonExternalIDs() = %+v, want ID=1 ImdbID=%q", ids, "nm0000123")
+	}
+}

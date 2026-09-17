@@ -43,6 +43,22 @@ type PersonCombinedCredit struct {
 	EpisodeCount  int     `json:"episode_count"`
 }
 
+// PersonExternalIDs is the response shape for
+// GET /person/{person_id}/external_ids.
+type PersonExternalIDs struct {
+	ID          int64  `json:"id"`
+	FreebaseMid string `json:"freebase_mid"`
+	FreebaseID  string `json:"freebase_id"`
+	ImdbID      string `json:"imdb_id"`
+	TvrageID    int64  `json:"tvrage_id"`
+	WikidataID  string `json:"wikidata_id"`
+	FacebookID  string `json:"facebook_id"`
+	InstagramID string `json:"instagram_id"`
+	TiktokID    string `json:"tiktok_id"`
+	TwitterID   string `json:"twitter_id"`
+	YoutubeID   string `json:"youtube_id"`
+}
+
 // PersonCombinedCredits is the response shape for
 // GET /person/{person_id}/combined_credits.
 type PersonCombinedCredits struct {

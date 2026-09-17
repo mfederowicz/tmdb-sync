@@ -47,3 +47,21 @@ func (s *PeopleService) GetPersonCombinedCredits(ctx context.Context, personID i
 
 	return credits, resp, nil
 }
+
+// GetPersonExternalIDs fetches the external ids for a single person by TMDB id.
+//
+// Api docs: https://developer.themoviedb.org/reference/person-external-ids
+func (s *PeopleService) GetPersonExternalIDs(ctx context.Context, personID int64) (*str.PersonExternalIDs, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("person/%d/external_ids", personID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ids := new(str.PersonExternalIDs)
+	resp, err := s.client.Do(ctx, req, ids)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return ids, resp, nil
+}
