@@ -25,6 +25,8 @@ aiming for full TMDB v3 API coverage, one module at a time.
 - [`networks`](docs/networks.md) ✅ — network details, alternative names, images.
 - [`people`](docs/people.md) ✅ — person details, credits, images, translations, popular/latest.
 - [`reviews`](docs/reviews.md) ✅ — review details.
+- [`search`](docs/search.md) ✅ — search collections, companies, keywords, movies, multi, people,
+  TV shows.
 
 See:
 

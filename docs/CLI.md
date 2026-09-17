@@ -65,7 +65,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | `networks` ✅ ([docs](networks.md)) | `details -i <id>`, `alternative-names -i <id>`, `images -i <id>` |
 | `people` ✅ ([docs](people.md)) | `details -i <id>`, `popular` (paginated, see below), `latest`, `movie-credits -i <id>`, `tv-credits -i <id>`, ... full list in `docs/people.md` |
 | `reviews` ✅ ([docs](reviews.md)) | `details -i <review_id>` |
-| `search`          | `movie -q <query>`, `tv -q <query>`, `person -q <query>`, `multi -q <query>`, `collection -q <query>`, `company -q <query>`, `keyword -q <query>` |
+| `search` ✅ ([docs](search.md)) | `collections -query <query>`, `companies -query <query>`, `keywords -query <query>`, `movies -query <query>`, `multi -query <query>`, `people -query <query>`, `tv -query <query>` |
 | `trending`        | `all -w <day\|week>`, `movie -w <day\|week>`, `tv -w <day\|week>`, `person -w <day\|week>` |
 | `tv`              | `details -i <id>`, `popular`, `top-rated`, `on-the-air`, `airing-today`, ... |
 | `tv-seasons`      | `details -i <id> -s <season_number>`, ... |

@@ -84,6 +84,70 @@ type MovieAlternativeTitlesOptions struct {
 	Country string `url:"country,omitempty"`
 }
 
+// SearchCollectionOptions carries the query parameters accepted by
+// GET /search/collection.
+type SearchCollectionOptions struct {
+	Query        string `url:"query,omitempty"`
+	Page         int    `url:"page,omitempty"`
+	Language     string `url:"language,omitempty"`
+	IncludeAdult bool   `url:"include_adult,omitempty"`
+	Region       string `url:"region,omitempty"`
+}
+
+// SearchCompanyOptions carries the query parameters accepted by
+// GET /search/company.
+type SearchCompanyOptions struct {
+	Query string `url:"query,omitempty"`
+	Page  int    `url:"page,omitempty"`
+}
+
+// SearchKeywordOptions carries the query parameters accepted by
+// GET /search/keyword.
+type SearchKeywordOptions struct {
+	Query string `url:"query,omitempty"`
+	Page  int    `url:"page,omitempty"`
+}
+
+// SearchMovieOptions carries the query parameters accepted by
+// GET /search/movie.
+type SearchMovieOptions struct {
+	Query              string `url:"query,omitempty"`
+	Page               int    `url:"page,omitempty"`
+	Language           string `url:"language,omitempty"`
+	IncludeAdult       bool   `url:"include_adult,omitempty"`
+	Region             string `url:"region,omitempty"`
+	Year               int    `url:"year,omitempty"`
+	PrimaryReleaseYear int    `url:"primary_release_year,omitempty"`
+}
+
+// SearchMultiOptions carries the query parameters accepted by
+// GET /search/multi.
+type SearchMultiOptions struct {
+	Query        string `url:"query,omitempty"`
+	Page         int    `url:"page,omitempty"`
+	Language     string `url:"language,omitempty"`
+	IncludeAdult bool   `url:"include_adult,omitempty"`
+}
+
+// SearchPersonOptions carries the query parameters accepted by
+// GET /search/person.
+type SearchPersonOptions struct {
+	Query        string `url:"query,omitempty"`
+	Page         int    `url:"page,omitempty"`
+	Language     string `url:"language,omitempty"`
+	IncludeAdult bool   `url:"include_adult,omitempty"`
+}
+
+// SearchTVOptions carries the query parameters accepted by GET /search/tv.
+type SearchTVOptions struct {
+	Query            string `url:"query,omitempty"`
+	Page             int    `url:"page,omitempty"`
+	Language         string `url:"language,omitempty"`
+	IncludeAdult     bool   `url:"include_adult,omitempty"`
+	FirstAirDateYear int    `url:"first_air_date_year,omitempty"`
+	Year             int    `url:"year,omitempty"`
+}
+
 // LanguageOptions carries the optional language query parameter accepted by
 // several per-resource endpoints (e.g. movie/{id}/credits, /videos, ...).
 type LanguageOptions struct {
