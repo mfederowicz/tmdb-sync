@@ -8,6 +8,9 @@ aiming for full TMDB v3 API coverage, one module at a time.
 🚧 **In progress**, one module at a time. Implemented so far:
 
 - [`certifications`](docs/certifications.md) ✅ — movie/tv certifications, by country.
+- [`changes`](docs/changes.md) ✅ — movie/tv/person change lists.
+- [`collections`](docs/collections.md) ✅ — collection details, images, translations.
+- [`companies`](docs/companies.md) ✅ — company details, alternative names, images.
 - [`configuration`](docs/configuration.md) ✅ — image base URLs/sizes, countries, jobs, languages,
   primary translations, timezones.
 - `movies` 🚧 — `details`, `popular` implemented; the rest of the module is still planned.
