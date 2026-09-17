@@ -22,6 +22,12 @@ schedule.
 
 ### Fixed
 
+## [0.6.0] - 2026-09-17
+
+### Added
+
+- `credits` module: `details` action (`GET /credit/{credit_id}`).
+
 ## [0.5.0] - 2026-09-17
 
 ### Added
