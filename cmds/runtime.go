@@ -31,6 +31,7 @@ func init() {
 		ListsCmd,
 		MoviesCmd,
 		NetworksCmd,
+		PeopleCmd,
 		HelpCmd,
 	}
 }

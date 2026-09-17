@@ -132,7 +132,7 @@ Revisit both once that checkpoint is reached.
 - [x] Images — `GET /network/{network_id}/images`
 
 ## People
-- [ ] Details — `GET /person/{person_id}`
+- [x] Details — `GET /person/{person_id}`
 - [ ] Combined Credits — `GET /person/{person_id}/combined_credits`
 - [ ] External IDs — `GET /person/{person_id}/external_ids`
 - [ ] Images — `GET /person/{person_id}/images`
