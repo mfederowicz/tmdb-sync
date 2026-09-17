@@ -39,6 +39,14 @@ type AccountListOptions struct {
 	Page      int    `url:"page,omitempty"`
 }
 
+// ChangesOptions carries the optional query parameters accepted by the
+// movie/tv/person change-list endpoints.
+type ChangesOptions struct {
+	StartDate string `url:"start_date,omitempty"`
+	EndDate   string `url:"end_date,omitempty"`
+	Page      int    `url:"page,omitempty"`
+}
+
 // ListOptions specifies the optional query parameters accepted by TMDB list
 // endpoints. Fields are added as modules need them rather than mirroring the
 // full TMDB param surface up front.
