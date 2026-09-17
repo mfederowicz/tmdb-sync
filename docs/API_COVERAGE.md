@@ -80,8 +80,8 @@ Revisit both once that checkpoint is reached.
 - [x] By external ID — `GET /find/{external_id}`
 
 ## Genres
-- [ ] Movie List — `GET /genre/movie/list`
-- [ ] TV List — `GET /genre/tv/list`
+- [x] Movie List — `GET /genre/movie/list`
+- [x] TV List — `GET /genre/tv/list`
 
 ## Guest Sessions
 - [ ] Rated Movies — `GET /guest_session/{guest_session_id}/rated/movies`
