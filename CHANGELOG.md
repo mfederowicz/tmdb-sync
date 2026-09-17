@@ -22,6 +22,13 @@ schedule.
 
 ### Fixed
 
+## [0.17.0] - 2026-09-17
+
+### Added
+
+- `trending` module: `all`, `movie`, `tv`, and `person` actions, with `-w <day|week>` time-window
+  support.
+
 ## [0.16.0] - 2026-09-17
 
 ### Added
