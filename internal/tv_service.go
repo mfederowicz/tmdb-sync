@@ -77,3 +77,22 @@ func (s *TVService) GetAggregateCredits(ctx context.Context, seriesID int64, lan
 
 	return credits, resp, nil
 }
+
+// GetAlternativeTitles fetches the alternative titles for a single TV
+// series.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-alternative-titles
+func (s *TVService) GetAlternativeTitles(ctx context.Context, seriesID int64) (*str.TVAlternativeTitles, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("tv/%d/alternative_titles", seriesID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	titles := new(str.TVAlternativeTitles)
+	resp, err := s.client.Do(ctx, req, titles)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return titles, resp, nil
+}

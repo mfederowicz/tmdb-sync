@@ -99,3 +99,28 @@ func TestGetAggregateCredits(t *testing.T) {
 		t.Errorf("GetAggregateCredits() = %+v, want ID=1399 with 1 cast (1 role) and 1 crew (1 job)", credits)
 	}
 }
+
+func TestGetTVAlternativeTitles(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/alternative_titles", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1399,
+			"results": []map[string]any{
+				{"iso_3166_1": "US", "title": "Game of Thrones", "type": ""},
+			},
+		})
+	})
+
+	titles, _, err := client.TV.GetAlternativeTitles(context.Background(), 1399)
+	if err != nil {
+		t.Fatalf("GetAlternativeTitles() error = %v", err)
+	}
+	if titles.ID != 1399 || len(titles.Results) != 1 || titles.Results[0].Title != "Game of Thrones" {
+		t.Errorf("GetAlternativeTitles() = %+v, want ID=1399 with 1 title %q", titles, "Game of Thrones")
+	}
+}

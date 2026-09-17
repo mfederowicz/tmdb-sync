@@ -85,6 +85,21 @@ type TVAggregateCredits struct {
 	Crew []TVAggregateCrewMember `json:"crew"`
 }
 
+// TVAlternativeTitle is one alternative title, as returned inline on the tv
+// alternative-titles endpoint.
+type TVAlternativeTitle struct {
+	Iso31661 string `json:"iso_3166_1"`
+	Title    string `json:"title"`
+	Type     string `json:"type"`
+}
+
+// TVAlternativeTitles is the response shape for
+// GET /tv/{series_id}/alternative_titles.
+type TVAlternativeTitles struct {
+	ID      int64                `json:"id"`
+	Results []TVAlternativeTitle `json:"results"`
+}
+
 // TVShows is a paginated list of TV shows.
 type TVShows struct {
 	Page         int  `json:"page"`

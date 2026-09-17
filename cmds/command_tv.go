@@ -23,11 +23,11 @@ var tvSessionActions = map[string]bool{
 
 // tvActionsHelp lists every tv action, shared between the -a flag's usage
 // string and the "-a is required" error so both stay in sync.
-const tvActionsHelp = "details, account-states, aggregate-credits"
+const tvActionsHelp = "details, account-states, aggregate-credits, alternative-titles"
 
 // tvIDActionsHelp lists the tv actions that require -i, shared between the
 // -i flag's usage string and the module doc.
-const tvIDActionsHelp = "details, account-states, aggregate-credits"
+const tvIDActionsHelp = "details, account-states, aggregate-credits, alternative-titles"
 
 // TVCmd is the "tv" module.
 var TVCmd = &Command{
@@ -81,6 +81,12 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 			return fmt.Errorf("tv: -i <series_id> is required for -a aggregate-credits")
 		}
 		handler = handlers.TVAggregateCreditsHandler{SeriesID: *seriesID, Language: *language}
+		params = []string{fmt.Sprintf("id-%d", *seriesID)}
+	case "alternative-titles":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv: -i <series_id> is required for -a alternative-titles")
+		}
+		handler = handlers.TVAlternativeTitlesHandler{SeriesID: *seriesID}
 		params = []string{fmt.Sprintf("id-%d", *seriesID)}
 	default:
 		return fmt.Errorf("tv: unknown action %q", *action)
