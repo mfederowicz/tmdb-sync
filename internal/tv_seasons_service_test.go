@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
+
+	"github.com/mfederowicz/tmdb-sync/uri"
 )
 
 func TestGetTVSeason(t *testing.T) {
@@ -128,5 +130,30 @@ func TestTVSeasonsGetExternalIDs(t *testing.T) {
 	}
 	if ids.ID != 3624 || ids.TvdbID != 3436 || ids.WikidataID != "Q3629848" {
 		t.Errorf("GetExternalIDs() = %+v, want ID=3624 TvdbID=3436 WikidataID=Q3629848", ids)
+	}
+}
+
+func TestTVSeasonsGetImages(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/season/1/images", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 3624,
+			"posters": []map[string]any{
+				{"file_path": "/poster.jpg"},
+			},
+		})
+	})
+
+	images, _, err := client.TVSeasons.GetImages(context.Background(), 1399, 1, &uri.ImagesOptions{})
+	if err != nil {
+		t.Fatalf("GetImages() error = %v", err)
+	}
+	if images.ID != 3624 || len(images.Posters) != 1 {
+		t.Errorf("GetImages() = %+v, want ID=3624 with 1 poster", images)
 	}
 }

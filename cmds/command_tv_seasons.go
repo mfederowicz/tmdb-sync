@@ -21,7 +21,7 @@ var tvSeasonsSessionActions = map[string]bool{
 
 // tvSeasonsActionsHelp lists every tv-seasons action, shared between the -a
 // flag's usage string and the "-a is required" error so both stay in sync.
-const tvSeasonsActionsHelp = "details, account-states, aggregate-credits, credits, external-ids"
+const tvSeasonsActionsHelp = "details, account-states, aggregate-credits, credits, external-ids, images"
 
 // TVSeasonsCmd is the "tv-seasons" module.
 var TVSeasonsCmd = &Command{
@@ -43,7 +43,8 @@ func execTVSeasonsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Conf
 	action := flagSet.String("a", "", "action: "+tvSeasonsActionsHelp+" (required)")
 	seriesID := flagSet.Int64("i", 0, "tv series id, required for -a "+tvSeasonsActionsHelp)
 	seasonNumber := flagSet.Int("s", 0, "season number, required for -a "+tvSeasonsActionsHelp)
-	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a aggregate-credits, credits")
+	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a aggregate-credits, credits, images")
+	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -88,6 +89,12 @@ func execTVSeasonsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Conf
 			return fmt.Errorf("tv-seasons: -i <series_id> is required for -a external-ids")
 		}
 		handler = handlers.TVSeasonsExternalIDsHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber}
+		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber)}
+	case "images":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv-seasons: -i <series_id> is required for -a images")
+		}
+		handler = handlers.TVSeasonsImagesHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, Language: *language, IncludeImageLanguage: *includeImageLanguage}
 		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber)}
 	default:
 		return fmt.Errorf("tv-seasons: unknown action %q (action: %s)", *action, tvSeasonsActionsHelp)
