@@ -22,6 +22,13 @@ schedule.
 
 ### Fixed
 
+## [0.9.0] - 2026-09-17
+
+### Added
+
+- `genres` module: `movie` and `tv` actions (`GET /genre/movie/list`, `GET /genre/tv/list`),
+  returning TMDB's official genre lists.
+
 ## [0.8.0] - 2026-09-17
 
 ### Added
