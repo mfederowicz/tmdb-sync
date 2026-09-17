@@ -355,6 +355,46 @@ func (s *MoviesService) GetReviews(ctx context.Context, movieID int64, language 
 	})
 }
 
+// getSimilarPage fetches a single page of a movie's similar-movies list.
+func (s *MoviesService) getSimilarPage(ctx context.Context, movieID int64, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("movie/%d/similar", movieID), opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	movies := new(str.Movies)
+	resp, err := s.client.Do(ctx, req, movies)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return movies, resp, nil
+}
+
+// GetSimilar returns movies similar to a single movie, walking pages until
+// TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-similar
+func (s *MoviesService) GetSimilar(ctx context.Context, movieID int64, language string, pagesLimit int) ([]str.Movie, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.Movie], error) {
+		movies, _, err := s.getSimilarPage(ctx, movieID, &uri.ListOptions{Page: page, Language: language})
+		if err != nil {
+			return PageResult[str.Movie]{}, err
+		}
+		return PageResult[str.Movie]{
+			Results:    movies.Results,
+			Page:       movies.Page,
+			TotalPages: movies.TotalPages,
+		}, nil
+	})
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)
