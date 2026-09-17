@@ -89,9 +89,9 @@ Revisit both once that checkpoint is reached.
 - [ ] Rated TV Episodes — `GET /guest_session/{guest_session_id}/rated/tv/episodes`
 
 ## Keywords
-- [ ] Details — `GET /keyword/{keyword_id}`
-- [ ] Movies by keyword — `GET /keyword/{keyword_id}/movies` *(deprecated by TMDB in favor of
-      Discover; implement only if still live)*
+- [x] Details — `GET /keyword/{keyword_id}`
+- [ ] Movies by keyword — `GET /keyword/{keyword_id}/movies` *(deprecated by TMDB — "Use
+      `/discover/movie` with `with_keywords` instead"; not implemented)*
 
 ## Lists (v3) 🔒 for mutation, public for read
 - [ ] Details — `GET /list/{list_id}`
