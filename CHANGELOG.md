@@ -22,6 +22,20 @@ schedule.
 
 ### Fixed
 
+## [0.5.0] - 2026-09-17
+
+### Added
+
+- `collections` module: `details`, `images`, `translations` actions.
+- `companies` module: `details`, `alternative-names`, `images` actions.
+- Shared `str.Image`/`str.Images` and `str.Translation`/`str.Translations` response types, and
+  `uri.ImagesOptions`, reusable by future per-resource image/translation endpoints.
+
+### Fixed
+
+- `str.CollectionPart.GenreIds` renamed to `GenreIDs` to follow Go naming conventions for
+  initialisms.
+
 ## [0.4.0] - 2026-09-17
 
 ### Added
