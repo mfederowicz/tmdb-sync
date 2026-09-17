@@ -64,6 +64,39 @@ type ImagesOptions struct {
 	IncludeImageLanguage string `url:"include_image_language,omitempty"`
 }
 
+// DiscoverMovieOptions carries the optional query parameters accepted by
+// GET /discover/movie. Fields are added as modules need them rather than
+// mirroring TMDB's full discover-movie filter surface up front.
+type DiscoverMovieOptions struct {
+	Page               int     `url:"page,omitempty"`
+	Language           string  `url:"language,omitempty"`
+	Region             string  `url:"region,omitempty"`
+	SortBy             string  `url:"sort_by,omitempty"`
+	IncludeAdult       bool    `url:"include_adult,omitempty"`
+	PrimaryReleaseYear int     `url:"primary_release_year,omitempty"`
+	WithGenres         string  `url:"with_genres,omitempty"`
+	VoteAverageGTE     float64 `url:"vote_average.gte,omitempty"`
+	VoteAverageLTE     float64 `url:"vote_average.lte,omitempty"`
+	WithWatchProviders string  `url:"with_watch_providers,omitempty"`
+	WatchRegion        string  `url:"watch_region,omitempty"`
+}
+
+// DiscoverTVOptions carries the optional query parameters accepted by
+// GET /discover/tv. Fields are added as modules need them rather than
+// mirroring TMDB's full discover-tv filter surface up front.
+type DiscoverTVOptions struct {
+	Page               int     `url:"page,omitempty"`
+	Language           string  `url:"language,omitempty"`
+	SortBy             string  `url:"sort_by,omitempty"`
+	IncludeAdult       bool    `url:"include_adult,omitempty"`
+	FirstAirDateYear   int     `url:"first_air_date_year,omitempty"`
+	WithGenres         string  `url:"with_genres,omitempty"`
+	VoteAverageGTE     float64 `url:"vote_average.gte,omitempty"`
+	VoteAverageLTE     float64 `url:"vote_average.lte,omitempty"`
+	WithWatchProviders string  `url:"with_watch_providers,omitempty"`
+	WatchRegion        string  `url:"watch_region,omitempty"`
+}
+
 // AddQuery adds opts' non-zero fields to s as URL query parameters, sorted by
 // key. opts may be a struct or pointer to struct (including nil, which adds
 // nothing).
@@ -113,6 +146,8 @@ func addFieldValue(qs *url.Values, fieldTag string, fieldValue reflect.Value) {
 	switch fieldValue.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		value = strconv.FormatInt(fieldValue.Int(), 10)
+	case reflect.Float32, reflect.Float64:
+		value = strconv.FormatFloat(fieldValue.Float(), 'f', -1, 64)
 	case reflect.Bool:
 		value = strconv.FormatBool(fieldValue.Bool())
 	case reflect.String:

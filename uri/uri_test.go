@@ -45,3 +45,14 @@ func TestAddQuery_IncludeAdultTrue(t *testing.T) {
 		t.Fatalf("AddQuery() = %q, want %q", got, want)
 	}
 }
+
+func TestAddQuery_FloatField(t *testing.T) {
+	got, err := AddQuery("discover/movie", &DiscoverMovieOptions{VoteAverageGTE: 7.5})
+	if err != nil {
+		t.Fatalf("AddQuery() error = %v", err)
+	}
+	want := "discover/movie?vote_average.gte=7.5"
+	if got != want {
+		t.Fatalf("AddQuery() = %q, want %q", got, want)
+	}
+}

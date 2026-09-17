@@ -56,7 +56,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | `companies` ✅ ([docs](companies.md)) | `details -i <id>`, `alternative-names -i <id>`, `images -i <id>` |
 | `configuration` ✅ ([docs](configuration.md)) | `details`, `countries`, `languages`, `jobs`, `timezones`, `primary-translations` |
 | `credits` ✅ ([docs](credits.md)) | `details -i <credit_id>` |
-| `discover`        | `movie [filters]`, `tv [filters]` |
+| `discover` ✅ ([docs](discover.md)) | `movie [filters]`, `tv [filters]` |
 | `find`            | `-i <external_id> --source <imdb_id\|tvdb_id\|...>` |
 | `genres`          | `movie`, `tv` |
 | `keywords`        | `details -i <id>` |
