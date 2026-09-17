@@ -26,12 +26,21 @@ after the session-auth plumbing from phase 2 exists but before any account comma
 
 ## Authentication
 Used internally by the session flow (`internal/auth_service.go`, `cli/session.go`), not exposed as
-a CLI action — a future 🔒 module (e.g. `account`) triggers it on demand.
+a CLI action. `CreateRequestToken`/`CreateSession` back the `account` module's login flow
+(`cli.HandleToken`); `ValidateKey` backs a startup credentials preflight (`main.go`), and a 401
+from any `account` call now transparently re-triggers login via `cli.CreateSessionInteractively`
+(`cmds/command_account.go`'s `execAccountAttempt`). `DeleteSession` and `CreateGuestSession` are
+implemented and unit-tested but **not usable/wired-in yet** — marked unchecked deliberately (not
+an oversight). They're blocked on a future checkpoint: a `rating` module (movie/TV/episode rating
++ reading back guest ratings) that would give `CreateGuestSession` a real caller; `DeleteSession`
+has no organic caller identified at all (TMDB has no equivalent delete for guest sessions — they
+just expire after 60 min idle — and there's no planned explicit account-logout feature either).
+Revisit both once that checkpoint is reached.
 - [ ] Create Guest Session — `GET /authentication/guest_session/new`
-- [ ] Create Request Token — `GET /authentication/token/new`
-- [ ] Create Session — `POST /authentication/session/new`
+- [x] Create Request Token — `GET /authentication/token/new`
+- [x] Create Session — `POST /authentication/session/new`
 - [ ] Delete Session (logout) — `DELETE /authentication/session`
-- [ ] Validate Key — `GET /authentication`
+- [x] Validate Key — `GET /authentication`
 
 ## Certifications
 - [x] Movie Certifications — `GET /certification/movie/list`

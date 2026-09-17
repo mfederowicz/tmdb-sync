@@ -129,6 +129,14 @@ TMDB v3 has its own request-token/session flow, independent of v4:
 adding v4 means new files (`internal/auth_v4_service.go`, a new `cli` flow, a `cfg.AuthVersion`
 switch already reserved in `Config`), never edits to the v3 files above.
 
+Two more `Client.Auth` methods have real callers beyond the login flow itself: `main.go` calls
+`ValidateKey` once at startup as a credentials preflight (fails fast on a misconfigured
+`api_key`/`read_access_token` instead of a confusing error deep in whichever module ran first),
+and `cmds/command_account.go`'s `execAccountAttempt` treats an HTTP 401 from any `account` call as
+a stale/revoked session — it transparently re-runs `cli.CreateSessionInteractively` and retries
+the action once, instead of requiring an explicit logout/re-login step. `DeleteSession` and
+`CreateGuestSession` remain implemented/tested but unused.
+
 ## Error handling
 
 - Typed errors: `str.ErrorResponse` (TMDB's JSON error body) for normal 4xx/5xx, and

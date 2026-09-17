@@ -2,8 +2,10 @@ package cmds
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
+	"net/http"
 
 	"github.com/mfederowicz/tmdb-sync/cfg"
 	"github.com/mfederowicz/tmdb-sync/cli"
@@ -15,6 +17,18 @@ import (
 	"github.com/mfederowicz/tmdb-sync/str"
 )
 
+// refreshSession is a var (not a plain function call) so tests can stub it
+// without triggering the real browser-approval flow.
+var refreshSession = cli.CreateSessionInteractively
+
+// isSessionInvalid reports whether err is a TMDB auth failure (HTTP 401),
+// which is the only signal TMDB gives for an expired/revoked session_id —
+// there's no dedicated "check my session" endpoint.
+func isSessionInvalid(err error) bool {
+	var errResp *str.ErrorResponse
+	return errors.As(err, &errResp) && errResp.StatusCode == http.StatusUnauthorized
+}
+
 // AccountCmd is the "account" 🔒 module. Every action requires a v3 session,
 // established on demand via cli.HandleToken.
 var AccountCmd = &Command{
@@ -25,6 +39,13 @@ var AccountCmd = &Command{
 }
 
 func execAccount(fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string) error {
+	return execAccountAttempt(fs, client, config, options, args, false)
+}
+
+// execAccountAttempt is execAccount's body, split out so a stale session
+// (detected via isSessionInvalid) can trigger one transparent re-login and
+// retry instead of failing outright.
+func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string, retried bool) error {
 	flagSet := flag.NewFlagSet("account", flag.ContinueOnError)
 	action := flagSet.String("a", "", "action: details, add-watchlist, add-favorite, favorite-movies, favorite-tv, lists, rated-movies, rated-tv, rated-tv-episodes, watchlist-movies, watchlist-tv (required)")
 	accountID := flagSet.Int64("i", 0, "account id (optional: omit to self-resolve via the session and cache it)")
@@ -146,6 +167,12 @@ func execAccount(fs afero.Fs, client *internal.Client, config *cfg.Config, optio
 
 	result, err := handler.Handle(context.Background(), client)
 	if err != nil {
+		if !retried && isSessionInvalid(err) {
+			if newSession, refreshErr := refreshSession(fs, config, client); refreshErr == nil {
+				options.Session = newSession
+				return execAccountAttempt(fs, client, config, options, args, true)
+			}
+		}
 		return err
 	}
 
