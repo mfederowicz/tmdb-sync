@@ -181,7 +181,7 @@ Revisit both once that checkpoint is reached.
 - [x] Videos — `GET /tv/{series_id}/videos`
 - [x] Watch Providers — `GET /tv/{series_id}/watch/providers`
 - [x] Popular — `GET /tv/popular`
-- [ ] Top Rated — `GET /tv/top_rated`
+- [x] Top Rated — `GET /tv/top_rated`
 - [ ] On The Air — `GET /tv/on_the_air`
 - [ ] Airing Today — `GET /tv/airing_today`
 - [ ] Add Rating 🔒 — `POST /tv/{series_id}/rating`
