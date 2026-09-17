@@ -104,27 +104,27 @@ Revisit both once that checkpoint is reached.
 
 ## Movies
 - [x] Details — `GET /movie/{movie_id}`
-- [ ] Account States 🔒 — `GET /movie/{movie_id}/account_states`
-- [ ] Alternative Titles — `GET /movie/{movie_id}/alternative_titles`
-- [ ] Credits — `GET /movie/{movie_id}/credits`
-- [ ] External IDs — `GET /movie/{movie_id}/external_ids`
-- [ ] Images — `GET /movie/{movie_id}/images`
-- [ ] Keywords — `GET /movie/{movie_id}/keywords`
-- [ ] Latest — `GET /movie/latest`
-- [ ] Lists — `GET /movie/{movie_id}/lists`
-- [ ] Now Playing — `GET /movie/now_playing`
+- [x] Account States 🔒 — `GET /movie/{movie_id}/account_states`
+- [x] Alternative Titles — `GET /movie/{movie_id}/alternative_titles`
+- [x] Credits — `GET /movie/{movie_id}/credits`
+- [x] External IDs — `GET /movie/{movie_id}/external_ids`
+- [x] Images — `GET /movie/{movie_id}/images`
+- [x] Keywords — `GET /movie/{movie_id}/keywords`
+- [x] Latest — `GET /movie/latest`
+- [x] Lists — `GET /movie/{movie_id}/lists`
+- [x] Now Playing — `GET /movie/now_playing`
 - [x] Popular — `GET /movie/popular`
-- [ ] Recommendations — `GET /movie/{movie_id}/recommendations`
-- [ ] Release Dates — `GET /movie/{movie_id}/release_dates`
-- [ ] Reviews — `GET /movie/{movie_id}/reviews`
-- [ ] Similar — `GET /movie/{movie_id}/similar`
-- [ ] Top Rated — `GET /movie/top_rated`
-- [ ] Translations — `GET /movie/{movie_id}/translations`
-- [ ] Upcoming — `GET /movie/upcoming`
-- [ ] Videos — `GET /movie/{movie_id}/videos`
-- [ ] Watch Providers — `GET /movie/{movie_id}/watch/providers`
-- [ ] Add Rating 🔒 — `POST /movie/{movie_id}/rating`
-- [ ] Delete Rating 🔒 — `DELETE /movie/{movie_id}/rating`
+- [x] Recommendations — `GET /movie/{movie_id}/recommendations`
+- [x] Release Dates — `GET /movie/{movie_id}/release_dates`
+- [x] Reviews — `GET /movie/{movie_id}/reviews`
+- [x] Similar — `GET /movie/{movie_id}/similar`
+- [x] Top Rated — `GET /movie/top_rated`
+- [x] Translations — `GET /movie/{movie_id}/translations`
+- [x] Upcoming — `GET /movie/upcoming`
+- [x] Videos — `GET /movie/{movie_id}/videos`
+- [x] Watch Providers — `GET /movie/{movie_id}/watch/providers`
+- [x] Add Rating 🔒 — `POST /movie/{movie_id}/rating`
+- [x] Delete Rating 🔒 — `DELETE /movie/{movie_id}/rating`
 
 ## Networks
 - [ ] Details — `GET /network/{network_id}`
