@@ -55,3 +55,27 @@ func (s *TVSeasonsService) GetAccountStates(ctx context.Context, seriesID int64,
 
 	return states, resp, nil
 }
+
+// GetAggregateCredits fetches the cast and crew for a single TV season,
+// with roles/jobs aggregated across every episode.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-season-aggregate-credits
+func (s *TVSeasonsService) GetAggregateCredits(ctx context.Context, seriesID int64, seasonNumber int, language string) (*str.TVAggregateCredits, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/season/%d/aggregate_credits", seriesID, seasonNumber), &uri.LanguageOptions{Language: language})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	credits := new(str.TVAggregateCredits)
+	resp, err := s.client.Do(ctx, req, credits)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return credits, resp, nil
+}
