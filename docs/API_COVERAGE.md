@@ -47,9 +47,9 @@ Revisit both once that checkpoint is reached.
 - [x] TV Certifications — `GET /certification/tv/list`
 
 ## Changes
-- [ ] Movie Change List — `GET /movie/changes`
-- [ ] People Change List — `GET /person/changes`
-- [ ] TV Change List — `GET /tv/changes`
+- [x] Movie Change List — `GET /movie/changes`
+- [x] People Change List — `GET /person/changes`
+- [x] TV Change List — `GET /tv/changes`
 
 ## Collections
 - [ ] Details — `GET /collection/{collection_id}`
