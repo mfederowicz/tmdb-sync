@@ -106,3 +106,26 @@ func TestGetPersonImages(t *testing.T) {
 		t.Errorf("GetPersonImages() = %+v, want one profile", images)
 	}
 }
+
+func TestPeopleGetLatest(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/person/latest", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":   2,
+			"name": "Jane Doe",
+		})
+	})
+
+	person, _, err := client.People.GetLatest(context.Background())
+	if err != nil {
+		t.Fatalf("GetLatest() error = %v", err)
+	}
+	if person.ID != 2 || person.Name != "Jane Doe" {
+		t.Errorf("GetLatest() = %+v, want ID=2 Name=%q", person, "Jane Doe")
+	}
+}

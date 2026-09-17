@@ -136,7 +136,7 @@ Revisit both once that checkpoint is reached.
 - [x] Combined Credits — `GET /person/{person_id}/combined_credits`
 - [x] External IDs — `GET /person/{person_id}/external_ids`
 - [x] Images — `GET /person/{person_id}/images`
-- [ ] Latest — `GET /person/latest`
+- [x] Latest — `GET /person/latest`
 - [ ] Movie Credits — `GET /person/{person_id}/movie_credits`
 - [ ] Popular — `GET /person/popular`
 - [ ] TV Credits — `GET /person/{person_id}/tv_credits`

@@ -15,7 +15,7 @@ import (
 
 // peopleActionsHelp lists every people action, shared between the -a flag's
 // usage string and the "-a is required" error so both stay in sync.
-const peopleActionsHelp = "details, combined-credits, external-ids, images"
+const peopleActionsHelp = "details, combined-credits, external-ids, images, latest"
 
 // peopleIDActionsHelp lists the people actions that require -i.
 const peopleIDActionsHelp = "details, combined-credits, external-ids, images"
@@ -37,6 +37,7 @@ func execPeople(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 	}
 
 	var handler handlers.Handler
+	var params []string
 	switch *action {
 	case "":
 		return fmt.Errorf("people: -a is required (action: %s)", peopleActionsHelp)
@@ -45,21 +46,27 @@ func execPeople(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 			return fmt.Errorf("people: -i <person_id> is required for -a details")
 		}
 		handler = handlers.PeopleDetailsHandler{PersonID: *personID}
+		params = []string{fmt.Sprintf("id-%d", *personID)}
 	case "combined-credits":
 		if *personID == 0 {
 			return fmt.Errorf("people: -i <person_id> is required for -a combined-credits")
 		}
 		handler = handlers.PeopleCombinedCreditsHandler{PersonID: *personID}
+		params = []string{fmt.Sprintf("id-%d", *personID)}
 	case "external-ids":
 		if *personID == 0 {
 			return fmt.Errorf("people: -i <person_id> is required for -a external-ids")
 		}
 		handler = handlers.PeopleExternalIDsHandler{PersonID: *personID}
+		params = []string{fmt.Sprintf("id-%d", *personID)}
 	case "images":
 		if *personID == 0 {
 			return fmt.Errorf("people: -i <person_id> is required for -a images")
 		}
 		handler = handlers.PeopleImagesHandler{PersonID: *personID}
+		params = []string{fmt.Sprintf("id-%d", *personID)}
+	case "latest":
+		handler = handlers.PeopleLatestHandler{}
 	default:
 		return fmt.Errorf("people: unknown action %q", *action)
 	}
@@ -69,6 +76,5 @@ func execPeople(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 		return err
 	}
 
-	params := []string{fmt.Sprintf("id-%d", *personID)}
 	return writeResult(fs, config, "people", *action, result, params...)
 }

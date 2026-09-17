@@ -83,3 +83,21 @@ func (s *PeopleService) GetPersonImages(ctx context.Context, personID int64) (*s
 
 	return images, resp, nil
 }
+
+// GetLatest fetches the most recently created person entry.
+//
+// Api docs: https://developer.themoviedb.org/reference/person-latest-id
+func (s *PeopleService) GetLatest(ctx context.Context) (*str.PersonDetails, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, "person/latest", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	person := new(str.PersonDetails)
+	resp, err := s.client.Do(ctx, req, person)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return person, resp, nil
+}
