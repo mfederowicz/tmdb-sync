@@ -64,7 +64,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | `movies` ✅ ([docs](movies.md)) | `details -i <id>`, `popular` (paginated, see below), `top-rated`, `now-playing`, `upcoming`, `credits -i <id>`, `videos -i <id>`, ... full list in `docs/movies.md` |
 | `networks` ✅ ([docs](networks.md)) | `details -i <id>`, `alternative-names -i <id>`, `images -i <id>` |
 | `people` ✅ ([docs](people.md)) | `details -i <id>`, `popular` (paginated, see below), `latest`, `movie-credits -i <id>`, `tv-credits -i <id>`, ... full list in `docs/people.md` |
-| `reviews`         | `details -i <review_id>` |
+| `reviews` ✅ ([docs](reviews.md)) | `details -i <review_id>` |
 | `search`          | `movie -q <query>`, `tv -q <query>`, `person -q <query>`, `multi -q <query>`, `collection -q <query>`, `company -q <query>`, `keyword -q <query>` |
 | `trending`        | `all -w <day\|week>`, `movie -w <day\|week>`, `tv -w <day\|week>`, `person -w <day\|week>` |
 | `tv`              | `details -i <id>`, `popular`, `top-rated`, `on-the-air`, `airing-today`, ... |

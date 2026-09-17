@@ -143,7 +143,7 @@ Revisit both once that checkpoint is reached.
 - [x] Translations — `GET /person/{person_id}/translations`
 
 ## Reviews
-- [ ] Details — `GET /review/{review_id}`
+- [x] Details — `GET /review/{review_id}`
 
 ## Search
 - [ ] Collections — `GET /search/collection`
