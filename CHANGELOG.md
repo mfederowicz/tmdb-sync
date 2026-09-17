@@ -22,6 +22,18 @@ schedule.
 
 ### Fixed
 
+## [0.7.0] - 2026-09-17
+
+### Added
+
+- `discover` module: `movie` and `tv` actions (`GET /discover/movie`, `GET /discover/tv`) with
+  filters for sort order, language/region, release/air year, genres, vote average range, watch
+  providers, and watch region.
+
+### Changed
+
+- `uri.AddQuery`'s query-string builder now supports float-valued filter fields.
+
 ## [0.6.0] - 2026-09-17
 
 ### Added
