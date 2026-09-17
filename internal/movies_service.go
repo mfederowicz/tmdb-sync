@@ -395,6 +395,46 @@ func (s *MoviesService) GetSimilar(ctx context.Context, movieID int64, language 
 	})
 }
 
+// getTopRatedMoviesPage fetches a single page of the top-rated-movies list.
+func (s *MoviesService) getTopRatedMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
+	urlStr, err := uri.AddQuery("movie/top_rated", opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	movies := new(str.Movies)
+	resp, err := s.client.Do(ctx, req, movies)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return movies, resp, nil
+}
+
+// GetTopRatedMovies returns the current top-rated-movies list, walking pages
+// until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-top-rated-list
+func (s *MoviesService) GetTopRatedMovies(ctx context.Context, pagesLimit int) ([]str.Movie, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.Movie], error) {
+		movies, _, err := s.getTopRatedMoviesPage(ctx, &uri.ListOptions{Page: page})
+		if err != nil {
+			return PageResult[str.Movie]{}, err
+		}
+		return PageResult[str.Movie]{
+			Results:    movies.Results,
+			Page:       movies.Page,
+			TotalPages: movies.TotalPages,
+		}, nil
+	})
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)
