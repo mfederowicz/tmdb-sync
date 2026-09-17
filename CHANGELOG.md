@@ -22,6 +22,14 @@ schedule.
 
 ### Fixed
 
+## [0.11.0] - 2026-09-17
+
+### Added
+
+- `lists` 🚧 module: `details` and `item-status` actions (`GET /list/{list_id}`,
+  `GET /list/{list_id}/item_status`), both public reads. Mutation actions (`create`, `add-movie`,
+  `remove-movie`, `clear`, `delete`), all requiring a v3 session, are planned in a later PR.
+
 ## [0.10.0] - 2026-09-17
 
 ### Added

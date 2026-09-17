@@ -60,7 +60,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | `find` ✅ ([docs](find.md)) | `by-id -i <external_id> --source <imdb_id\|tvdb_id\|...>` |
 | `genres` ✅ ([docs](genres.md)) | `movie`, `tv` |
 | `keywords` ✅ ([docs](keywords.md)) | `details -i <id>` |
-| `lists`           | `details -i <id>`, `create`, `add-movie`, `remove-movie`, `clear`, `delete` |
+| `lists` 🚧 ([docs](lists.md)) | `details -i <id>`, `item-status -i <id> -media-id <movie_id>`, `create`, `add-movie`, `remove-movie`, `clear`, `delete` |
 | `movies` ✅        | `details -i <id>`, `popular` (paginated, see below), `top-rated`, `now-playing`, `upcoming`, `credits -i <id>`, `videos -i <id>`, ... |
 | `networks`        | `details -i <id>`, `images -i <id>` |
 | `people`          | `details -i <id>`, `popular`, `movie-credits -i <id>`, `tv-credits -i <id>`, ... |

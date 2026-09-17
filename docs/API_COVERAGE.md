@@ -94,8 +94,8 @@ Revisit both once that checkpoint is reached.
       `/discover/movie` with `with_keywords` instead"; not implemented)*
 
 ## Lists (v3) 🔒 for mutation, public for read
-- [ ] Details — `GET /list/{list_id}`
-- [ ] Check Item Status — `GET /list/{list_id}/item_status`
+- [x] Details — `GET /list/{list_id}`
+- [x] Check Item Status — `GET /list/{list_id}/item_status`
 - [ ] Create — `POST /list`
 - [ ] Add Movie — `POST /list/{list_id}/add_item`
 - [ ] Remove Movie — `POST /list/{list_id}/remove_item`

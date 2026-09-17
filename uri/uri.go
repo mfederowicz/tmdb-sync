@@ -57,6 +57,13 @@ type ListOptions struct {
 	IncludeAdult bool   `url:"include_adult,omitempty"`
 }
 
+// ListItemStatusOptions carries the query parameters accepted by
+// GET /list/{list_id}/item_status.
+type ListItemStatusOptions struct {
+	MovieID  int64  `url:"movie_id,omitempty"`
+	Language string `url:"language,omitempty"`
+}
+
 // ImagesOptions carries the optional query parameters accepted by
 // per-resource images endpoints.
 type ImagesOptions struct {
