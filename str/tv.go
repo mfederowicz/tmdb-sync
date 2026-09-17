@@ -312,6 +312,13 @@ type TVVideos struct {
 	Results []TVVideo `json:"results"`
 }
 
+// TVWatchProviders is the response shape for
+// GET /tv/{series_id}/watch/providers.
+type TVWatchProviders struct {
+	ID      int64                          `json:"id"`
+	Results map[string]WatchProviderRegion `json:"results"`
+}
+
 // TVScreenedTheatricallyEpisode is one episode that had a theatrical
 // screening, as returned inline on the tv screened-theatrically endpoint.
 type TVScreenedTheatricallyEpisode struct {

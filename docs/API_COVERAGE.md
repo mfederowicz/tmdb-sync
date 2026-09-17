@@ -179,7 +179,7 @@ Revisit both once that checkpoint is reached.
 - [x] Similar — `GET /tv/{series_id}/similar`
 - [x] Translations — `GET /tv/{series_id}/translations`
 - [x] Videos — `GET /tv/{series_id}/videos`
-- [ ] Watch Providers — `GET /tv/{series_id}/watch/providers`
+- [x] Watch Providers — `GET /tv/{series_id}/watch/providers`
 - [ ] Popular — `GET /tv/popular`
 - [ ] Top Rated — `GET /tv/top_rated`
 - [ ] On The Air — `GET /tv/on_the_air`

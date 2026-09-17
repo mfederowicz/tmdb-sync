@@ -437,6 +437,25 @@ func (s *TVService) GetVideos(ctx context.Context, seriesID int64, language stri
 	return videos, resp, nil
 }
 
+// GetWatchProviders fetches the per-region streaming/rental/purchase
+// providers for a single TV series.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-watch-providers
+func (s *TVService) GetWatchProviders(ctx context.Context, seriesID int64) (*str.TVWatchProviders, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("tv/%d/watch/providers", seriesID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	providers := new(str.TVWatchProviders)
+	resp, err := s.client.Do(ctx, req, providers)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return providers, resp, nil
+}
+
 // GetLatest fetches the most recently created TV series on TMDB.
 //
 // Api docs: https://developer.themoviedb.org/reference/tv-series-latest-id

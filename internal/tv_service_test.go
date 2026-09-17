@@ -497,3 +497,34 @@ func TestGetTVVideos(t *testing.T) {
 		t.Errorf("GetVideos() = %+v, want ID=1399 with 1 video named %q", videos, "Trailer")
 	}
 }
+
+func TestGetTVWatchProviders(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/watch/providers", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1399,
+			"results": map[string]any{
+				"US": map[string]any{
+					"link": "https://www.themoviedb.org/tv/1399/watch",
+					"flatrate": []map[string]any{
+						{"provider_id": 8, "provider_name": "Netflix"},
+					},
+				},
+			},
+		})
+	})
+
+	providers, _, err := client.TV.GetWatchProviders(context.Background(), 1399)
+	if err != nil {
+		t.Fatalf("GetWatchProviders() error = %v", err)
+	}
+	region, ok := providers.Results["US"]
+	if providers.ID != 1399 || !ok || len(region.Flatrate) != 1 || region.Flatrate[0].ProviderName != "Netflix" {
+		t.Errorf("GetWatchProviders() = %+v, want ID=1399 with US flatrate provider %q", providers, "Netflix")
+	}
+}
