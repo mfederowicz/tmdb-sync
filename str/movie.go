@@ -188,6 +188,32 @@ type MovieVideos struct {
 	Results []MovieVideo `json:"results"`
 }
 
+// WatchProvider is a single streaming/rental/purchase provider entry, as
+// returned inline on TMDB's per-resource watch-providers endpoints (e.g.
+// movie/{id}/watch/providers, tv/{id}/watch/providers).
+type WatchProvider struct {
+	LogoPath        string `json:"logo_path"`
+	ProviderID      int64  `json:"provider_id"`
+	ProviderName    string `json:"provider_name"`
+	DisplayPriority int    `json:"display_priority"`
+}
+
+// WatchProviderRegion is one country's watch-provider offers, keyed by
+// ISO 3166-1 country code in the parent Results map.
+type WatchProviderRegion struct {
+	Link     string          `json:"link"`
+	Flatrate []WatchProvider `json:"flatrate,omitempty"`
+	Rent     []WatchProvider `json:"rent,omitempty"`
+	Buy      []WatchProvider `json:"buy,omitempty"`
+}
+
+// MovieWatchProviders is the response shape for
+// GET /movie/{movie_id}/watch/providers.
+type MovieWatchProviders struct {
+	ID      int64                          `json:"id"`
+	Results map[string]WatchProviderRegion `json:"results"`
+}
+
 // MovieExternalIDs is the response shape for
 // GET /movie/{movie_id}/external_ids.
 type MovieExternalIDs struct {

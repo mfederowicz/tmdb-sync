@@ -395,6 +395,35 @@ func TestGetVideos(t *testing.T) {
 	}
 }
 
+func TestGetWatchProviders(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/watch/providers", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 550,
+			"results": map[string]any{
+				"US": map[string]any{
+					"link":     "https://www.themoviedb.org/movie/550-fight-club/watch",
+					"flatrate": []map[string]any{{"provider_id": 8, "provider_name": "Netflix"}},
+				},
+			},
+		})
+	})
+
+	providers, _, err := client.Movies.GetWatchProviders(context.Background(), 550)
+	if err != nil {
+		t.Fatalf("GetWatchProviders() error = %v", err)
+	}
+	us, ok := providers.Results["US"]
+	if providers.ID != 550 || !ok || len(us.Flatrate) != 1 {
+		t.Errorf("GetWatchProviders() = %+v, want ID=550 with a US region with 1 flatrate provider", providers)
+	}
+}
+
 func TestGetReleaseDates(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()

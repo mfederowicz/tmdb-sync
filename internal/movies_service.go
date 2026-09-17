@@ -516,6 +516,25 @@ func (s *MoviesService) GetVideos(ctx context.Context, movieID int64, language s
 	return videos, resp, nil
 }
 
+// GetWatchProviders fetches the per-region streaming/rental/purchase
+// providers for a single movie.
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-watch-providers
+func (s *MoviesService) GetWatchProviders(ctx context.Context, movieID int64) (*str.MovieWatchProviders, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("movie/%d/watch/providers", movieID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	providers := new(str.MovieWatchProviders)
+	resp, err := s.client.Do(ctx, req, providers)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return providers, resp, nil
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)
