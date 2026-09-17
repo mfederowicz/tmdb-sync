@@ -23,11 +23,16 @@ var tvSessionActions = map[string]bool{
 
 // tvActionsHelp lists every tv action, shared between the -a flag's usage
 // string and the "-a is required" error so both stay in sync.
-const tvActionsHelp = "details, account-states, add-rating, aggregate-credits, airing-today, alternative-titles, content-ratings, credits, delete-rating, episode-groups, external-ids, images, keywords, latest, lists, on-the-air, popular, recommendations, reviews, screened-theatrically, similar, top-rated, translations, videos, watch-providers"
+const tvActionsHelp = "details, account-states, add-rating, aggregate-credits, airing-today, " +
+	"alternative-titles, content-ratings, credits, delete-rating, episode-groups, external-ids, " +
+	"images, keywords, latest, lists, on-the-air, popular, recommendations, reviews, " +
+	"screened-theatrically, similar, top-rated, translations, videos, watch-providers"
 
 // tvIDActionsHelp lists the tv actions that require -i, shared between the
 // -i flag's usage string and the module doc.
-const tvIDActionsHelp = "details, account-states, add-rating, aggregate-credits, alternative-titles, content-ratings, credits, delete-rating, episode-groups, external-ids, images, keywords, lists, recommendations, reviews, screened-theatrically, similar, translations, videos, watch-providers"
+const tvIDActionsHelp = "details, account-states, add-rating, aggregate-credits, alternative-titles, " +
+	"content-ratings, credits, delete-rating, episode-groups, external-ids, images, keywords, lists, " +
+	"recommendations, reviews, screened-theatrically, similar, translations, videos, watch-providers"
 
 // TVCmd is the "tv" module.
 var TVCmd = &Command{
