@@ -2,8 +2,13 @@ package cli
 
 import (
 	"fmt"
+	"regexp"
 	"runtime/debug"
 )
+
+// pseudoVersionRE matches Go pseudo-versions, e.g. v0.9.1-0.20260917155637-65660c458192,
+// capturing the embedded timestamp and abbreviated commit hash.
+var pseudoVersionRE = regexp.MustCompile(`-(\d{14})-([0-9a-f]{12})$`)
 
 // version info, overridden at build time via -ldflags (see Makefile).
 var (
@@ -31,6 +36,17 @@ func GenAppVersion() string {
 				}
 			}
 			by = "go install"
+		}
+
+		if c == "unknown" || d == "unknown" {
+			if m := pseudoVersionRE.FindStringSubmatch(v); m != nil {
+				if c == "unknown" {
+					c = m[2]
+				}
+				if d == "unknown" {
+					d = m[1]
+				}
+			}
 		}
 	}
 
