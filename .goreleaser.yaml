@@ -16,6 +16,7 @@ builds:
       - -X "github.com/mfederowicz/tmdb-sync/cli.date={{ .Date }}"
       - -X "github.com/mfederowicz/tmdb-sync/cli.builtBy=GoReleaser"
       - -X "github.com/mfederowicz/tmdb-sync/cli.version={{ .Version }}"
+      - -X "github.com/mfederowicz/tmdb-sync/cli.commit={{ .FullCommit }}"
 
 archives:
   - id: tmdb-sync
