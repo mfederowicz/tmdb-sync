@@ -22,6 +22,14 @@ schedule.
 
 ### Fixed
 
+## [0.12.1] - 2026-09-17
+
+### Fixed
+
+- `movies`: fixed two `revive` line-length warnings on the `-a`/`-i` flag usage strings and the
+  "-a is required" error (extracted into shared consts), and an unused-receiver warning on
+  `MoviesLatestHandler.Handle`. No behavior change.
+
 ## [0.12.0] - 2026-09-17
 
 ### Added

@@ -21,6 +21,19 @@ var moviesSessionActions = map[string]bool{
 	"delete-rating":  true,
 }
 
+// moviesActionsHelp lists every movies action, shared between the -a flag's
+// usage string and the "-a is required" error so both stay in sync.
+const moviesActionsHelp = "details, popular, account-states, alternative-titles, credits, " +
+	"external-ids, images, keywords, latest, lists, now-playing, recommendations, " +
+	"release-dates, reviews, similar, top-rated, translations, upcoming, videos, " +
+	"watch-providers, add-rating, delete-rating"
+
+// moviesIDActionsHelp lists the movies actions that require -i, shared
+// between the -i flag's usage string and the module doc.
+const moviesIDActionsHelp = "details, account-states, alternative-titles, credits, " +
+	"external-ids, images, keywords, release-dates, translations, videos, " +
+	"watch-providers, add-rating, delete-rating"
+
 // MoviesCmd is the "movies" module.
 var MoviesCmd = &Command{
 	Name:   "movies",
@@ -38,8 +51,8 @@ func execMovies(fs afero.Fs, client *internal.Client, config *cfg.Config, option
 // retry instead of failing outright.
 func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string, retried bool) error {
 	flagSet := flag.NewFlagSet("movies", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: details, popular, account-states, alternative-titles, credits, external-ids, images, keywords, latest, lists, now-playing, recommendations, release-dates, reviews, similar, top-rated, translations, upcoming, videos, watch-providers, add-rating, delete-rating (required)")
-	movieID := flagSet.Int64("i", 0, "movie id, required for -a details, account-states, alternative-titles, credits, external-ids, images, keywords, release-dates, translations, videos, watch-providers, add-rating, delete-rating")
+	action := flagSet.String("a", "", "action: "+moviesActionsHelp+" (required)")
+	movieID := flagSet.Int64("i", 0, "movie id, required for -a "+moviesIDActionsHelp)
 	value := flagSet.Float64("value", 0, "rating value (0.5-10.0, in 0.5 increments), required for -a add-rating")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a popular, lists, now-playing, recommendations, reviews, similar, top-rated, upcoming (default: pages_limit from config, 0 = unlimited)")
 	country := flagSet.String("country", "", "ISO 3166-1 country code, used by -a alternative-titles")
@@ -59,7 +72,7 @@ func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config,
 	var params []string
 	switch *action {
 	case "":
-		return fmt.Errorf("movies: -a is required (action: details, popular, account-states, alternative-titles, credits, external-ids, images, keywords, latest, lists, now-playing, recommendations, release-dates, reviews, similar, top-rated, translations, upcoming, videos, watch-providers, add-rating, delete-rating)")
+		return fmt.Errorf("movies: -a is required (action: %s)", moviesActionsHelp)
 	case "details":
 		if *movieID == 0 {
 			return fmt.Errorf("movies: -i <movie_id> is required for -a details")
