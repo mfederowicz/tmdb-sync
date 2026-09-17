@@ -121,6 +121,24 @@ func (s *PeopleService) GetPersonMovieCredits(ctx context.Context, personID int6
 	return credits, resp, nil
 }
 
+// GetPersonTVCredits fetches the TV credits for a single person by TMDB id.
+//
+// Api docs: https://developer.themoviedb.org/reference/person-tv-credits
+func (s *PeopleService) GetPersonTVCredits(ctx context.Context, personID int64) (*str.PersonTVCredits, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("person/%d/tv_credits", personID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	credits := new(str.PersonTVCredits)
+	resp, err := s.client.Do(ctx, req, credits)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return credits, resp, nil
+}
+
 // getPopularPersonsPage fetches a single page of the popular-people list.
 func (s *PeopleService) getPopularPersonsPage(ctx context.Context, opts *uri.ListOptions) (*str.PopularPersons, *str.Response, error) {
 	urlStr, err := uri.AddQuery("person/popular", opts)

@@ -114,6 +114,32 @@ type PopularPersons struct {
 	TotalResults int             `json:"total_results"`
 }
 
+// PersonTVCredit is a single cast/crew entry in a person's TV credits.
+type PersonTVCredit struct {
+	ID           int64   `json:"id"`
+	Name         string  `json:"name"`
+	OriginalName string  `json:"original_name"`
+	Overview     string  `json:"overview"`
+	PosterPath   string  `json:"poster_path"`
+	FirstAirDate string  `json:"first_air_date"`
+	Popularity   float64 `json:"popularity"`
+	VoteAverage  float64 `json:"vote_average"`
+	VoteCount    int64   `json:"vote_count"`
+	Character    string  `json:"character"`
+	CreditID     string  `json:"credit_id"`
+	Department   string  `json:"department"`
+	Job          string  `json:"job"`
+	EpisodeCount int     `json:"episode_count"`
+}
+
+// PersonTVCredits is the response shape for
+// GET /person/{person_id}/tv_credits.
+type PersonTVCredits struct {
+	ID   int64            `json:"id"`
+	Cast []PersonTVCredit `json:"cast"`
+	Crew []PersonTVCredit `json:"crew"`
+}
+
 // PersonCombinedCredits is the response shape for
 // GET /person/{person_id}/combined_credits.
 type PersonCombinedCredits struct {
