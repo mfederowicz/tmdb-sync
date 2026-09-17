@@ -13,6 +13,8 @@ aiming for full TMDB v3 API coverage, one module at a time.
 - [`companies`](docs/companies.md) ✅ — company details, alternative names, images.
 - [`configuration`](docs/configuration.md) ✅ — image base URLs/sizes, countries, jobs, languages,
   primary translations, timezones.
+- [`credits`](docs/credits.md) ✅ — credit details.
+- [`discover`](docs/discover.md) ✅ — discover movies/TV shows by filter.
 - `movies` 🚧 — `details`, `popular` implemented; the rest of the module is still planned.
 
 See:
