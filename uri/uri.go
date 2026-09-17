@@ -84,6 +84,12 @@ type MovieAlternativeTitlesOptions struct {
 	Country string `url:"country,omitempty"`
 }
 
+// LanguageOptions carries the optional language query parameter accepted by
+// several per-resource endpoints (e.g. movie/{id}/credits, /videos, ...).
+type LanguageOptions struct {
+	Language string `url:"language,omitempty"`
+}
+
 // ImagesOptions carries the optional query parameters accepted by
 // per-resource images endpoints.
 type ImagesOptions struct {

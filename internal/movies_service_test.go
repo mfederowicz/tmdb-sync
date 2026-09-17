@@ -112,3 +112,31 @@ func TestGetAlternativeTitles(t *testing.T) {
 		t.Errorf("GetAlternativeTitles() = %+v, want ID=550 with 1 title %q", titles, "Fight Club")
 	}
 }
+
+func TestGetCredits(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/credits", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 550,
+			"cast": []map[string]any{
+				{"id": 819, "name": "Edward Norton", "character": "The Narrator", "credit_id": "abc"},
+			},
+			"crew": []map[string]any{
+				{"id": 7467, "name": "David Fincher", "job": "Director", "credit_id": "def"},
+			},
+		})
+	})
+
+	credits, _, err := client.Movies.GetCredits(context.Background(), 550, "")
+	if err != nil {
+		t.Fatalf("GetCredits() error = %v", err)
+	}
+	if credits.ID != 550 || len(credits.Cast) != 1 || len(credits.Crew) != 1 {
+		t.Errorf("GetCredits() = %+v, want ID=550 with 1 cast and 1 crew", credits)
+	}
+}

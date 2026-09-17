@@ -55,3 +55,43 @@ type MovieAlternativeTitles struct {
 	ID     int64                   `json:"id"`
 	Titles []MovieAlternativeTitle `json:"titles"`
 }
+
+// MovieCastMember is one cast entry, as returned inline on the movie
+// credits endpoint.
+type MovieCastMember struct {
+	Adult              bool    `json:"adult"`
+	Gender             int     `json:"gender"`
+	ID                 int64   `json:"id"`
+	KnownForDepartment string  `json:"known_for_department"`
+	Name               string  `json:"name"`
+	OriginalName       string  `json:"original_name"`
+	Popularity         float64 `json:"popularity"`
+	ProfilePath        string  `json:"profile_path"`
+	CastID             int64   `json:"cast_id"`
+	Character          string  `json:"character"`
+	CreditID           string  `json:"credit_id"`
+	Order              int     `json:"order"`
+}
+
+// MovieCrewMember is one crew entry, as returned inline on the movie
+// credits endpoint.
+type MovieCrewMember struct {
+	Adult              bool    `json:"adult"`
+	Gender             int     `json:"gender"`
+	ID                 int64   `json:"id"`
+	KnownForDepartment string  `json:"known_for_department"`
+	Name               string  `json:"name"`
+	OriginalName       string  `json:"original_name"`
+	Popularity         float64 `json:"popularity"`
+	ProfilePath        string  `json:"profile_path"`
+	CreditID           string  `json:"credit_id"`
+	Department         string  `json:"department"`
+	Job                string  `json:"job"`
+}
+
+// MovieCredits is the response shape for GET /movie/{movie_id}/credits.
+type MovieCredits struct {
+	ID   int64             `json:"id"`
+	Cast []MovieCastMember `json:"cast"`
+	Crew []MovieCrewMember `json:"crew"`
+}

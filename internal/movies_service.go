@@ -78,6 +78,29 @@ func (s *MoviesService) GetAlternativeTitles(ctx context.Context, movieID int64,
 	return titles, resp, nil
 }
 
+// GetCredits fetches the cast and crew for a single movie.
+//
+// Api docs: https://developer.themoviedb.org/reference/movie-credits
+func (s *MoviesService) GetCredits(ctx context.Context, movieID int64, language string) (*str.MovieCredits, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("movie/%d/credits", movieID), &uri.LanguageOptions{Language: language})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	credits := new(str.MovieCredits)
+	resp, err := s.client.Do(ctx, req, credits)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return credits, resp, nil
+}
+
 // getPopularMoviesPage fetches a single page of the popular-movies list.
 func (s *MoviesService) getPopularMoviesPage(ctx context.Context, opts *uri.ListOptions) (*str.Movies, *str.Response, error) {
 	urlStr, err := uri.AddQuery("movie/popular", opts)
