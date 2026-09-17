@@ -23,11 +23,11 @@ var tvSessionActions = map[string]bool{
 
 // tvActionsHelp lists every tv action, shared between the -a flag's usage
 // string and the "-a is required" error so both stay in sync.
-const tvActionsHelp = "details, account-states, aggregate-credits, airing-today, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords, latest, lists, on-the-air, popular, recommendations, reviews, screened-theatrically, similar, top-rated, translations, videos, watch-providers"
+const tvActionsHelp = "details, account-states, add-rating, aggregate-credits, airing-today, alternative-titles, content-ratings, credits, delete-rating, episode-groups, external-ids, images, keywords, latest, lists, on-the-air, popular, recommendations, reviews, screened-theatrically, similar, top-rated, translations, videos, watch-providers"
 
 // tvIDActionsHelp lists the tv actions that require -i, shared between the
 // -i flag's usage string and the module doc.
-const tvIDActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images, keywords, lists, recommendations, reviews, screened-theatrically, similar, translations, videos, watch-providers"
+const tvIDActionsHelp = "details, account-states, add-rating, aggregate-credits, alternative-titles, content-ratings, credits, delete-rating, episode-groups, external-ids, images, keywords, lists, recommendations, reviews, screened-theatrically, similar, translations, videos, watch-providers"
 
 // TVCmd is the "tv" module.
 var TVCmd = &Command{
@@ -51,6 +51,7 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a aggregate-credits, credits, images, lists, recommendations, reviews, similar, videos")
 	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a airing-today, lists, on-the-air, popular, recommendations, reviews, similar, top-rated (default: pages_limit from config, 0 = unlimited)")
+	value := flagSet.Float64("value", 0, "rating value (0.5-10.0, in 0.5 increments), required for -a add-rating")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -183,6 +184,21 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 			return fmt.Errorf("tv: -i <series_id> is required for -a watch-providers")
 		}
 		handler = handlers.TVWatchProvidersHandler{SeriesID: *seriesID}
+		params = []string{fmt.Sprintf("id-%d", *seriesID)}
+	case "add-rating":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv: -i <series_id> is required for -a add-rating")
+		}
+		if *value == 0 {
+			return fmt.Errorf("tv: -value <rating> is required for -a add-rating")
+		}
+		handler = handlers.TVAddRatingHandler{SeriesID: *seriesID, SessionID: options.Session.SessionID, Value: *value}
+		params = []string{fmt.Sprintf("id-%d", *seriesID)}
+	case "delete-rating":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv: -i <series_id> is required for -a delete-rating")
+		}
+		handler = handlers.TVDeleteRatingHandler{SeriesID: *seriesID, SessionID: options.Session.SessionID}
 		params = []string{fmt.Sprintf("id-%d", *seriesID)}
 	default:
 		return fmt.Errorf("tv: unknown action %q", *action)

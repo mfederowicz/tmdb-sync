@@ -28,6 +28,8 @@ aiming for full TMDB v3 API coverage, one module at a time.
 - [`search`](docs/search.md) ✅ — search collections, companies, keywords, movies, multi, people,
   TV shows.
 - [`trending`](docs/trending.md) ✅ — trending movies, TV shows, and people, by day or week.
+- [`tv`](docs/tv.md) ✅ — full TV series module: details, lists, credits, images, videos,
+  watch providers, and 🔒 account-states/add-rating/delete-rating.
 
 See:
 

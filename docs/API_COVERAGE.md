@@ -184,8 +184,8 @@ Revisit both once that checkpoint is reached.
 - [x] Top Rated — `GET /tv/top_rated`
 - [x] On The Air — `GET /tv/on_the_air`
 - [x] Airing Today — `GET /tv/airing_today`
-- [ ] Add Rating 🔒 — `POST /tv/{series_id}/rating`
-- [ ] Delete Rating 🔒 — `DELETE /tv/{series_id}/rating`
+- [x] Add Rating 🔒 — `POST /tv/{series_id}/rating`
+- [x] Delete Rating 🔒 — `DELETE /tv/{series_id}/rating`
 
 ## TV Seasons
 - [ ] Details — `GET /tv/{series_id}/season/{season_number}`

@@ -67,7 +67,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | `reviews` ✅ ([docs](reviews.md)) | `details -i <review_id>` |
 | `search` ✅ ([docs](search.md)) | `collections -query <query>`, `companies -query <query>`, `keywords -query <query>`, `movies -query <query>`, `multi -query <query>`, `people -query <query>`, `tv -query <query>` |
 | `trending` ✅ ([docs](trending.md)) | `all -w <day\|week>`, `movie -w <day\|week>`, `tv -w <day\|week>`, `person -w <day\|week>` |
-| `tv`              | `details -i <id>`, `popular`, `top-rated`, `on-the-air`, `airing-today`, ... |
+| `tv` ✅ ([docs](tv.md)) | `details -i <id>`, `popular` (paginated, see below), `top-rated`, `on-the-air`, `airing-today`, `credits -i <id>`, `videos -i <id>`, ... full list in `docs/tv.md` |
 | `tv-seasons`      | `details -i <id> -s <season_number>`, ... |
 | `tv-episodes`     | `details -i <id> -s <season_number> -e <episode_number>`, ... |
 | `watch-providers` | `regions`, `movie`, `tv` |

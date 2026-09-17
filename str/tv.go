@@ -17,6 +17,11 @@ type TV struct {
 	OriginalLanguage string  `json:"original_language"`
 }
 
+// TVRatingRequest is the body of POST /tv/{series_id}/rating.
+type TVRatingRequest struct {
+	Value float64 `json:"value"`
+}
+
 // TVAccountStates is the response shape for GET /tv/{series_id}/account_states.
 // Rated is `any` because TMDB returns either `false` (not rated) or an object
 // like {"value": 8} (rated) for the same field.

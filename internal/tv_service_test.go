@@ -636,3 +636,54 @@ func TestGetAiringTodayTV(t *testing.T) {
 		t.Fatalf("len(shows) = %d, want 2", len(shows))
 	}
 }
+
+func TestTVAddRating(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/rating", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "sess" {
+			t.Errorf("session_id = %s, want sess", got)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.TV.AddRating(context.Background(), 1399, "sess", 8.5)
+	if err != nil {
+		t.Fatalf("AddRating() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("AddRating() = %+v, want Success=true", status)
+	}
+}
+
+func TestTVDeleteRating(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/rating", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.TV.DeleteRating(context.Background(), 1399, "sess")
+	if err != nil {
+		t.Fatalf("DeleteRating() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("DeleteRating() = %+v, want Success=true", status)
+	}
+}
