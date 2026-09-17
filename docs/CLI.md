@@ -61,7 +61,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | `genres` ✅ ([docs](genres.md)) | `movie`, `tv` |
 | `keywords` ✅ ([docs](keywords.md)) | `details -i <id>` |
 | `lists` ✅ ([docs](lists.md)) | `details -i <id>`, `item-status -i <id> -media-id <movie_id>`, `create -name <name>` 🔒, `add-movie -i <id> -media-id <id>` 🔒, `remove-movie -i <id> -media-id <id>` 🔒, `clear -i <id>` 🔒, `delete -i <id>` 🔒 |
-| `movies` ✅        | `details -i <id>`, `popular` (paginated, see below), `top-rated`, `now-playing`, `upcoming`, `credits -i <id>`, `videos -i <id>`, ... |
+| `movies` ✅ ([docs](movies.md)) | `details -i <id>`, `popular` (paginated, see below), `top-rated`, `now-playing`, `upcoming`, `credits -i <id>`, `videos -i <id>`, ... full list in `docs/movies.md` |
 | `networks`        | `details -i <id>`, `images -i <id>` |
 | `people`          | `details -i <id>`, `popular`, `movie-credits -i <id>`, `tv-credits -i <id>`, ... |
 | `reviews`         | `details -i <review_id>` |

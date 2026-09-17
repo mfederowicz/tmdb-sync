@@ -22,6 +22,18 @@ schedule.
 
 ### Fixed
 
+## [0.12.0] - 2026-09-17
+
+### Added
+
+- `movies` module, complete: `account-states` 🔒, `alternative-titles`, `credits`, `external-ids`,
+  `images`, `keywords`, `latest`, `lists`, `now-playing`, `recommendations`, `release-dates`,
+  `reviews`, `similar`, `top-rated`, `translations`, `upcoming`, `videos`, `watch-providers`,
+  `add-rating` 🔒, `delete-rating` 🔒 — completes the module's full 20/20 endpoint coverage
+  (`details` and `popular` already existed). `add-rating`/`delete-rating` use the existing
+  v3-session plumbing directly, without needing the guest-session flow deferred for the future
+  rating/guest-sessions checkpoint.
+
 ## [0.11.0] - 2026-09-17
 
 ### Added

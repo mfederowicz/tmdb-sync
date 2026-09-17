@@ -451,6 +451,30 @@ func TestAddRating(t *testing.T) {
 	}
 }
 
+func TestDeleteRating(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/movie/550/rating", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.Movies.DeleteRating(context.Background(), 550, "sess")
+	if err != nil {
+		t.Fatalf("DeleteRating() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("DeleteRating() = %+v, want Success=true", status)
+	}
+}
+
 func TestGetReleaseDates(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()

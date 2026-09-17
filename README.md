@@ -20,7 +20,8 @@ aiming for full TMDB v3 API coverage, one module at a time.
 - [`keywords`](docs/keywords.md) ✅ — keyword details.
 - [`lists`](docs/lists.md) ✅ — list details, item status, and 🔒 create/add-movie/remove-movie/
   clear/delete.
-- `movies` 🚧 — `details`, `popular` implemented; the rest of the module is still planned.
+- [`movies`](docs/movies.md) ✅ — full movie module: details, lists, credits, images, videos,
+  watch providers, and 🔒 account-states/add-rating/delete-rating.
 
 See:
 
