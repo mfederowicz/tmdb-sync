@@ -23,11 +23,11 @@ var tvSessionActions = map[string]bool{
 
 // tvActionsHelp lists every tv action, shared between the -a flag's usage
 // string and the "-a is required" error so both stay in sync.
-const tvActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids"
+const tvActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images"
 
 // tvIDActionsHelp lists the tv actions that require -i, shared between the
 // -i flag's usage string and the module doc.
-const tvIDActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids"
+const tvIDActionsHelp = "details, account-states, aggregate-credits, alternative-titles, content-ratings, credits, episode-groups, external-ids, images"
 
 // TVCmd is the "tv" module.
 var TVCmd = &Command{
@@ -48,7 +48,8 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 	flagSet := flag.NewFlagSet("tv", flag.ContinueOnError)
 	action := flagSet.String("a", "", "action: "+tvActionsHelp+" (required)")
 	seriesID := flagSet.Int64("i", 0, "tv series id, required for -a "+tvIDActionsHelp)
-	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a aggregate-credits")
+	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a aggregate-credits, credits, images")
+	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -111,6 +112,12 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 			return fmt.Errorf("tv: -i <series_id> is required for -a external-ids")
 		}
 		handler = handlers.TVExternalIDsHandler{SeriesID: *seriesID}
+		params = []string{fmt.Sprintf("id-%d", *seriesID)}
+	case "images":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv: -i <series_id> is required for -a images")
+		}
+		handler = handlers.TVImagesHandler{SeriesID: *seriesID, Language: *language, IncludeImageLanguage: *includeImageLanguage}
 		params = []string{fmt.Sprintf("id-%d", *seriesID)}
 	default:
 		return fmt.Errorf("tv: unknown action %q", *action)

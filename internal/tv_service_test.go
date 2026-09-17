@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
+
+	"github.com/mfederowicz/tmdb-sync/uri"
 )
 
 func TestGetTV(t *testing.T) {
@@ -231,5 +233,33 @@ func TestGetTVExternalIDs(t *testing.T) {
 	}
 	if ids.ID != 1399 || ids.ImdbID != "tt0944947" {
 		t.Errorf("GetExternalIDs() = %+v, want ID=1399 ImdbID=%q", ids, "tt0944947")
+	}
+}
+
+func TestGetTVImages(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/images", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1399,
+			"backdrops": []map[string]any{
+				{"file_path": "/backdrop.jpg", "width": 1920, "height": 1080},
+			},
+			"posters": []map[string]any{
+				{"file_path": "/poster.jpg", "width": 500, "height": 750},
+			},
+		})
+	})
+
+	images, _, err := client.TV.GetImages(context.Background(), 1399, &uri.ImagesOptions{})
+	if err != nil {
+		t.Fatalf("GetImages() error = %v", err)
+	}
+	if len(images.Backdrops) != 1 || len(images.Posters) != 1 {
+		t.Errorf("GetImages() = %+v, want 1 backdrop and 1 poster", images)
 	}
 }

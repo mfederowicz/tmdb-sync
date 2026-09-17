@@ -174,3 +174,26 @@ func (s *TVService) GetCredits(ctx context.Context, seriesID int64, language str
 
 	return credits, resp, nil
 }
+
+// GetImages fetches the images for a single TV series.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-images
+func (s *TVService) GetImages(ctx context.Context, seriesID int64, opts *uri.ImagesOptions) (*str.Images, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/images", seriesID), opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	images := new(str.Images)
+	resp, err := s.client.Do(ctx, req, images)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return images, resp, nil
+}
