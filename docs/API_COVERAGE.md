@@ -167,7 +167,7 @@ Revisit both once that checkpoint is reached.
 - [x] Alternative Titles — `GET /tv/{series_id}/alternative_titles`
 - [x] Content Ratings — `GET /tv/{series_id}/content_ratings`
 - [x] Credits — `GET /tv/{series_id}/credits`
-- [ ] Episode Groups — `GET /tv/{series_id}/episode_groups`
+- [x] Episode Groups — `GET /tv/{series_id}/episode_groups`
 - [ ] External IDs — `GET /tv/{series_id}/external_ids`
 - [ ] Images — `GET /tv/{series_id}/images`
 - [ ] Keywords — `GET /tv/{series_id}/keywords`
