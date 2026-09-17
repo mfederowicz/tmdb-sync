@@ -120,7 +120,7 @@ Revisit both once that checkpoint is reached.
 - [x] Similar — `GET /movie/{movie_id}/similar`
 - [x] Top Rated — `GET /movie/top_rated`
 - [x] Translations — `GET /movie/{movie_id}/translations`
-- [ ] Upcoming — `GET /movie/upcoming`
+- [x] Upcoming — `GET /movie/upcoming`
 - [ ] Videos — `GET /movie/{movie_id}/videos`
 - [ ] Watch Providers — `GET /movie/{movie_id}/watch/providers`
 - [ ] Add Rating 🔒 — `POST /movie/{movie_id}/rating`
