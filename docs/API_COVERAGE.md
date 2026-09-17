@@ -133,7 +133,7 @@ Revisit both once that checkpoint is reached.
 
 ## People
 - [x] Details — `GET /person/{person_id}`
-- [ ] Combined Credits — `GET /person/{person_id}/combined_credits`
+- [x] Combined Credits — `GET /person/{person_id}/combined_credits`
 - [ ] External IDs — `GET /person/{person_id}/external_ids`
 - [ ] Images — `GET /person/{person_id}/images`
 - [ ] Latest — `GET /person/latest`

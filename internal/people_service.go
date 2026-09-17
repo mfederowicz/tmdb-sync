@@ -28,3 +28,22 @@ func (s *PeopleService) GetPerson(ctx context.Context, personID int64) (*str.Per
 
 	return person, resp, nil
 }
+
+// GetPersonCombinedCredits fetches the movie and TV credits for a single
+// person by TMDB id.
+//
+// Api docs: https://developer.themoviedb.org/reference/person-combined-credits
+func (s *PeopleService) GetPersonCombinedCredits(ctx context.Context, personID int64) (*str.PersonCombinedCredits, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("person/%d/combined_credits", personID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	credits := new(str.PersonCombinedCredits)
+	resp, err := s.client.Do(ctx, req, credits)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return credits, resp, nil
+}
