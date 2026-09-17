@@ -456,6 +456,46 @@ func (s *TVService) GetWatchProviders(ctx context.Context, seriesID int64) (*str
 	return providers, resp, nil
 }
 
+// getPopularTVPage fetches a single page of the popular-tv-series list.
+func (s *TVService) getPopularTVPage(ctx context.Context, opts *uri.ListOptions) (*str.TVShows, *str.Response, error) {
+	urlStr, err := uri.AddQuery("tv/popular", opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	shows := new(str.TVShows)
+	resp, err := s.client.Do(ctx, req, shows)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return shows, resp, nil
+}
+
+// GetPopularTV returns the current popular-tv-series list, walking pages
+// until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-popular-list
+func (s *TVService) GetPopularTV(ctx context.Context, pagesLimit int) ([]str.TV, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.TV], error) {
+		shows, _, err := s.getPopularTVPage(ctx, &uri.ListOptions{Page: page})
+		if err != nil {
+			return PageResult[str.TV]{}, err
+		}
+		return PageResult[str.TV]{
+			Results:    shows.Results,
+			Page:       shows.Page,
+			TotalPages: shows.TotalPages,
+		}, nil
+	})
+}
+
 // GetLatest fetches the most recently created TV series on TMDB.
 //
 // Api docs: https://developer.themoviedb.org/reference/tv-series-latest-id

@@ -180,7 +180,7 @@ Revisit both once that checkpoint is reached.
 - [x] Translations — `GET /tv/{series_id}/translations`
 - [x] Videos — `GET /tv/{series_id}/videos`
 - [x] Watch Providers — `GET /tv/{series_id}/watch/providers`
-- [ ] Popular — `GET /tv/popular`
+- [x] Popular — `GET /tv/popular`
 - [ ] Top Rated — `GET /tv/top_rated`
 - [ ] On The Air — `GET /tv/on_the_air`
 - [ ] Airing Today — `GET /tv/airing_today`

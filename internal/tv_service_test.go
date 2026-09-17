@@ -528,3 +528,30 @@ func TestGetTVWatchProviders(t *testing.T) {
 		t.Errorf("GetWatchProviders() = %+v, want ID=1399 with US flatrate provider %q", providers, "Netflix")
 	}
 }
+
+func TestGetPopularTV(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/popular", func(w http.ResponseWriter, r *http.Request) {
+		pageNum, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			pageNum = 1
+		}
+		results := []map[string]any{{"id": pageNum, "name": "a show"}}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          pageNum,
+			"results":       results,
+			"total_pages":   2,
+			"total_results": 2,
+		})
+	})
+
+	shows, err := client.TV.GetPopularTV(context.Background(), 0)
+	if err != nil {
+		t.Fatalf("GetPopularTV() error = %v", err)
+	}
+	if len(shows) != 2 {
+		t.Fatalf("len(shows) = %d, want 2", len(shows))
+	}
+}
