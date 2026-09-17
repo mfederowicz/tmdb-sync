@@ -32,8 +32,8 @@ schedule.
 
 ### Changed
 
-- Raised the per-PR module-size threshold from ~3 to ~10 endpoints (see `CLAUDE.md`), so a module
-  of this size can land as one PR.
+- Replaced the fixed per-PR module-size threshold with asking the user how many endpoints to
+  tackle per session/branch (see `CLAUDE.md`), since available token budget varies per session.
 
 ## [0.10.0] - 2026-09-17
 
