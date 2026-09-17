@@ -27,6 +27,64 @@ type TVAccountStates struct {
 	Watchlist bool  `json:"watchlist"`
 }
 
+// TVCastRole is a single role a cast member played across episodes, as
+// returned inline on the tv aggregate-credits endpoint's cast entries.
+type TVCastRole struct {
+	CreditID     string `json:"credit_id"`
+	Character    string `json:"character"`
+	EpisodeCount int    `json:"episode_count"`
+}
+
+// TVCrewJob is a single job a crew member held across episodes, as returned
+// inline on the tv aggregate-credits endpoint's crew entries.
+type TVCrewJob struct {
+	CreditID     string `json:"credit_id"`
+	Job          string `json:"job"`
+	EpisodeCount int    `json:"episode_count"`
+}
+
+// TVAggregateCastMember is one cast entry, as returned inline on the tv
+// aggregate-credits endpoint. Unlike the plain credits endpoint, a cast
+// member's roles are aggregated across every episode they appeared in.
+type TVAggregateCastMember struct {
+	Adult              bool         `json:"adult"`
+	Gender             int          `json:"gender"`
+	ID                 int64        `json:"id"`
+	KnownForDepartment string       `json:"known_for_department"`
+	Name               string       `json:"name"`
+	OriginalName       string       `json:"original_name"`
+	Popularity         float64      `json:"popularity"`
+	ProfilePath        string       `json:"profile_path"`
+	Roles              []TVCastRole `json:"roles"`
+	TotalEpisodeCount  int          `json:"total_episode_count"`
+	Order              int          `json:"order"`
+}
+
+// TVAggregateCrewMember is one crew entry, as returned inline on the tv
+// aggregate-credits endpoint. Unlike the plain credits endpoint, a crew
+// member's jobs are aggregated across every episode they worked on.
+type TVAggregateCrewMember struct {
+	Adult              bool        `json:"adult"`
+	Gender             int         `json:"gender"`
+	ID                 int64       `json:"id"`
+	KnownForDepartment string      `json:"known_for_department"`
+	Name               string      `json:"name"`
+	OriginalName       string      `json:"original_name"`
+	Popularity         float64     `json:"popularity"`
+	ProfilePath        string      `json:"profile_path"`
+	Jobs               []TVCrewJob `json:"jobs"`
+	Department         string      `json:"department"`
+	TotalEpisodeCount  int         `json:"total_episode_count"`
+}
+
+// TVAggregateCredits is the response shape for
+// GET /tv/{series_id}/aggregate_credits.
+type TVAggregateCredits struct {
+	ID   int64                   `json:"id"`
+	Cast []TVAggregateCastMember `json:"cast"`
+	Crew []TVAggregateCrewMember `json:"crew"`
+}
+
 // TVShows is a paginated list of TV shows.
 type TVShows struct {
 	Page         int  `json:"page"`

@@ -57,3 +57,45 @@ func TestTVGetAccountStates(t *testing.T) {
 		t.Errorf("GetAccountStates() = %+v, want ID=1399 Favorite=true Watchlist=false", states)
 	}
 }
+
+func TestGetAggregateCredits(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/aggregate_credits", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1399,
+			"cast": []map[string]any{
+				{
+					"id":   1223792,
+					"name": "Emilia Clarke",
+					"roles": []map[string]any{
+						{"credit_id": "abc", "character": "Daenerys Targaryen", "episode_count": 62},
+					},
+					"total_episode_count": 62,
+				},
+			},
+			"crew": []map[string]any{
+				{
+					"id":   1,
+					"name": "David Benioff",
+					"jobs": []map[string]any{
+						{"credit_id": "def", "job": "Executive Producer", "episode_count": 73},
+					},
+					"total_episode_count": 73,
+				},
+			},
+		})
+	})
+
+	credits, _, err := client.TV.GetAggregateCredits(context.Background(), 1399, "")
+	if err != nil {
+		t.Fatalf("GetAggregateCredits() error = %v", err)
+	}
+	if credits.ID != 1399 || len(credits.Cast) != 1 || len(credits.Cast[0].Roles) != 1 || len(credits.Crew) != 1 || len(credits.Crew[0].Jobs) != 1 {
+		t.Errorf("GetAggregateCredits() = %+v, want ID=1399 with 1 cast (1 role) and 1 crew (1 job)", credits)
+	}
+}
