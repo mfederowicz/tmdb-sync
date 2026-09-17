@@ -15,6 +15,7 @@ aiming for full TMDB v3 API coverage, one module at a time.
   primary translations, timezones.
 - [`credits`](docs/credits.md) ✅ — credit details.
 - [`discover`](docs/discover.md) ✅ — discover movies/TV shows by filter.
+- [`find`](docs/find.md) ✅ — find TMDB movies/TV/people by an external id (IMDb, TVDB, ...).
 - `movies` 🚧 — `details`, `popular` implemented; the rest of the module is still planned.
 
 See:

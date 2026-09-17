@@ -97,6 +97,12 @@ type DiscoverTVOptions struct {
 	WatchRegion        string  `url:"watch_region,omitempty"`
 }
 
+// FindOptions carries the query parameters accepted by GET /find/{external_id}.
+type FindOptions struct {
+	ExternalSource string `url:"external_source,omitempty"`
+	Language       string `url:"language,omitempty"`
+}
+
 // AddQuery adds opts' non-zero fields to s as URL query parameters, sorted by
 // key. opts may be a struct or pointer to struct (including nil, which adds
 // nothing).
