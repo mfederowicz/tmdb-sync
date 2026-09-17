@@ -78,6 +78,24 @@ func (s *TVService) GetAggregateCredits(ctx context.Context, seriesID int64, lan
 	return credits, resp, nil
 }
 
+// GetEpisodeGroups fetches the episode groups for a single TV series.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-series-episode-groups
+func (s *TVService) GetEpisodeGroups(ctx context.Context, seriesID int64) (*str.TVEpisodeGroups, *str.Response, error) {
+	req, err := s.client.NewRequest(http.MethodGet, fmt.Sprintf("tv/%d/episode_groups", seriesID), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	groups := new(str.TVEpisodeGroups)
+	resp, err := s.client.Do(ctx, req, groups)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return groups, resp, nil
+}
+
 // GetAlternativeTitles fetches the alternative titles for a single TV
 // series.
 //

@@ -177,3 +177,36 @@ func TestGetTVCredits(t *testing.T) {
 		t.Errorf("GetCredits() = %+v, want ID=1399 with 1 cast and 1 crew", credits)
 	}
 }
+
+func TestGetEpisodeGroups(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/episode_groups", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 1399,
+			"results": []map[string]any{
+				{
+					"id":            "abc123",
+					"name":          "Seasons",
+					"description":   "",
+					"episode_count": 73,
+					"group_count":   8,
+					"type":          6,
+					"network":       map[string]any{"id": 49, "name": "HBO"},
+				},
+			},
+		})
+	})
+
+	groups, _, err := client.TV.GetEpisodeGroups(context.Background(), 1399)
+	if err != nil {
+		t.Fatalf("GetEpisodeGroups() error = %v", err)
+	}
+	if groups.ID != 1399 || len(groups.Results) != 1 || groups.Results[0].Name != "Seasons" {
+		t.Errorf("GetEpisodeGroups() = %+v, want ID=1399 with 1 group %q", groups, "Seasons")
+	}
+}

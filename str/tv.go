@@ -154,6 +154,33 @@ type TVCredits struct {
 	Crew []TVCrewMember `json:"crew"`
 }
 
+// TVEpisodeGroupNetwork is the network associated with an episode group, as
+// returned inline on the tv episode-groups endpoint.
+type TVEpisodeGroupNetwork struct {
+	ID            int64  `json:"id"`
+	LogoPath      string `json:"logo_path"`
+	Name          string `json:"name"`
+	OriginCountry string `json:"origin_country"`
+}
+
+// TVEpisodeGroup is one episode-group entry, as returned by the tv
+// episode-groups endpoint.
+type TVEpisodeGroup struct {
+	Description  string                `json:"description"`
+	EpisodeCount int                   `json:"episode_count"`
+	GroupCount   int                   `json:"group_count"`
+	ID           string                `json:"id"`
+	Name         string                `json:"name"`
+	Network      TVEpisodeGroupNetwork `json:"network"`
+	Type         int                   `json:"type"`
+}
+
+// TVEpisodeGroups is the response shape for GET /tv/{series_id}/episode_groups.
+type TVEpisodeGroups struct {
+	Results []TVEpisodeGroup `json:"results"`
+	ID      int64            `json:"id"`
+}
+
 // TVShows is a paginated list of TV shows.
 type TVShows struct {
 	Page         int  `json:"page"`
