@@ -54,3 +54,27 @@ func TestGetMovieProviders(t *testing.T) {
 		t.Errorf("GetMovieProviders() = %+v, want one result named Netflix", providers)
 	}
 }
+
+func TestGetTVProviders(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/watch/providers/tv", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"results": []map[string]any{
+				{"provider_id": 8, "provider_name": "Netflix", "display_priority": 0, "display_priorities": map[string]any{"US": 0}},
+			},
+		})
+	})
+
+	providers, _, err := client.WatchProviders.GetTVProviders(context.Background(), "", "")
+	if err != nil {
+		t.Fatalf("GetTVProviders() error = %v", err)
+	}
+	if len(providers.Results) != 1 || providers.Results[0].ProviderName != "Netflix" {
+		t.Errorf("GetTVProviders() = %+v, want one result named Netflix", providers)
+	}
+}

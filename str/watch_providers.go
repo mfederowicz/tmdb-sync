@@ -28,3 +28,8 @@ type WatchProviderListEntry struct {
 type MovieWatchProviderList struct {
 	Results []WatchProviderListEntry `json:"results"`
 }
+
+// TVWatchProviderList is the response shape for GET /watch/providers/tv.
+type TVWatchProviderList struct {
+	Results []WatchProviderListEntry `json:"results"`
+}

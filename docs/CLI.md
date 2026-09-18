@@ -71,7 +71,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | `tv-seasons` ✅ ([docs](tv-seasons.md)) | `details -i <id> -s <season_number>`, `account-states -i <id> -s <season_number>` 🔒, `aggregate-credits -i <id> -s <season_number>`, `credits -i <id> -s <season_number>`, `external-ids -i <id> -s <season_number>`, `images -i <id> -s <season_number>`, `translations -i <id> -s <season_number>`, `videos -i <id> -s <season_number>` |
 | `tv-episodes` ✅ ([docs](tv-episodes.md)) | `details -i <id> -s <season_number> -e <episode_number>`, `account-states -i <id> -s <season_number> -e <episode_number>` 🔒, `credits -i <id> -s <season_number> -e <episode_number>`, `external-ids -i <id> -s <season_number> -e <episode_number>`, `images -i <id> -s <season_number> -e <episode_number>`, `translations -i <id> -s <season_number> -e <episode_number>`, `videos -i <id> -s <season_number> -e <episode_number>`, `add-rating -i <id> -s <season_number> -e <episode_number> -value <rating>` 🔒, `delete-rating -i <id> -s <season_number> -e <episode_number>` 🔒 |
 | `tv-episode-groups` ✅ ([docs](tv-episode-groups.md)) | `details -i <episode_group_id>` |
-| `watch-providers` | `regions`, `movie`, `tv` |
+| `watch-providers` ✅ ([docs](watch-providers.md)) | `available-regions`, `movie-providers`, `tv-providers` |
 
 🔒 = requires a v3 session. There's no standalone `authentication` command — a 🔒 module (like
 `account`) triggers the request-token → browser-approval → session flow itself, on demand

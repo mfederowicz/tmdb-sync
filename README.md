@@ -35,6 +35,7 @@ aiming for full TMDB v3 API coverage, one module at a time.
 - [`tv-episodes`](docs/tv-episodes.md) ✅ — TV episode details, credits, external-ids, images,
   translations, videos, and 🔒 account-states/add-rating/delete-rating.
 - [`tv-episode-groups`](docs/tv-episode-groups.md) ✅ — TV episode group details by group id.
+- [`watch-providers`](docs/watch-providers.md) ✅ — available regions, movie/tv watch provider lists.
 
 See:
 

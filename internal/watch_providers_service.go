@@ -58,3 +58,26 @@ func (s *WatchProvidersService) GetMovieProviders(ctx context.Context, language,
 
 	return providers, resp, nil
 }
+
+// GetTVProviders fetches the list of watch providers for TV series.
+//
+// Api docs: https://developer.themoviedb.org/reference/watch-provider-tv-list
+func (s *WatchProvidersService) GetTVProviders(ctx context.Context, language, watchRegion string) (*str.TVWatchProviderList, *str.Response, error) {
+	urlStr, err := uri.AddQuery("watch/providers/tv", &uri.WatchProviderListOptions{Language: language, WatchRegion: watchRegion})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	providers := new(str.TVWatchProviderList)
+	resp, err := s.client.Do(ctx, req, providers)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return providers, resp, nil
+}

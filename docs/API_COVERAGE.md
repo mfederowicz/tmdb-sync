@@ -214,4 +214,4 @@ Revisit both once that checkpoint is reached.
 ## Watch Providers
 - [x] Available Regions — `GET /watch/providers/regions`
 - [x] Movie Providers — `GET /watch/providers/movie`
-- [ ] TV Providers — `GET /watch/providers/tv`
+- [x] TV Providers — `GET /watch/providers/tv`
