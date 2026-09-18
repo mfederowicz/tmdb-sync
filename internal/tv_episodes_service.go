@@ -138,3 +138,27 @@ func (s *TVEpisodesService) GetTranslations(ctx context.Context, seriesID int64,
 
 	return translations, resp, nil
 }
+
+// GetVideos fetches the videos (trailers, teasers, ...) for a single TV
+// episode.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-episode-videos
+func (s *TVEpisodesService) GetVideos(ctx context.Context, seriesID int64, seasonNumber int, episodeNumber int, language string) (*str.TVVideos, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/season/%d/episode/%d/videos", seriesID, seasonNumber, episodeNumber), &uri.LanguageOptions{Language: language})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	videos := new(str.TVVideos)
+	resp, err := s.client.Do(ctx, req, videos)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return videos, resp, nil
+}
