@@ -39,6 +39,14 @@ type AccountListOptions struct {
 	Page      int    `url:"page,omitempty"`
 }
 
+// RatingOptions carries the session_id or guest_session_id query parameter
+// accepted by movie/tv/tv-episode add-rating (🔒) endpoints, which take
+// either an account session or a guest session.
+type RatingOptions struct {
+	SessionID      string `url:"session_id,omitempty"`
+	GuestSessionID string `url:"guest_session_id,omitempty"`
+}
+
 // ChangesOptions carries the optional query parameters accepted by the
 // movie/tv/person change-list endpoints.
 type ChangesOptions struct {

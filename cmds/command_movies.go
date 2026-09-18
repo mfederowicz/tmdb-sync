@@ -58,11 +58,15 @@ func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config,
 	country := flagSet.String("country", "", "ISO 3166-1 country code, used by -a alternative-titles")
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a credits, images, videos")
 	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
+	guestSessionID := flagSet.String("guest-session-id", "", "guest session id (alternative to account session, used by -a add-rating): omit to use the one cached by `guest-sessions -a create`, if no account session is set up")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
-	if moviesSessionActions[*action] {
+	ratingGuestSessionID := resolveRatingGuestSessionID(*action, *guestSessionID, options)
+	usingGuestSession := ratingGuestSessionID != ""
+
+	if moviesSessionActions[*action] && !usingGuestSession {
 		if err := cli.HandleToken(fs, config, client, options); err != nil {
 			return fmt.Errorf("movies: %w", err)
 		}
@@ -183,7 +187,11 @@ func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config,
 		if *value == 0 {
 			return fmt.Errorf("movies: -value <rating> is required for -a add-rating")
 		}
-		handler = handlers.MoviesAddRatingHandler{MovieID: *movieID, SessionID: options.Session.SessionID, Value: *value}
+		sessionID := ""
+		if !usingGuestSession {
+			sessionID = options.Session.SessionID
+		}
+		handler = handlers.MoviesAddRatingHandler{MovieID: *movieID, SessionID: sessionID, GuestSessionID: ratingGuestSessionID, Value: *value}
 		params = []string{fmt.Sprintf("id-%d", *movieID)}
 	case "delete-rating":
 		if *movieID == 0 {
@@ -197,7 +205,7 @@ func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config,
 
 	result, err := handler.Handle(context.Background(), client)
 	if err != nil {
-		if !retried && moviesSessionActions[*action] && isSessionInvalid(err) {
+		if !retried && moviesSessionActions[*action] && !usingGuestSession && isSessionInvalid(err) {
 			if newSession, refreshErr := refreshSession(fs, config, client); refreshErr == nil {
 				options.Session = newSession
 				return execMoviesAttempt(fs, client, config, options, args, true)

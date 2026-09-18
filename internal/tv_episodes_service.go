@@ -163,11 +163,12 @@ func (s *TVEpisodesService) GetVideos(ctx context.Context, seriesID int64, seaso
 	return videos, resp, nil
 }
 
-// AddRating rates a TV episode on behalf of the session's account.
+// AddRating rates a TV episode on behalf of the session's account, or a
+// guest session when guestSessionID is set instead of sessionID.
 //
 // Api docs: https://developer.themoviedb.org/reference/tv-episode-add-rating
-func (s *TVEpisodesService) AddRating(ctx context.Context, seriesID int64, seasonNumber int, episodeNumber int, sessionID string, value float64) (*str.AuthStatus, *str.Response, error) {
-	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/season/%d/episode/%d/rating", seriesID, seasonNumber, episodeNumber), &uri.AccountOptions{SessionID: sessionID})
+func (s *TVEpisodesService) AddRating(ctx context.Context, seriesID int64, seasonNumber int, episodeNumber int, sessionID, guestSessionID string, value float64) (*str.AuthStatus, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/season/%d/episode/%d/rating", seriesID, seasonNumber, episodeNumber), &uri.RatingOptions{SessionID: sessionID, GuestSessionID: guestSessionID})
 	if err != nil {
 		return nil, nil, err
 	}

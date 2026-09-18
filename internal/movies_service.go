@@ -535,11 +535,12 @@ func (s *MoviesService) GetWatchProviders(ctx context.Context, movieID int64) (*
 	return providers, resp, nil
 }
 
-// AddRating rates a movie on behalf of the session's account.
+// AddRating rates a movie on behalf of the session's account, or a guest
+// session when guestSessionID is set instead of sessionID.
 //
 // Api docs: https://developer.themoviedb.org/reference/movie-add-rating
-func (s *MoviesService) AddRating(ctx context.Context, movieID int64, sessionID string, value float64) (*str.AuthStatus, *str.Response, error) {
-	urlStr, err := uri.AddQuery(fmt.Sprintf("movie/%d/rating", movieID), &uri.AccountOptions{SessionID: sessionID})
+func (s *MoviesService) AddRating(ctx context.Context, movieID int64, sessionID, guestSessionID string, value float64) (*str.AuthStatus, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("movie/%d/rating", movieID), &uri.RatingOptions{SessionID: sessionID, GuestSessionID: guestSessionID})
 	if err != nil {
 		return nil, nil, err
 	}

@@ -442,7 +442,7 @@ func TestAddRating(t *testing.T) {
 		})
 	})
 
-	status, _, err := client.Movies.AddRating(context.Background(), 550, "sess", 8.5)
+	status, _, err := client.Movies.AddRating(context.Background(), 550, "sess", "", 8.5)
 	if err != nil {
 		t.Fatalf("AddRating() error = %v", err)
 	}
