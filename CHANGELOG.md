@@ -22,6 +22,13 @@ schedule.
 
 ### Fixed
 
+## [0.20.0] - 2026-09-18
+
+### Added
+
+- `tv-episodes` module: `details`, `account-states`, `credits`, `external-ids`, `images`,
+  `translations`, `videos`, `add-rating`, `delete-rating`.
+
 ## [0.19.0] - 2026-09-18
 
 ### Added
