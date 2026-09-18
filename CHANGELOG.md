@@ -22,6 +22,12 @@ schedule.
 
 ### Fixed
 
+## [0.22.0] - 2026-09-18
+
+### Added
+
+- `watch-providers` module: `available-regions`, `movie-providers`, `tv-providers`.
+
 ## [0.21.0] - 2026-09-18
 
 ### Added
