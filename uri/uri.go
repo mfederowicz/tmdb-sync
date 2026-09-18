@@ -200,6 +200,13 @@ type DiscoverTVOptions struct {
 	WatchRegion        string  `url:"watch_region,omitempty"`
 }
 
+// WatchProviderListOptions carries the optional query parameters accepted by
+// GET /watch/providers/movie and GET /watch/providers/tv.
+type WatchProviderListOptions struct {
+	Language    string `url:"language,omitempty"`
+	WatchRegion string `url:"watch_region,omitempty"`
+}
+
 // FindOptions carries the query parameters accepted by GET /find/{external_id}.
 type FindOptions struct {
 	ExternalSource string `url:"external_source,omitempty"`

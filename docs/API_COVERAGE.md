@@ -212,6 +212,6 @@ Revisit both once that checkpoint is reached.
 - [x] Details — `GET /tv/episode_group/{id}`
 
 ## Watch Providers
-- [ ] Available Regions — `GET /watch/providers/regions`
-- [ ] Movie Providers — `GET /watch/providers/movie`
-- [ ] TV Providers — `GET /watch/providers/tv`
+- [x] Available Regions — `GET /watch/providers/regions`
+- [x] Movie Providers — `GET /watch/providers/movie`
+- [x] TV Providers — `GET /watch/providers/tv`
