@@ -57,3 +57,28 @@ func TestTVEpisodesGetAccountStates(t *testing.T) {
 		t.Errorf("GetAccountStates() = %+v, want ID=63056", states)
 	}
 }
+
+func TestTVEpisodesGetCredits(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/season/1/episode/1/credits", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"cast": []map[string]any{
+				{"id": 22970, "name": "Sean Bean"},
+			},
+			"crew": []map[string]any{},
+		})
+	})
+
+	credits, _, err := client.TVEpisodes.GetCredits(context.Background(), 1399, 1, 1, "")
+	if err != nil {
+		t.Fatalf("GetCredits() error = %v", err)
+	}
+	if len(credits.Cast) != 1 || credits.Cast[0].Name != "Sean Bean" {
+		t.Errorf("GetCredits() = %+v, want Cast[0].Name=Sean Bean", credits)
+	}
+}
