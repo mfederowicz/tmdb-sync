@@ -23,8 +23,9 @@ var WatchProvidersCmd = &Command{
 
 func execWatchProviders(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("watch-providers", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: available-regions (required)")
-	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a available-regions")
+	action := flagSet.String("a", "", "action: available-regions, movie-providers (required)")
+	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a available-regions, movie-providers")
+	watchRegion := flagSet.String("watch-region", "", "ISO 3166-1 region code, used by -a movie-providers")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -32,9 +33,11 @@ func execWatchProviders(fs afero.Fs, client *internal.Client, config *cfg.Config
 	var handler handlers.Handler
 	switch *action {
 	case "":
-		return fmt.Errorf("watch-providers: -a is required (action: available-regions)")
+		return fmt.Errorf("watch-providers: -a is required (action: available-regions, movie-providers)")
 	case "available-regions":
 		handler = handlers.WatchProvidersAvailableRegionsHandler{Language: *language}
+	case "movie-providers":
+		handler = handlers.WatchProvidersMovieProvidersHandler{Language: *language, WatchRegion: *watchRegion}
 	default:
 		return fmt.Errorf("watch-providers: unknown action %q", *action)
 	}

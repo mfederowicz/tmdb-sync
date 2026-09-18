@@ -12,3 +12,19 @@ type WatchProviderRegionInfo struct {
 type WatchProviderRegions struct {
 	Results []WatchProviderRegionInfo `json:"results"`
 }
+
+// WatchProviderListEntry is one provider entry in the movie/tv watch
+// providers list endpoints, including the per-region display priorities
+// alongside the provider's own identity fields.
+type WatchProviderListEntry struct {
+	DisplayPriorities map[string]int `json:"display_priorities"`
+	DisplayPriority   int            `json:"display_priority"`
+	LogoPath          string         `json:"logo_path"`
+	ProviderName      string         `json:"provider_name"`
+	ProviderID        int64          `json:"provider_id"`
+}
+
+// MovieWatchProviderList is the response shape for GET /watch/providers/movie.
+type MovieWatchProviderList struct {
+	Results []WatchProviderListEntry `json:"results"`
+}
