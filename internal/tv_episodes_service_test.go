@@ -181,3 +181,30 @@ func TestTVEpisodesGetVideos(t *testing.T) {
 		t.Errorf("GetVideos() = %+v, want Results[0].Key=abc123", videos)
 	}
 }
+
+func TestTVEpisodesAddRating(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/season/1/episode/1/rating", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if got := r.URL.Query().Get("session_id"); got != "sess" {
+			t.Errorf("session_id = %s, want sess", got)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.TVEpisodes.AddRating(context.Background(), 1399, 1, 1, "sess", 8.5)
+	if err != nil {
+		t.Fatalf("AddRating() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("AddRating() = %+v, want Success=true", status)
+	}
+}

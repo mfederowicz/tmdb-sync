@@ -17,12 +17,13 @@ import (
 // tvEpisodesSessionActions are the actions that require a v3 session.
 var tvEpisodesSessionActions = map[string]bool{
 	"account-states": true,
+	"add-rating":     true,
 }
 
 // tvEpisodesActionsHelp lists every tv-episodes action, shared between the
 // -a flag's usage string and the "-a is required" error so both stay in
 // sync.
-const tvEpisodesActionsHelp = "details, account-states, credits, external-ids, images, translations, videos"
+const tvEpisodesActionsHelp = "details, account-states, add-rating, credits, external-ids, images, translations, videos"
 
 // TVEpisodesCmd is the "tv-episodes" module.
 var TVEpisodesCmd = &Command{
@@ -47,6 +48,7 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 	episodeNumber := flagSet.Int("e", 0, "episode number, required for -a "+tvEpisodesActionsHelp)
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a credits, images, videos")
 	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
+	value := flagSet.Float64("value", 0, "rating value (0.5-10.0, in 0.5 increments), required for -a add-rating")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -103,6 +105,15 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 			return fmt.Errorf("tv-episodes: -i <series_id> is required for -a videos")
 		}
 		handler = handlers.TVEpisodesVideosHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, EpisodeNumber: *episodeNumber, Language: *language}
+		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber), fmt.Sprintf("episode-%d", *episodeNumber)}
+	case "add-rating":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv-episodes: -i <series_id> is required for -a add-rating")
+		}
+		if *value == 0 {
+			return fmt.Errorf("tv-episodes: -value <rating> is required for -a add-rating")
+		}
+		handler = handlers.TVEpisodesAddRatingHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, EpisodeNumber: *episodeNumber, SessionID: options.Session.SessionID, Value: *value}
 		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber), fmt.Sprintf("episode-%d", *episodeNumber)}
 	default:
 		return fmt.Errorf("tv-episodes: unknown action %q (action: %s)", *action, tvEpisodesActionsHelp)

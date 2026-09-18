@@ -205,7 +205,7 @@ Revisit both once that checkpoint is reached.
 - [x] Images — `.../episode/{episode_number}/images`
 - [x] Translations — `.../episode/{episode_number}/translations`
 - [x] Videos — `.../episode/{episode_number}/videos`
-- [ ] Add Rating 🔒 — `POST .../episode/{episode_number}/rating`
+- [x] Add Rating 🔒 — `POST .../episode/{episode_number}/rating`
 - [ ] Delete Rating 🔒 — `DELETE .../episode/{episode_number}/rating`
 
 ## TV Episode Groups
