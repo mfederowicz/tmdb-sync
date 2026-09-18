@@ -7,4 +7,5 @@ type Options struct {
 	Account      *Account
 	GuestSession *GuestSession
 	Verbose      bool
+	Debug        bool
 }

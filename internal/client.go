@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mfederowicz/tmdb-sync/printer"
 	"github.com/mfederowicz/tmdb-sync/str"
 	"github.com/mfederowicz/tmdb-sync/uri"
 )
@@ -70,6 +71,8 @@ type Client struct {
 	WatchProviders *WatchProvidersService
 	rateMu         sync.Mutex
 	RateLimitReset time.Time
+	// Debug, when true, prints the full request URL for each API call to stdout.
+	Debug bool
 }
 
 // GetTimezone to get timezone from ctx object
@@ -135,6 +138,10 @@ func (c *Client) NewRequest(method, urlStr string, body any, opts ...RequestOpti
 	u, err := c.BaseURL.Parse(urlStr)
 	if err != nil {
 		return nil, err
+	}
+
+	if c.Debug {
+		printer.Println("tmdb-sync: request URL:", u.String())
 	}
 
 	if apiKey, ok := c.headers[APIKeyParam]; ok {

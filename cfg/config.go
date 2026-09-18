@@ -29,6 +29,7 @@ type Config struct {
 	PerPage          int    `toml:"per_page"`
 	PagesLimit       int    `toml:"pages_limit"`
 	Verbose          bool   `toml:"verbose"`
+	Debug            bool   `toml:"debug"`
 }
 
 // InitConfig of app
@@ -73,6 +74,7 @@ func MergeConfigs(defaultConfig *Config, fileConfig *Config, flagConfig map[stri
 	defaultConfig.PagesLimit = processOptionPagesLimit(defaultConfig, fileConfig)
 	defaultConfig.OutputDir = processOptionOutputDir(defaultConfig, fileConfig)
 	defaultConfig.Verbose = processOptionVerbose(defaultConfig, fileConfig, flagConfig, flagset)
+	defaultConfig.Debug = processOptionDebug(defaultConfig, fileConfig, flagConfig, flagset)
 
 	sessionPath, err := processOptionSessionPath(defaultConfig, fileConfig)
 	if err != nil {
@@ -155,6 +157,20 @@ func processOptionVerbose(defaultConfig *Config, fileConfig *Config, flagConfig 
 	return defaultConfig.Verbose
 }
 
+func processOptionDebug(defaultConfig *Config, fileConfig *Config, flagConfig map[string]string, flagset map[string]bool) bool {
+	if fileConfig.Debug {
+		defaultConfig.Debug = fileConfig.Debug
+	}
+	if flagset["d"] {
+		dValue, dErr := strconv.ParseBool(flagConfig["d"])
+		debugValue, debugErr := strconv.ParseBool(flagConfig["debug"])
+		if dErr == nil && debugErr == nil {
+			defaultConfig.Debug = dValue || debugValue
+		}
+	}
+	return defaultConfig.Debug
+}
+
 func processOptionSessionPath(defaultConfig *Config, fileConfig *Config) (string, error) {
 	if len(fileConfig.SessionPath) > consts.ZeroValue {
 		defaultConfig.SessionPath = fileConfig.SessionPath
@@ -235,6 +251,7 @@ func DefaultConfig() *Config {
 		PerPage:          consts.ZeroValue,
 		PagesLimit:       consts.PagesLimit,
 		Verbose:          false,
+		Debug:            false,
 	}
 }
 

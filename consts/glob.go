@@ -14,6 +14,7 @@ const (
 	VerboseUsage = "verbose output"
 	VersionUsage = "print version and exit"
 	ConfigUsage  = "path to config file"
+	DebugUsage   = "print the full request URL for each API call"
 )
 
 // TMDB media_type values, shared by modules that accept both movie and TV
