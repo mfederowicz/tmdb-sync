@@ -198,7 +198,7 @@ Revisit both once that checkpoint is reached.
 - [x] Videos — `GET /tv/{series_id}/season/{season_number}/videos`
 
 ## TV Episodes
-- [ ] Details — `GET /tv/{series_id}/season/{season_number}/episode/{episode_number}`
+- [x] Details — `GET /tv/{series_id}/season/{season_number}/episode/{episode_number}`
 - [ ] Account States 🔒 — `.../episode/{episode_number}/account_states`
 - [ ] Credits — `.../episode/{episode_number}/credits`
 - [ ] External IDs — `.../episode/{episode_number}/external_ids`
