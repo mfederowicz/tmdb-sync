@@ -97,3 +97,26 @@ func (s *TVEpisodesService) GetExternalIDs(ctx context.Context, seriesID int64, 
 
 	return ids, resp, nil
 }
+
+// GetImages fetches the images for a single TV episode.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-episode-images
+func (s *TVEpisodesService) GetImages(ctx context.Context, seriesID int64, seasonNumber int, episodeNumber int, opts *uri.ImagesOptions) (*str.TVEpisodeImages, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/season/%d/episode/%d/images", seriesID, seasonNumber, episodeNumber), opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	images := new(str.TVEpisodeImages)
+	resp, err := s.client.Do(ctx, req, images)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return images, resp, nil
+}

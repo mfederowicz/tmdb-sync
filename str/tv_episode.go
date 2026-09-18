@@ -36,3 +36,10 @@ type TVEpisodeExternalIDs struct {
 	TvrageID    int64  `json:"tvrage_id"`
 	WikidataID  string `json:"wikidata_id"`
 }
+
+// TVEpisodeImages is the response shape for
+// GET .../episode/{episode_number}/images.
+type TVEpisodeImages struct {
+	ID     int64   `json:"id"`
+	Stills []Image `json:"stills"`
+}

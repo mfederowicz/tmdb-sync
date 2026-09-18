@@ -22,7 +22,7 @@ var tvEpisodesSessionActions = map[string]bool{
 // tvEpisodesActionsHelp lists every tv-episodes action, shared between the
 // -a flag's usage string and the "-a is required" error so both stay in
 // sync.
-const tvEpisodesActionsHelp = "details, account-states, credits, external-ids"
+const tvEpisodesActionsHelp = "details, account-states, credits, external-ids, images"
 
 // TVEpisodesCmd is the "tv-episodes" module.
 var TVEpisodesCmd = &Command{
@@ -45,7 +45,8 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 	seriesID := flagSet.Int64("i", 0, "tv series id, required for -a "+tvEpisodesActionsHelp)
 	seasonNumber := flagSet.Int("s", 0, "season number, required for -a "+tvEpisodesActionsHelp)
 	episodeNumber := flagSet.Int("e", 0, "episode number, required for -a "+tvEpisodesActionsHelp)
-	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a credits")
+	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a credits, images")
+	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -84,6 +85,12 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 			return fmt.Errorf("tv-episodes: -i <series_id> is required for -a external-ids")
 		}
 		handler = handlers.TVEpisodesExternalIDsHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, EpisodeNumber: *episodeNumber}
+		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber), fmt.Sprintf("episode-%d", *episodeNumber)}
+	case "images":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv-episodes: -i <series_id> is required for -a images")
+		}
+		handler = handlers.TVEpisodesImagesHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, EpisodeNumber: *episodeNumber, Language: *language, IncludeImageLanguage: *includeImageLanguage}
 		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber), fmt.Sprintf("episode-%d", *episodeNumber)}
 	default:
 		return fmt.Errorf("tv-episodes: unknown action %q (action: %s)", *action, tvEpisodesActionsHelp)

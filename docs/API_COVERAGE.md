@@ -202,7 +202,7 @@ Revisit both once that checkpoint is reached.
 - [x] Account States 🔒 — `.../episode/{episode_number}/account_states`
 - [x] Credits — `.../episode/{episode_number}/credits`
 - [x] External IDs — `.../episode/{episode_number}/external_ids`
-- [ ] Images — `.../episode/{episode_number}/images`
+- [x] Images — `.../episode/{episode_number}/images`
 - [ ] Translations — `.../episode/{episode_number}/translations`
 - [ ] Videos — `.../episode/{episode_number}/videos`
 - [ ] Add Rating 🔒 — `POST .../episode/{episode_number}/rating`
