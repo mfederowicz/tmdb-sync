@@ -24,3 +24,15 @@ type TVEpisodeAccountStates struct {
 	ID    int64 `json:"id"`
 	Rated any   `json:"rated"`
 }
+
+// TVEpisodeExternalIDs is the response shape for
+// GET .../episode/{episode_number}/external_ids.
+type TVEpisodeExternalIDs struct {
+	ID          int64  `json:"id"`
+	FreebaseMID string `json:"freebase_mid"`
+	FreebaseID  string `json:"freebase_id"`
+	IMDbID      string `json:"imdb_id"`
+	TvdbID      int64  `json:"tvdb_id"`
+	TvrageID    int64  `json:"tvrage_id"`
+	WikidataID  string `json:"wikidata_id"`
+}

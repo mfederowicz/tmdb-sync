@@ -82,3 +82,26 @@ func TestTVEpisodesGetCredits(t *testing.T) {
 		t.Errorf("GetCredits() = %+v, want Cast[0].Name=Sean Bean", credits)
 	}
 }
+
+func TestTVEpisodesGetExternalIDs(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/season/1/episode/1/external_ids", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id":      63056,
+			"imdb_id": "tt1480055",
+		})
+	})
+
+	ids, _, err := client.TVEpisodes.GetExternalIDs(context.Background(), 1399, 1, 1)
+	if err != nil {
+		t.Fatalf("GetExternalIDs() error = %v", err)
+	}
+	if ids.ID != 63056 || ids.IMDbID != "tt1480055" {
+		t.Errorf("GetExternalIDs() = %+v, want ID=63056 IMDbID=tt1480055", ids)
+	}
+}
