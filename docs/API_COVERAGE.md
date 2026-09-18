@@ -209,7 +209,7 @@ Revisit both once that checkpoint is reached.
 - [x] Delete Rating 🔒 — `DELETE .../episode/{episode_number}/rating`
 
 ## TV Episode Groups
-- [ ] Details — `GET /tv/episode_group/{id}`
+- [x] Details — `GET /tv/episode_group/{id}`
 
 ## Watch Providers
 - [ ] Available Regions — `GET /watch/providers/regions`
