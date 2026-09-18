@@ -208,3 +208,27 @@ func TestTVEpisodesAddRating(t *testing.T) {
 		t.Errorf("AddRating() = %+v, want Success=true", status)
 	}
 }
+
+func TestTVEpisodesDeleteRating(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/season/1/episode/1/rating", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success":        true,
+			"status_code":    1,
+			"status_message": "Success.",
+		})
+	})
+
+	status, _, err := client.TVEpisodes.DeleteRating(context.Background(), 1399, 1, 1, "sess")
+	if err != nil {
+		t.Fatalf("DeleteRating() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("DeleteRating() = %+v, want Success=true", status)
+	}
+}

@@ -32,6 +32,8 @@ aiming for full TMDB v3 API coverage, one module at a time.
   watch providers, and 🔒 account-states/add-rating/delete-rating.
 - [`tv-seasons`](docs/tv-seasons.md) ✅ — TV season details, aggregate-credits, credits,
   external-ids, images, translations, videos, and 🔒 account-states.
+- [`tv-episodes`](docs/tv-episodes.md) ✅ — TV episode details, credits, external-ids, images,
+  translations, videos, and 🔒 account-states/add-rating/delete-rating.
 
 See:
 

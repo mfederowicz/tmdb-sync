@@ -18,12 +18,13 @@ import (
 var tvEpisodesSessionActions = map[string]bool{
 	"account-states": true,
 	"add-rating":     true,
+	"delete-rating":  true,
 }
 
 // tvEpisodesActionsHelp lists every tv-episodes action, shared between the
 // -a flag's usage string and the "-a is required" error so both stay in
 // sync.
-const tvEpisodesActionsHelp = "details, account-states, add-rating, credits, external-ids, images, translations, videos"
+const tvEpisodesActionsHelp = "details, account-states, add-rating, credits, delete-rating, external-ids, images, translations, videos"
 
 // TVEpisodesCmd is the "tv-episodes" module.
 var TVEpisodesCmd = &Command{
@@ -114,6 +115,12 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 			return fmt.Errorf("tv-episodes: -value <rating> is required for -a add-rating")
 		}
 		handler = handlers.TVEpisodesAddRatingHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, EpisodeNumber: *episodeNumber, SessionID: options.Session.SessionID, Value: *value}
+		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber), fmt.Sprintf("episode-%d", *episodeNumber)}
+	case "delete-rating":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv-episodes: -i <series_id> is required for -a delete-rating")
+		}
+		handler = handlers.TVEpisodesDeleteRatingHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, EpisodeNumber: *episodeNumber, SessionID: options.Session.SessionID}
 		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber), fmt.Sprintf("episode-%d", *episodeNumber)}
 	default:
 		return fmt.Errorf("tv-episodes: unknown action %q (action: %s)", *action, tvEpisodesActionsHelp)

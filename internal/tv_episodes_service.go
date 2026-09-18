@@ -185,3 +185,26 @@ func (s *TVEpisodesService) AddRating(ctx context.Context, seriesID int64, seaso
 
 	return status, resp, nil
 }
+
+// DeleteRating removes the session's account's rating for a TV episode.
+//
+// Api docs: https://developer.themoviedb.org/reference/tv-episode-delete-rating
+func (s *TVEpisodesService) DeleteRating(ctx context.Context, seriesID int64, seasonNumber int, episodeNumber int, sessionID string) (*str.AuthStatus, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/season/%d/episode/%d/rating", seriesID, seasonNumber, episodeNumber), &uri.AccountOptions{SessionID: sessionID})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodDelete, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	status := new(str.AuthStatus)
+	resp, err := s.client.Do(ctx, req, status)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return status, resp, nil
+}
