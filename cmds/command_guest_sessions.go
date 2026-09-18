@@ -23,8 +23,8 @@ var GuestSessionsCmd = &Command{
 
 func execGuestSessions(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("guest-sessions", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: rated-movies, rated-tv, rated-tv-episodes (required)")
-	guestSessionID := flagSet.String("i", "", "guest session id, required for all actions")
+	action := flagSet.String("a", "", "action: create, rated-movies, rated-tv, rated-tv-episodes (required)")
+	guestSessionID := flagSet.String("i", "", "guest session id, required for rated-movies, rated-tv, rated-tv-episodes")
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a rated-movies, rated-tv, rated-tv-episodes")
 	sortBy := flagSet.String("sort-by", "", "sort order (created_at.asc, created_at.desc), used by -a rated-movies, rated-tv, rated-tv-episodes")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a rated-movies, rated-tv, rated-tv-episodes (default: pages_limit from config, 0 = unlimited)")
@@ -35,7 +35,9 @@ func execGuestSessions(fs afero.Fs, client *internal.Client, config *cfg.Config,
 	var handler handlers.Handler
 	switch *action {
 	case "":
-		return fmt.Errorf("guest-sessions: -a is required (action: rated-movies, rated-tv, rated-tv-episodes)")
+		return fmt.Errorf("guest-sessions: -a is required (action: create, rated-movies, rated-tv, rated-tv-episodes)")
+	case "create":
+		handler = handlers.GuestSessionsCreateHandler{}
 	case "rated-movies":
 		if *guestSessionID == "" {
 			return fmt.Errorf("guest-sessions: -i <guest_session_id> is required for -a rated-movies")
@@ -60,6 +62,9 @@ func execGuestSessions(fs afero.Fs, client *internal.Client, config *cfg.Config,
 		return err
 	}
 
-	params := []string{fmt.Sprintf("id-%s", *guestSessionID)}
+	var params []string
+	if *guestSessionID != "" {
+		params = append(params, fmt.Sprintf("id-%s", *guestSessionID))
+	}
 	return writeResult(fs, config, "guest-sessions", *action, result, params...)
 }
