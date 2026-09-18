@@ -22,6 +22,23 @@ schedule.
 
 ### Fixed
 
+## [0.24.0] - 2026-09-18
+
+### Added
+
+- `-d`/`-debug` CLI flags and `debug` config option: print the full resolved request URL (before
+  the API key is appended) to stdout for each outbound API call.
+- `movies`, `tv`, and `tv-episodes` `-a add-rating` accept a new `-guest-session-id` flag, sending
+  TMDB's `guest_session_id` query parameter instead of `session_id` so a rating can be attached to
+  a guest session; falls back to the id cached by `guest-sessions -a create` when no account
+  session is configured.
+
+### Fixed
+
+- `guest-sessions -a rated-movies/rated-tv/rated-tv-episodes` always returned a 404, since there
+  was no way to actually record a rating against a guest session (rating endpoints only ever sent
+  `session_id`, never `guest_session_id`).
+
 ## [0.23.0] - 2026-09-18
 
 ### Added
