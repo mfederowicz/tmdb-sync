@@ -18,16 +18,17 @@ import (
 
 // Config struct for app.
 type Config struct {
-	APIKey          string `toml:"api_key"`
-	ReadAccessToken string `toml:"read_access_token"`
-	AuthVersion     string `toml:"auth_version"`
-	ConfigPath      string `toml:"config_path"`
-	SessionPath     string `toml:"session_path"`
-	AccountPath     string `toml:"account_path"`
-	OutputDir       string `toml:"output_dir"`
-	PerPage         int    `toml:"per_page"`
-	PagesLimit      int    `toml:"pages_limit"`
-	Verbose         bool   `toml:"verbose"`
+	APIKey           string `toml:"api_key"`
+	ReadAccessToken  string `toml:"read_access_token"`
+	AuthVersion      string `toml:"auth_version"`
+	ConfigPath       string `toml:"config_path"`
+	SessionPath      string `toml:"session_path"`
+	AccountPath      string `toml:"account_path"`
+	GuestSessionPath string `toml:"guest_session_path"`
+	OutputDir        string `toml:"output_dir"`
+	PerPage          int    `toml:"per_page"`
+	PagesLimit       int    `toml:"pages_limit"`
+	Verbose          bool   `toml:"verbose"`
 }
 
 // InitConfig of app
@@ -84,6 +85,12 @@ func MergeConfigs(defaultConfig *Config, fileConfig *Config, flagConfig map[stri
 		return nil, fmt.Errorf("config error : %w", err)
 	}
 	defaultConfig.AccountPath = accountPath
+
+	guestSessionPath, err := processOptionGuestSessionPath(defaultConfig, fileConfig)
+	if err != nil {
+		return nil, fmt.Errorf("config error : %w", err)
+	}
+	defaultConfig.GuestSessionPath = guestSessionPath
 
 	defaultConfig.ConfigPath = processOptionConfigPath(defaultConfig, fileConfig, flagConfig, flagset)
 
@@ -172,6 +179,18 @@ func processOptionAccountPath(defaultConfig *Config, fileConfig *Config) (string
 	return accountPath, nil
 }
 
+func processOptionGuestSessionPath(defaultConfig *Config, fileConfig *Config) (string, error) {
+	if len(fileConfig.GuestSessionPath) > consts.ZeroValue {
+		defaultConfig.GuestSessionPath = fileConfig.GuestSessionPath
+	}
+
+	guestSessionPath, err := expandTilde(defaultConfig.GuestSessionPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to expand tilde from guestSessionPath: %w", err)
+	}
+	return guestSessionPath, nil
+}
+
 func processOptionConfigPath(defaultConfig *Config, fileConfig *Config, flagConfig map[string]string, flagset map[string]bool) string {
 	if len(fileConfig.ConfigPath) > consts.ZeroValue {
 		defaultConfig.ConfigPath = fileConfig.ConfigPath
@@ -205,16 +224,17 @@ func ReadConfigFromFile(fs afero.Fs, filename string) (*Config, error) {
 // DefaultConfig config with default values
 func DefaultConfig() *Config {
 	return &Config{
-		APIKey:          consts.EmptyString,
-		ReadAccessToken: consts.EmptyString,
-		AuthVersion:     "v3",
-		ConfigPath:      buildDefaultConfigPath(),
-		SessionPath:     buildDefaultSessionPath(),
-		AccountPath:     buildDefaultAccountPath(),
-		OutputDir:       consts.EmptyString,
-		PerPage:         consts.ZeroValue,
-		PagesLimit:      consts.PagesLimit,
-		Verbose:         false,
+		APIKey:           consts.EmptyString,
+		ReadAccessToken:  consts.EmptyString,
+		AuthVersion:      "v3",
+		ConfigPath:       buildDefaultConfigPath(),
+		SessionPath:      buildDefaultSessionPath(),
+		AccountPath:      buildDefaultAccountPath(),
+		GuestSessionPath: buildDefaultGuestSessionPath(),
+		OutputDir:        consts.EmptyString,
+		PerPage:          consts.ZeroValue,
+		PagesLimit:       consts.PagesLimit,
+		Verbose:          false,
 	}
 }
 
@@ -259,6 +279,14 @@ func buildDefaultSessionPath() string {
 
 func buildDefaultAccountPath() string {
 	absPath, err := expandTilde("~/.config/tmdb-sync/account.json")
+	if err != nil {
+		panic(err)
+	}
+	return absPath
+}
+
+func buildDefaultGuestSessionPath() string {
+	absPath, err := expandTilde("~/.config/tmdb-sync/guest_session.json")
 	if err != nil {
 		panic(err)
 	}

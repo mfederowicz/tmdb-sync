@@ -59,6 +59,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | `discover` ✅ ([docs](discover.md)) | `movie [filters]`, `tv [filters]` |
 | `find` ✅ ([docs](find.md)) | `by-id -i <external_id> --source <imdb_id\|tvdb_id\|...>` |
 | `genres` ✅ ([docs](genres.md)) | `movie`, `tv` |
+| `guest-sessions` ✅ ([docs](guest-sessions.md)) | `create`, `rated-movies -i <guest_session_id>`, `rated-tv -i <guest_session_id>`, `rated-tv-episodes -i <guest_session_id>` |
 | `keywords` ✅ ([docs](keywords.md)) | `details -i <id>` |
 | `lists` ✅ ([docs](lists.md)) | `details -i <id>`, `item-status -i <id> -media-id <movie_id>`, `create -name <name>` 🔒, `add-movie -i <id> -media-id <id>` 🔒, `remove-movie -i <id> -media-id <id>` 🔒, `clear -i <id>` 🔒, `delete -i <id>` 🔒 |
 | `movies` ✅ ([docs](movies.md)) | `details -i <id>`, `popular` (paginated, see below), `top-rated`, `now-playing`, `upcoming`, `credits -i <id>`, `videos -i <id>`, ... full list in `docs/movies.md` |
