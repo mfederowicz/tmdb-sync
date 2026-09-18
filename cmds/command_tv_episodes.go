@@ -22,7 +22,7 @@ var tvEpisodesSessionActions = map[string]bool{
 // tvEpisodesActionsHelp lists every tv-episodes action, shared between the
 // -a flag's usage string and the "-a is required" error so both stay in
 // sync.
-const tvEpisodesActionsHelp = "details, account-states, credits, external-ids, images"
+const tvEpisodesActionsHelp = "details, account-states, credits, external-ids, images, translations"
 
 // TVEpisodesCmd is the "tv-episodes" module.
 var TVEpisodesCmd = &Command{
@@ -91,6 +91,12 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 			return fmt.Errorf("tv-episodes: -i <series_id> is required for -a images")
 		}
 		handler = handlers.TVEpisodesImagesHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, EpisodeNumber: *episodeNumber, Language: *language, IncludeImageLanguage: *includeImageLanguage}
+		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber), fmt.Sprintf("episode-%d", *episodeNumber)}
+	case "translations":
+		if *seriesID == 0 {
+			return fmt.Errorf("tv-episodes: -i <series_id> is required for -a translations")
+		}
+		handler = handlers.TVEpisodesTranslationsHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, EpisodeNumber: *episodeNumber}
 		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber), fmt.Sprintf("episode-%d", *episodeNumber)}
 	default:
 		return fmt.Errorf("tv-episodes: unknown action %q (action: %s)", *action, tvEpisodesActionsHelp)

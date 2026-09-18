@@ -131,3 +131,28 @@ func TestTVEpisodesGetImages(t *testing.T) {
 		t.Errorf("GetImages() = %+v, want Stills[0].FilePath=/still.jpg", images)
 	}
 }
+
+func TestTVEpisodesGetTranslations(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/tv/1399/season/1/episode/1/translations", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 63056,
+			"translations": []map[string]any{
+				{"iso_639_1": "en"},
+			},
+		})
+	})
+
+	translations, _, err := client.TVEpisodes.GetTranslations(context.Background(), 1399, 1, 1)
+	if err != nil {
+		t.Fatalf("GetTranslations() error = %v", err)
+	}
+	if len(translations.Translations) != 1 || translations.Translations[0].Iso6391 != "en" {
+		t.Errorf("GetTranslations() = %+v, want Translations[0].Iso6391=en", translations)
+	}
+}

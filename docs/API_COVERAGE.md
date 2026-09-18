@@ -203,7 +203,7 @@ Revisit both once that checkpoint is reached.
 - [x] Credits — `.../episode/{episode_number}/credits`
 - [x] External IDs — `.../episode/{episode_number}/external_ids`
 - [x] Images — `.../episode/{episode_number}/images`
-- [ ] Translations — `.../episode/{episode_number}/translations`
+- [x] Translations — `.../episode/{episode_number}/translations`
 - [ ] Videos — `.../episode/{episode_number}/videos`
 - [ ] Add Rating 🔒 — `POST .../episode/{episode_number}/rating`
 - [ ] Delete Rating 🔒 — `DELETE .../episode/{episode_number}/rating`
