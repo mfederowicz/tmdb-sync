@@ -24,6 +24,7 @@ func OptionsFromConfig(fs afero.Fs, config *Config) (*str.Options, error) {
 	options := &str.Options{
 		Headers: headers,
 		Verbose: config.Verbose,
+		Debug:   config.Debug,
 	}
 
 	session, err := readSession(fs, config.SessionPath)

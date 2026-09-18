@@ -20,6 +20,8 @@ var (
 	_verbose    = flag.Bool("v", false, consts.VerboseUsage)
 	_version    = flag.Bool("version", false, consts.VersionUsage)
 	_configPath = flag.String("c", cfg.DefaultConfig().ConfigPath, consts.ConfigUsage)
+	_debugShort = flag.Bool("d", false, consts.DebugUsage)
+	_debug      = flag.Bool("debug", false, consts.DebugUsage)
 )
 
 func init() {
@@ -50,6 +52,7 @@ func main() {
 
 	client := internal.NewClient(nil)
 	client.UpdateHeaders(options.Headers)
+	client.Debug = options.Debug
 
 	if _, _, err := client.Auth.ValidateKey(context.Background()); err != nil {
 		printer.Printf("Error: invalid api_key/read_access_token: %v\n", err)
