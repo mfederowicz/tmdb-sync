@@ -50,11 +50,15 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a credits, images, videos")
 	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
 	value := flagSet.Float64("value", 0, "rating value (0.5-10.0, in 0.5 increments), required for -a add-rating")
+	guestSessionID := flagSet.String("guest-session-id", "", "guest session id (alternative to account session, used by -a add-rating): omit to use the one cached by `guest-sessions -a create`, if no account session is set up")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
-	if tvEpisodesSessionActions[*action] {
+	ratingGuestSessionID := resolveRatingGuestSessionID(*action, *guestSessionID, options)
+	usingGuestSession := ratingGuestSessionID != ""
+
+	if tvEpisodesSessionActions[*action] && !usingGuestSession {
 		if err := cli.HandleToken(fs, config, client, options); err != nil {
 			return fmt.Errorf("tv-episodes: %w", err)
 		}
@@ -114,7 +118,11 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 		if *value == 0 {
 			return fmt.Errorf("tv-episodes: -value <rating> is required for -a add-rating")
 		}
-		handler = handlers.TVEpisodesAddRatingHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, EpisodeNumber: *episodeNumber, SessionID: options.Session.SessionID, Value: *value}
+		sessionID := ""
+		if !usingGuestSession {
+			sessionID = options.Session.SessionID
+		}
+		handler = handlers.TVEpisodesAddRatingHandler{SeriesID: *seriesID, SeasonNumber: *seasonNumber, EpisodeNumber: *episodeNumber, SessionID: sessionID, GuestSessionID: ratingGuestSessionID, Value: *value}
 		params = []string{fmt.Sprintf("id-%d", *seriesID), fmt.Sprintf("season-%d", *seasonNumber), fmt.Sprintf("episode-%d", *episodeNumber)}
 	case "delete-rating":
 		if *seriesID == 0 {
@@ -128,7 +136,7 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 
 	result, err := handler.Handle(context.Background(), client)
 	if err != nil {
-		if !retried && tvEpisodesSessionActions[*action] && isSessionInvalid(err) {
+		if !retried && tvEpisodesSessionActions[*action] && !usingGuestSession && isSessionInvalid(err) {
 			if newSession, refreshErr := refreshSession(fs, config, client); refreshErr == nil {
 				options.Session = newSession
 				return execTVEpisodesAttempt(fs, client, config, options, args, true)

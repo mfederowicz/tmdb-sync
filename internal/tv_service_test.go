@@ -655,7 +655,7 @@ func TestTVAddRating(t *testing.T) {
 		})
 	})
 
-	status, _, err := client.TV.AddRating(context.Background(), 1399, "sess", 8.5)
+	status, _, err := client.TV.AddRating(context.Background(), 1399, "sess", "", 8.5)
 	if err != nil {
 		t.Fatalf("AddRating() error = %v", err)
 	}

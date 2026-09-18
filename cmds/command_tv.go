@@ -57,11 +57,15 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a airing-today, lists, on-the-air, popular, recommendations, reviews, similar, top-rated (default: pages_limit from config, 0 = unlimited)")
 	value := flagSet.Float64("value", 0, "rating value (0.5-10.0, in 0.5 increments), required for -a add-rating")
+	guestSessionID := flagSet.String("guest-session-id", "", "guest session id (alternative to account session, used by -a add-rating): omit to use the one cached by `guest-sessions -a create`, if no account session is set up")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
-	if tvSessionActions[*action] {
+	ratingGuestSessionID := resolveRatingGuestSessionID(*action, *guestSessionID, options)
+	usingGuestSession := ratingGuestSessionID != ""
+
+	if tvSessionActions[*action] && !usingGuestSession {
 		if err := cli.HandleToken(fs, config, client, options); err != nil {
 			return fmt.Errorf("tv: %w", err)
 		}
@@ -197,7 +201,11 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 		if *value == 0 {
 			return fmt.Errorf("tv: -value <rating> is required for -a add-rating")
 		}
-		handler = handlers.TVAddRatingHandler{SeriesID: *seriesID, SessionID: options.Session.SessionID, Value: *value}
+		sessionID := ""
+		if !usingGuestSession {
+			sessionID = options.Session.SessionID
+		}
+		handler = handlers.TVAddRatingHandler{SeriesID: *seriesID, SessionID: sessionID, GuestSessionID: ratingGuestSessionID, Value: *value}
 		params = []string{fmt.Sprintf("id-%d", *seriesID)}
 	case "delete-rating":
 		if *seriesID == 0 {
@@ -211,7 +219,7 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 
 	result, err := handler.Handle(context.Background(), client)
 	if err != nil {
-		if !retried && tvSessionActions[*action] && isSessionInvalid(err) {
+		if !retried && tvSessionActions[*action] && !usingGuestSession && isSessionInvalid(err) {
 			if newSession, refreshErr := refreshSession(fs, config, client); refreshErr == nil {
 				options.Session = newSession
 				return execTVAttempt(fs, client, config, options, args, true)

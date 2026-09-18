@@ -616,11 +616,12 @@ func (s *TVService) GetAiringTodayTV(ctx context.Context, pagesLimit int) ([]str
 	})
 }
 
-// AddRating rates a TV series on behalf of the session's account.
+// AddRating rates a TV series on behalf of the session's account, or a guest
+// session when guestSessionID is set instead of sessionID.
 //
 // Api docs: https://developer.themoviedb.org/reference/tv-series-add-rating
-func (s *TVService) AddRating(ctx context.Context, seriesID int64, sessionID string, value float64) (*str.AuthStatus, *str.Response, error) {
-	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/rating", seriesID), &uri.AccountOptions{SessionID: sessionID})
+func (s *TVService) AddRating(ctx context.Context, seriesID int64, sessionID, guestSessionID string, value float64) (*str.AuthStatus, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("tv/%d/rating", seriesID), &uri.RatingOptions{SessionID: sessionID, GuestSessionID: guestSessionID})
 	if err != nil {
 		return nil, nil, err
 	}
