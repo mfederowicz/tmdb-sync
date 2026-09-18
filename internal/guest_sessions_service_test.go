@@ -33,3 +33,30 @@ func TestGetRatedMoviesGuestSession(t *testing.T) {
 		t.Errorf("GetRatedMovies() = %+v, want one result titled Fight Club", movies)
 	}
 }
+
+func TestGetRatedTVGuestSession(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/guest_session/abc123/rated/tv", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          1,
+			"total_pages":   1,
+			"total_results": 1,
+			"results": []map[string]any{
+				{"id": 1399, "name": "Game of Thrones", "rating": 9.0},
+			},
+		})
+	})
+
+	tvShows, err := client.GuestSessions.GetRatedTV(context.Background(), "abc123", "", "", 0)
+	if err != nil {
+		t.Fatalf("GetRatedTV() error = %v", err)
+	}
+	if len(tvShows) != 1 || tvShows[0].Name != "Game of Thrones" {
+		t.Errorf("GetRatedTV() = %+v, want one result named Game of Thrones", tvShows)
+	}
+}

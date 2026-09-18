@@ -23,11 +23,11 @@ var GuestSessionsCmd = &Command{
 
 func execGuestSessions(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("guest-sessions", flag.ContinueOnError)
-	action := flagSet.String("a", "", "action: rated-movies (required)")
+	action := flagSet.String("a", "", "action: rated-movies, rated-tv (required)")
 	guestSessionID := flagSet.String("i", "", "guest session id, required for all actions")
-	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a rated-movies")
-	sortBy := flagSet.String("sort-by", "", "sort order (created_at.asc, created_at.desc), used by -a rated-movies")
-	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a rated-movies (default: pages_limit from config, 0 = unlimited)")
+	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a rated-movies, rated-tv")
+	sortBy := flagSet.String("sort-by", "", "sort order (created_at.asc, created_at.desc), used by -a rated-movies, rated-tv")
+	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a rated-movies, rated-tv (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
@@ -35,12 +35,17 @@ func execGuestSessions(fs afero.Fs, client *internal.Client, config *cfg.Config,
 	var handler handlers.Handler
 	switch *action {
 	case "":
-		return fmt.Errorf("guest-sessions: -a is required (action: rated-movies)")
+		return fmt.Errorf("guest-sessions: -a is required (action: rated-movies, rated-tv)")
 	case "rated-movies":
 		if *guestSessionID == "" {
 			return fmt.Errorf("guest-sessions: -i <guest_session_id> is required for -a rated-movies")
 		}
 		handler = handlers.GuestSessionsRatedMoviesHandler{GuestSessionID: *guestSessionID, Language: *language, SortBy: *sortBy, PagesLimit: *pagesLimit}
+	case "rated-tv":
+		if *guestSessionID == "" {
+			return fmt.Errorf("guest-sessions: -i <guest_session_id> is required for -a rated-tv")
+		}
+		handler = handlers.GuestSessionsRatedTVHandler{GuestSessionID: *guestSessionID, Language: *language, SortBy: *sortBy, PagesLimit: *pagesLimit}
 	default:
 		return fmt.Errorf("guest-sessions: unknown action %q", *action)
 	}

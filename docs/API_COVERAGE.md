@@ -85,7 +85,7 @@ Revisit both once that checkpoint is reached.
 
 ## Guest Sessions
 - [x] Rated Movies — `GET /guest_session/{guest_session_id}/rated/movies`
-- [ ] Rated TV Shows — `GET /guest_session/{guest_session_id}/rated/tv`
+- [x] Rated TV Shows — `GET /guest_session/{guest_session_id}/rated/tv`
 - [ ] Rated TV Episodes — `GET /guest_session/{guest_session_id}/rated/tv/episodes`
 
 ## Keywords
