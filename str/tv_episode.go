@@ -17,3 +17,10 @@ type TVEpisode struct {
 	VoteAverage    float64        `json:"vote_average"`
 	VoteCount      int64          `json:"vote_count"`
 }
+
+// TVEpisodeAccountStates is the response shape for
+// GET .../episode/{episode_number}/account_states.
+type TVEpisodeAccountStates struct {
+	ID    int64 `json:"id"`
+	Rated any   `json:"rated"`
+}
