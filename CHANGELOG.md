@@ -22,6 +22,12 @@ schedule.
 
 ### Fixed
 
+## [0.21.0] - 2026-09-18
+
+### Added
+
+- `tv-episode-groups` module: `details`.
+
 ## [0.20.0] - 2026-09-18
 
 ### Added
