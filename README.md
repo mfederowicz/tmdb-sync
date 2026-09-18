@@ -17,6 +17,7 @@ aiming for full TMDB v3 API coverage, one module at a time.
 - [`discover`](docs/discover.md) ✅ — discover movies/TV shows by filter.
 - [`find`](docs/find.md) ✅ — find TMDB movies/TV/people by an external id (IMDb, TVDB, ...).
 - [`genres`](docs/genres.md) ✅ — official movie/tv genre lists.
+- [`guest-sessions`](docs/guest-sessions.md) ✅ — guest session rated movies, TV shows, TV episodes.
 - [`keywords`](docs/keywords.md) ✅ — keyword details.
 - [`lists`](docs/lists.md) ✅ — list details, item status, and 🔒 create/add-movie/remove-movie/
   clear/delete.

@@ -88,3 +88,42 @@ func (s *GuestSessionsService) GetRatedTV(ctx context.Context, guestSessionID, l
 		}, nil
 	})
 }
+
+func (s *GuestSessionsService) getRatedTVEpisodesPage(ctx context.Context, guestSessionID, language, sortBy string, page int) (*str.RatedTVEpisodes, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("guest_session/%s/rated/tv/episodes", guestSessionID), &uri.GuestSessionListOptions{Language: language, SortBy: sortBy, Page: page})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	episodes := new(str.RatedTVEpisodes)
+	resp, err := s.client.Do(ctx, req, episodes)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return episodes, resp, nil
+}
+
+// GetRatedTVEpisodes returns a guest session's rated TV episodes, walking
+// pages until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/reference/guest-session-rated-tv-episodes
+func (s *GuestSessionsService) GetRatedTVEpisodes(ctx context.Context, guestSessionID, language, sortBy string, pagesLimit int) ([]str.RatedTVEpisode, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.RatedTVEpisode], error) {
+		episodes, _, err := s.getRatedTVEpisodesPage(ctx, guestSessionID, language, sortBy, page)
+		if err != nil {
+			return PageResult[str.RatedTVEpisode]{}, err
+		}
+		return PageResult[str.RatedTVEpisode]{
+			Results:    episodes.Results,
+			Page:       episodes.Page,
+			TotalPages: episodes.TotalPages,
+		}, nil
+	})
+}
