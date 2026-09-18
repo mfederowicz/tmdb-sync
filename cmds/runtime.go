@@ -39,6 +39,7 @@ func init() {
 		TVSeasonsCmd,
 		TVEpisodesCmd,
 		TVEpisodeGroupsCmd,
+		WatchProvidersCmd,
 		HelpCmd,
 	}
 }
