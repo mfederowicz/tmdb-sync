@@ -207,6 +207,14 @@ type WatchProviderListOptions struct {
 	WatchRegion string `url:"watch_region,omitempty"`
 }
 
+// GuestSessionListOptions carries the optional query parameters accepted by
+// the /guest_session/{guest_session_id}/rated/... endpoints.
+type GuestSessionListOptions struct {
+	Language string `url:"language,omitempty"`
+	SortBy   string `url:"sort_by,omitempty"`
+	Page     int    `url:"page,omitempty"`
+}
+
 // FindOptions carries the query parameters accepted by GET /find/{external_id}.
 type FindOptions struct {
 	ExternalSource string `url:"external_source,omitempty"`
