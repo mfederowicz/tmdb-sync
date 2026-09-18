@@ -69,7 +69,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | `trending` ✅ ([docs](trending.md)) | `all -w <day\|week>`, `movie -w <day\|week>`, `tv -w <day\|week>`, `person -w <day\|week>` |
 | `tv` ✅ ([docs](tv.md)) | `details -i <id>`, `popular` (paginated, see below), `top-rated`, `on-the-air`, `airing-today`, `credits -i <id>`, `videos -i <id>`, ... full list in `docs/tv.md` |
 | `tv-seasons` ✅ ([docs](tv-seasons.md)) | `details -i <id> -s <season_number>`, `account-states -i <id> -s <season_number>` 🔒, `aggregate-credits -i <id> -s <season_number>`, `credits -i <id> -s <season_number>`, `external-ids -i <id> -s <season_number>`, `images -i <id> -s <season_number>`, `translations -i <id> -s <season_number>`, `videos -i <id> -s <season_number>` |
-| `tv-episodes`     | `details -i <id> -s <season_number> -e <episode_number>`, ... |
+| `tv-episodes` ✅ ([docs](tv-episodes.md)) | `details -i <id> -s <season_number> -e <episode_number>`, `account-states -i <id> -s <season_number> -e <episode_number>` 🔒, `credits -i <id> -s <season_number> -e <episode_number>`, `external-ids -i <id> -s <season_number> -e <episode_number>`, `images -i <id> -s <season_number> -e <episode_number>`, `translations -i <id> -s <season_number> -e <episode_number>`, `videos -i <id> -s <season_number> -e <episode_number>`, `add-rating -i <id> -s <season_number> -e <episode_number> -value <rating>` 🔒, `delete-rating -i <id> -s <season_number> -e <episode_number>` 🔒 |
 | `watch-providers` | `regions`, `movie`, `tv` |
 
 🔒 = requires a v3 session. There's no standalone `authentication` command — a 🔒 module (like

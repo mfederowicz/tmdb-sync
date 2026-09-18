@@ -1,0 +1,45 @@
+package str
+
+// TVEpisode is the response shape for
+// GET /tv/{series_id}/season/{season_number}/episode/{episode_number}.
+type TVEpisode struct {
+	AirDate        string         `json:"air_date"`
+	Crew           []TVCrewMember `json:"crew"`
+	EpisodeNumber  int            `json:"episode_number"`
+	GuestStars     []TVCastMember `json:"guest_stars"`
+	ID             int64          `json:"id"`
+	Name           string         `json:"name"`
+	Overview       string         `json:"overview"`
+	ProductionCode string         `json:"production_code"`
+	Runtime        int            `json:"runtime"`
+	SeasonNumber   int            `json:"season_number"`
+	StillPath      string         `json:"still_path"`
+	VoteAverage    float64        `json:"vote_average"`
+	VoteCount      int64          `json:"vote_count"`
+}
+
+// TVEpisodeAccountStates is the response shape for
+// GET .../episode/{episode_number}/account_states.
+type TVEpisodeAccountStates struct {
+	ID    int64 `json:"id"`
+	Rated any   `json:"rated"`
+}
+
+// TVEpisodeExternalIDs is the response shape for
+// GET .../episode/{episode_number}/external_ids.
+type TVEpisodeExternalIDs struct {
+	ID          int64  `json:"id"`
+	FreebaseMID string `json:"freebase_mid"`
+	FreebaseID  string `json:"freebase_id"`
+	IMDbID      string `json:"imdb_id"`
+	TvdbID      int64  `json:"tvdb_id"`
+	TvrageID    int64  `json:"tvrage_id"`
+	WikidataID  string `json:"wikidata_id"`
+}
+
+// TVEpisodeImages is the response shape for
+// GET .../episode/{episode_number}/images.
+type TVEpisodeImages struct {
+	ID     int64   `json:"id"`
+	Stills []Image `json:"stills"`
+}

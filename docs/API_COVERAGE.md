@@ -198,15 +198,15 @@ Revisit both once that checkpoint is reached.
 - [x] Videos — `GET /tv/{series_id}/season/{season_number}/videos`
 
 ## TV Episodes
-- [ ] Details — `GET /tv/{series_id}/season/{season_number}/episode/{episode_number}`
-- [ ] Account States 🔒 — `.../episode/{episode_number}/account_states`
-- [ ] Credits — `.../episode/{episode_number}/credits`
-- [ ] External IDs — `.../episode/{episode_number}/external_ids`
-- [ ] Images — `.../episode/{episode_number}/images`
-- [ ] Translations — `.../episode/{episode_number}/translations`
-- [ ] Videos — `.../episode/{episode_number}/videos`
-- [ ] Add Rating 🔒 — `POST .../episode/{episode_number}/rating`
-- [ ] Delete Rating 🔒 — `DELETE .../episode/{episode_number}/rating`
+- [x] Details — `GET /tv/{series_id}/season/{season_number}/episode/{episode_number}`
+- [x] Account States 🔒 — `.../episode/{episode_number}/account_states`
+- [x] Credits — `.../episode/{episode_number}/credits`
+- [x] External IDs — `.../episode/{episode_number}/external_ids`
+- [x] Images — `.../episode/{episode_number}/images`
+- [x] Translations — `.../episode/{episode_number}/translations`
+- [x] Videos — `.../episode/{episode_number}/videos`
+- [x] Add Rating 🔒 — `POST .../episode/{episode_number}/rating`
+- [x] Delete Rating 🔒 — `DELETE .../episode/{episode_number}/rating`
 
 ## TV Episode Groups
 - [ ] Details — `GET /tv/episode_group/{id}`
