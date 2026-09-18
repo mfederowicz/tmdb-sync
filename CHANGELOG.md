@@ -22,6 +22,18 @@ schedule.
 
 ### Fixed
 
+## [0.23.0] - 2026-09-18
+
+### Added
+
+- `guest-sessions` module: `create`, `rated-movies`, `rated-tv`, `rated-tv-episodes`.
+
+### Changed
+
+- `authentication`'s `CreateGuestSession` is now wired in via `guest-sessions -a create`, which
+  caches the returned id to `~/.config/tmdb-sync/guest_session.json` (`guest_session_path` in
+  config); `-i` is now optional on `guest-sessions`' `rated-*` actions, falling back to that cache.
+
 ## [0.22.0] - 2026-09-18
 
 ### Added
