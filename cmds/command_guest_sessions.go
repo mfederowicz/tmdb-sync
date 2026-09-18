@@ -21,15 +21,20 @@ var GuestSessionsCmd = &Command{
 	Exec:   execGuestSessions,
 }
 
-func execGuestSessions(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str.Options, args []string) error {
+func execGuestSessions(fs afero.Fs, client *internal.Client, config *cfg.Config, options *str.Options, args []string) error {
 	flagSet := flag.NewFlagSet("guest-sessions", flag.ContinueOnError)
 	action := flagSet.String("a", "", "action: create, rated-movies, rated-tv, rated-tv-episodes (required)")
-	guestSessionID := flagSet.String("i", "", "guest session id, required for rated-movies, rated-tv, rated-tv-episodes")
+	guestSessionID := flagSet.String("i", "", "guest session id (optional for rated-movies, rated-tv, rated-tv-episodes: omit to use the one cached by -a create)")
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a rated-movies, rated-tv, rated-tv-episodes")
 	sortBy := flagSet.String("sort-by", "", "sort order (created_at.asc, created_at.desc), used by -a rated-movies, rated-tv, rated-tv-episodes")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a rated-movies, rated-tv, rated-tv-episodes (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
+	}
+
+	id := *guestSessionID
+	if id == "" && options.GuestSession != nil && options.GuestSession.GuestSessionID != "" {
+		id = options.GuestSession.GuestSessionID
 	}
 
 	var handler handlers.Handler
@@ -39,20 +44,20 @@ func execGuestSessions(fs afero.Fs, client *internal.Client, config *cfg.Config,
 	case "create":
 		handler = handlers.GuestSessionsCreateHandler{}
 	case "rated-movies":
-		if *guestSessionID == "" {
-			return fmt.Errorf("guest-sessions: -i <guest_session_id> is required for -a rated-movies")
+		if id == "" {
+			return fmt.Errorf("guest-sessions: -i <guest_session_id> is required for -a rated-movies (or run -a create once to cache it)")
 		}
-		handler = handlers.GuestSessionsRatedMoviesHandler{GuestSessionID: *guestSessionID, Language: *language, SortBy: *sortBy, PagesLimit: *pagesLimit}
+		handler = handlers.GuestSessionsRatedMoviesHandler{GuestSessionID: id, Language: *language, SortBy: *sortBy, PagesLimit: *pagesLimit}
 	case "rated-tv":
-		if *guestSessionID == "" {
-			return fmt.Errorf("guest-sessions: -i <guest_session_id> is required for -a rated-tv")
+		if id == "" {
+			return fmt.Errorf("guest-sessions: -i <guest_session_id> is required for -a rated-tv (or run -a create once to cache it)")
 		}
-		handler = handlers.GuestSessionsRatedTVHandler{GuestSessionID: *guestSessionID, Language: *language, SortBy: *sortBy, PagesLimit: *pagesLimit}
+		handler = handlers.GuestSessionsRatedTVHandler{GuestSessionID: id, Language: *language, SortBy: *sortBy, PagesLimit: *pagesLimit}
 	case "rated-tv-episodes":
-		if *guestSessionID == "" {
-			return fmt.Errorf("guest-sessions: -i <guest_session_id> is required for -a rated-tv-episodes")
+		if id == "" {
+			return fmt.Errorf("guest-sessions: -i <guest_session_id> is required for -a rated-tv-episodes (or run -a create once to cache it)")
 		}
-		handler = handlers.GuestSessionsRatedTVEpisodesHandler{GuestSessionID: *guestSessionID, Language: *language, SortBy: *sortBy, PagesLimit: *pagesLimit}
+		handler = handlers.GuestSessionsRatedTVEpisodesHandler{GuestSessionID: id, Language: *language, SortBy: *sortBy, PagesLimit: *pagesLimit}
 	default:
 		return fmt.Errorf("guest-sessions: unknown action %q", *action)
 	}
@@ -63,8 +68,13 @@ func execGuestSessions(fs afero.Fs, client *internal.Client, config *cfg.Config,
 	}
 
 	var params []string
-	if *guestSessionID != "" {
-		params = append(params, fmt.Sprintf("id-%s", *guestSessionID))
+	if guestSession, ok := result.(*str.GuestSession); ok {
+		if err := cfg.WriteGuestSession(fs, config.GuestSessionPath, guestSession); err != nil {
+			return fmt.Errorf("guest-sessions: cache guest session: %w", err)
+		}
+	} else if id != "" {
+		params = []string{fmt.Sprintf("id-%s", id)}
 	}
+
 	return writeResult(fs, config, "guest-sessions", *action, result, params...)
 }

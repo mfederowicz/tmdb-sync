@@ -36,6 +36,11 @@ func OptionsFromConfig(fs afero.Fs, config *Config) (*str.Options, error) {
 		options.Account = account
 	}
 
+	guestSession, err := readGuestSession(fs, config.GuestSessionPath)
+	if err == nil {
+		options.GuestSession = guestSession
+	}
+
 	return options, nil
 }
 
@@ -82,6 +87,31 @@ func readAccount(fs afero.Fs, path string) (*str.Account, error) {
 // round trip or repeating -i.
 func WriteAccount(fs afero.Fs, path string, account *str.Account) error {
 	data, err := json.Marshal(account)
+	if err != nil {
+		return err
+	}
+	return afero.WriteFile(fs, path, data, consts.X644)
+}
+
+func readGuestSession(fs afero.Fs, path string) (*str.GuestSession, error) {
+	data, err := afero.ReadFile(fs, path)
+	if err != nil {
+		return nil, err
+	}
+
+	var guestSession str.GuestSession
+	if err := json.Unmarshal(data, &guestSession); err != nil {
+		return nil, err
+	}
+
+	return &guestSession, nil
+}
+
+// WriteGuestSession caches a created guest session to disk at path, so later
+// invocations of guest-sessions rated-* actions can reuse its id without
+// repeating -i.
+func WriteGuestSession(fs afero.Fs, path string, guestSession *str.GuestSession) error {
+	data, err := json.Marshal(guestSession)
 	if err != nil {
 		return err
 	}
