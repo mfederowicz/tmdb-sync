@@ -81,3 +81,15 @@ type AccountListV4 struct {
 	CreatedAt     string  `json:"created_at"`
 	UpdatedAt     string  `json:"updated_at"`
 }
+
+// AccountRatingV4 is the user's rating on an item in the v4 rated endpoints.
+type AccountRatingV4 struct {
+	CreatedAt string  `json:"created_at"`
+	Value     float64 `json:"value"`
+}
+
+// RatedMovieV4 is a movie in GET /4/account/{account_object_id}/movie/rated.
+type RatedMovieV4 struct {
+	Movie
+	AccountRating *AccountRatingV4 `json:"account_rating"`
+}
