@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/mfederowicz/tmdb-sync/uri"
 )
 
 // AbuseRateLimitError occurs when TMDB returns 429 Too Many Requests, or when
@@ -17,6 +19,6 @@ type AbuseRateLimitError struct {
 // Error implements the error interface.
 func (r *AbuseRateLimitError) Error() string {
 	return fmt.Sprintf("%v %v: %d %s",
-		r.Response.Request.Method, r.Response.Request.URL,
+		r.Response.Request.Method, uri.SanitizeURL(r.Response.Request.URL),
 		r.Response.StatusCode, r.Message)
 }
