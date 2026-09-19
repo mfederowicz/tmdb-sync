@@ -31,6 +31,10 @@ type Config struct {
 	PagesLimit       int    `toml:"pages_limit"`
 	Verbose          bool   `toml:"verbose"`
 	Debug            bool   `toml:"debug"`
+
+	// pagesLimitSet records that the config file itself defined pages_limit, so an
+	// explicit 0 (unlimited) can be told apart from the key being absent.
+	pagesLimitSet bool
 }
 
 // InitConfig of app
@@ -72,8 +76,19 @@ func MergeConfigs(defaultConfig *Config, fileConfig *Config, flagConfig map[stri
 	defaultConfig.ReadAccessToken = processOptionReadAccessToken(defaultConfig, fileConfig)
 	defaultConfig.AuthVersion = processOptionAuthVersion(defaultConfig, fileConfig)
 	defaultConfig.PerPage = processOptionPerPage(defaultConfig, fileConfig)
-	defaultConfig.PagesLimit = processOptionPagesLimit(defaultConfig, fileConfig)
-	defaultConfig.OutputDir = processOptionOutputDir(defaultConfig, fileConfig)
+
+	pagesLimit, err := processOptionPagesLimit(defaultConfig, fileConfig)
+	if err != nil {
+		return nil, fmt.Errorf("config error : %w", err)
+	}
+	defaultConfig.PagesLimit = pagesLimit
+
+	outputDir, err := processOptionOutputDir(defaultConfig, fileConfig)
+	if err != nil {
+		return nil, fmt.Errorf("config error : %w", err)
+	}
+	defaultConfig.OutputDir = outputDir
+
 	defaultConfig.Verbose = processOptionVerbose(defaultConfig, fileConfig, flagConfig, flagset)
 	defaultConfig.Debug = processOptionDebug(defaultConfig, fileConfig, flagConfig, flagset)
 
@@ -131,11 +146,16 @@ func processOptionAuthVersion(defaultConfig *Config, fileConfig *Config) string 
 	return defaultConfig.AuthVersion
 }
 
-func processOptionOutputDir(defaultConfig *Config, fileConfig *Config) string {
+func processOptionOutputDir(defaultConfig *Config, fileConfig *Config) (string, error) {
 	if len(fileConfig.OutputDir) > consts.ZeroValue {
 		defaultConfig.OutputDir = fileConfig.OutputDir
 	}
-	return defaultConfig.OutputDir
+
+	outputDir, err := expandTilde(defaultConfig.OutputDir)
+	if err != nil {
+		return "", fmt.Errorf("failed to expand tilde from outputDir: %w", err)
+	}
+	return outputDir, nil
 }
 
 func processOptionPerPage(defaultConfig *Config, fileConfig *Config) int {
@@ -145,11 +165,15 @@ func processOptionPerPage(defaultConfig *Config, fileConfig *Config) int {
 	return defaultConfig.PerPage
 }
 
-func processOptionPagesLimit(defaultConfig *Config, fileConfig *Config) int {
-	if fileConfig.PagesLimit > consts.ZeroValue {
+func processOptionPagesLimit(defaultConfig *Config, fileConfig *Config) (int, error) {
+	if fileConfig.PagesLimit < consts.ZeroValue {
+		return consts.ZeroValue, errors.New("pages_limit must not be negative (0 means all pages), update your config file")
+	}
+	// 0 is a valid value ("all pages"), so honour it whenever the file sets it.
+	if fileConfig.PagesLimit > consts.ZeroValue || fileConfig.pagesLimitSet {
 		defaultConfig.PagesLimit = fileConfig.PagesLimit
 	}
-	return defaultConfig.PagesLimit
+	return defaultConfig.PagesLimit, nil
 }
 
 func processOptionVerbose(defaultConfig *Config, fileConfig *Config, flagConfig map[string]string, flagset map[string]bool) bool {
@@ -249,9 +273,11 @@ func ReadConfigFromFile(fs afero.Fs, filename string) (*Config, error) {
 		return nil, errors.New("empty file content")
 	}
 
-	if _, err := toml.Decode(string(file), &config); err != nil {
+	meta, err := toml.Decode(string(file), &config)
+	if err != nil {
 		return nil, fmt.Errorf("cannot parse the config file : %w", err)
 	}
+	config.pagesLimitSet = meta.IsDefined("pages_limit")
 
 	return &config, nil
 }
@@ -288,7 +314,8 @@ func normalizeConfig(config *Config) error {
 }
 
 func expandTilde(path string) (string, error) {
-	if len(path) > consts.ZeroValue && path[consts.ZeroValue] == '~' {
+	// Only "~" and "~/..." mean the current user's home; "~other/..." is left alone.
+	if path == "~" || strings.HasPrefix(path, "~/") {
 		usr, err := user.Current()
 		if err != nil {
 			return consts.EmptyString, err

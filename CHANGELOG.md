@@ -29,6 +29,10 @@ schedule.
 
 ### Fixed
 
+- `pages_limit = 0` in the config file now means "all pages", as documented, instead of being
+  ignored in favour of the default of 10. A negative `pages_limit` is rejected with an error.
+- `output_dir` now expands a leading `~`, instead of creating a directory literally named `~`.
+  `~other/...` is no longer rewritten to `<home>/other/...` in any config path.
 - Login no longer fails on a fresh machine: the parent directory of the session, account,
   guest-session and access-token cache files is created if missing.
 - API client: response bodies of failed (non-2xx) requests are now closed, so failed calls no
