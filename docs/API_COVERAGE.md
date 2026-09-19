@@ -253,5 +253,5 @@ account id).
 - [x] Update Items — `PUT /4/list/{list_id}/items`
 - [x] Remove Items — `DELETE /4/list/{list_id}/items`
 - [x] Check Item Status — `GET /4/list/{list_id}/item_status`
-- [ ] Clear — `GET /4/list/{list_id}/clear` *(reference documents it as GET — verify against the
+- [x] Clear — `GET /4/list/{list_id}/clear` *(reference documents it as GET — verify against the
       live API)*

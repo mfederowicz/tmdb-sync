@@ -468,3 +468,27 @@ func TestListsGetItemStatusV4(t *testing.T) {
 		t.Errorf("GetItemStatusV4() = %+v", status)
 	}
 }
+
+func TestListsClearListV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8/clear", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"success": true, "status_code": 1})
+	})
+
+	status, err := client.Lists.ClearListV4(context.Background(), "usertok", "8")
+	if err != nil {
+		t.Fatalf("ClearListV4() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("ClearListV4() = %+v", status)
+	}
+}

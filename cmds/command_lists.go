@@ -27,7 +27,7 @@ var listsSessionActions = map[string]bool{
 }
 
 // listsV4Actions are the `lists` actions implemented for -v4.
-var listsV4Actions = []string{"details", "create", "update", "delete", "add-items", "update-items", "remove-items", "item-status"}
+var listsV4Actions = []string{"details", "create", "update", "delete", "add-items", "update-items", "remove-items", "item-status", "clear"}
 
 // ListsCmd is the "lists" module. Read actions (details, item-status) are
 // public; mutation actions (create, add-movie, remove-movie, clear, delete)
@@ -55,7 +55,7 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	description := flagSet.String("description", "", "list description, used by -a create")
 	language := flagSet.String("language", "", "list language (ISO 639-1), used by -a create")
 	v3 := flagSet.Bool("v3", false, "use the v3 API (default)")
-	v4 := flagSet.Bool("v4", false, "use the v4 API (optionally with `auth -v4 -a login` for private lists); actions: details, create, update, delete, add-items, update-items, remove-items, item-status")
+	v4 := flagSet.Bool("v4", false, "use the v4 API (optionally with `auth -v4 -a login` for private lists); actions: details, create, update, delete, add-items, update-items, remove-items, item-status, clear")
 	sortBy := flagSet.String("sort-by", "", "v4 only: sort order of the items, for -a details (e.g. original_order.asc, vote_average.desc)")
 	country := flagSet.String("country", "", "v4 only: list country (ISO 3166-1, e.g. US), required for -a create")
 	public := flagSet.Bool("public", false, "v4 only: make the list public, used by -a create")
@@ -239,6 +239,11 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	case "clear":
 		if *listID == "" {
 			return fmt.Errorf("lists: -i <list_id> is required for -a clear")
+		}
+		if v4Mode {
+			handler = handlers.ListsClearHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, ListID: *listID}
+			params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
+			break
 		}
 		handler = handlers.ListsClearHandler{ListID: *listID, SessionID: options.Session.SessionID}
 		params = []string{fmt.Sprintf("id-%s", *listID)}

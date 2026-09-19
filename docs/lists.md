@@ -34,6 +34,7 @@ Notes:
 | `update-items` 🔒 | `tmdb-sync lists -v4 -a update-items -i 8 -item "movie:100:my comment"` | `lists_update-items_id-8_v4.json` |
 | `remove-items` 🔒 | `tmdb-sync lists -v4 -a remove-items -i 8 -item movie:100 -item tv:200` | `lists_remove-items_id-8_v4.json` |
 | `item-status` | `tmdb-sync lists -v4 -a item-status -i 8 -media-type tv -media-id 100` | `lists_item-status_id-8_media-100_v4.json` |
+| `clear` 🔒 | `tmdb-sync lists -v4 -a clear -i 8` | `lists_clear_id-8_v4.json` |
 
 - `-v4 -a details` walks every item page (`-pages-limit`, default from config, 0 = unlimited) and
   merges the items into `results`. `-language` and `-sort-by` (e.g. `original_order.asc`) are optional.
@@ -53,3 +54,5 @@ Notes:
   the output has TMDB's per-item `results`. The ids are sent as a JSON body on the DELETE request.
 - `-v4 -a item-status` takes `-media-type movie|tv` and `-media-id`; like `details` it works on public
   lists with only `read_access_token` and uses the user token when cached.
+- `-v4 -a clear` needs `auth -v4 -a login`. It sends `GET /4/list/{list_id}/clear` as TMDB's reference
+  documents it (a destructive GET; to be confirmed against the live API) and removes every item.

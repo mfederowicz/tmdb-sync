@@ -343,3 +343,21 @@ func (s *ListsService) GetItemStatusV4(ctx context.Context, accessToken, listID,
 
 	return status, nil
 }
+
+// ClearListV4 removes all items from a list. TMDB's v4 reference documents
+// this as a GET request.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-clear
+func (s *ListsService) ClearListV4(ctx context.Context, accessToken, listID string) (*str.ListStatusV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodGet, fmt.Sprintf("list/%s/clear", listID), nil, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	status := new(str.ListStatusV4)
+	if _, err := s.client.Do(ctx, req, status); err != nil {
+		return nil, err
+	}
+
+	return status, nil
+}
