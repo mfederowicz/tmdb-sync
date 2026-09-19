@@ -60,3 +60,25 @@ func (s *AuthV4Service) CreateAccessToken(ctx context.Context, requestToken stri
 
 	return accessToken, resp, nil
 }
+
+// DeleteAccessToken logs out by invalidating a v4 user access token.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/auth-delete-access-token
+func (s *AuthV4Service) DeleteAccessToken(ctx context.Context, accessToken string) (*str.AuthStatus, *str.Response, error) {
+	body := struct {
+		AccessToken string `json:"access_token"`
+	}{AccessToken: accessToken}
+
+	req, err := s.client.NewRequestV4(http.MethodDelete, "auth/access_token", body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	status := new(str.AuthStatus)
+	resp, err := s.client.Do(ctx, req, status)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return status, resp, nil
+}

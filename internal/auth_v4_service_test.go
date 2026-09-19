@@ -130,3 +130,52 @@ func TestAuthV4CreateAccessToken_Unapproved(t *testing.T) {
 		t.Fatal("expected error for an unapproved request token")
 	}
 }
+
+func TestAuthV4DeleteAccessToken(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/auth/access_token", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer read" {
+			t.Errorf("Authorization = %q, want the read token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		var body struct {
+			AccessToken string `json:"access_token"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+		if body.AccessToken != "user-tok" {
+			t.Errorf("access_token in body = %q, want %q", body.AccessToken, "user-tok")
+		}
+		json.NewEncoder(w).Encode(map[string]any{"success": true, "status_code": 1, "status_message": "Success."})
+	})
+
+	status, _, err := client.AuthV4.DeleteAccessToken(context.Background(), "user-tok")
+	if err != nil {
+		t.Fatalf("DeleteAccessToken() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("status = %+v, want success", status)
+	}
+}
+
+func TestAuthV4DeleteAccessToken_Invalid(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/auth/access_token", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]any{"success": false, "status_code": 3, "status_message": "Authentication failed"})
+	})
+
+	if _, _, err := client.AuthV4.DeleteAccessToken(context.Background(), "bad"); err == nil {
+		t.Fatal("expected error for an invalid access token")
+	}
+}
