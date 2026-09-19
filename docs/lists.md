@@ -21,3 +21,14 @@ Notes:
   demand the same way the `account` module does, including transparent re-login on a stale session.
 - `clear` always passes TMDB's required `confirm=true` — there's no separate confirmation flag.
 - `li` is the module's `Abbrev` — `tmdb-sync li -a details -i 1` also works.
+
+## v4 (`-v4`)
+
+| action    | example                                                  | output file                |
+|-----------|-----------------------------------------------------------|----------------------------|
+| `details` | `tmdb-sync lists -v4 -a details -i 8 -language en-US`     | `lists_details_id-8_v4.json` |
+
+- `-v4 -a details` walks every item page (`-pages-limit`, default from config, 0 = unlimited) and
+  merges the items into `results`. `-language` and `-sort-by` (e.g. `original_order.asc`) are optional.
+- Public lists need only `read_access_token`; if `auth -v4 -a login` was run, the user token is sent
+  so private lists you own are readable too.

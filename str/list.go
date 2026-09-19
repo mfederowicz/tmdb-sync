@@ -39,3 +39,59 @@ type ListCreateResponse struct {
 type ListItemRequest struct {
 	MediaID int64 `json:"media_id"`
 }
+
+// ListCreatorV4 is the created_by object of a v4 list.
+type ListCreatorV4 struct {
+	GravatarHash string `json:"gravatar_hash"`
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	Username     string `json:"username"`
+}
+
+// ListItemV4 is one entry of a v4 list. TMDB sends movie fields (title,
+// release_date) or TV fields (name, first_air_date) depending on MediaType.
+type ListItemV4 struct {
+	Adult            bool     `json:"adult"`
+	BackdropPath     string   `json:"backdrop_path"`
+	FirstAirDate     string   `json:"first_air_date,omitempty"`
+	GenreIDs         []int    `json:"genre_ids"`
+	ID               int64    `json:"id"`
+	MediaType        string   `json:"media_type"`
+	Name             string   `json:"name,omitempty"`
+	OriginCountry    []string `json:"origin_country,omitempty"`
+	OriginalLanguage string   `json:"original_language"`
+	OriginalName     string   `json:"original_name,omitempty"`
+	OriginalTitle    string   `json:"original_title,omitempty"`
+	Overview         string   `json:"overview"`
+	Popularity       float64  `json:"popularity"`
+	PosterPath       string   `json:"poster_path"`
+	ReleaseDate      string   `json:"release_date,omitempty"`
+	Title            string   `json:"title,omitempty"`
+	Video            bool     `json:"video,omitempty"`
+	VoteAverage      float64  `json:"vote_average"`
+	VoteCount        int      `json:"vote_count"`
+}
+
+// ListV4 is the response shape for GET /4/list/{list_id}. Results holds the
+// items of every fetched page.
+type ListV4 struct {
+	AverageRating float64        `json:"average_rating"`
+	BackdropPath  string         `json:"backdrop_path"`
+	Comments      map[string]any `json:"comments"`
+	CreatedBy     ListCreatorV4  `json:"created_by"`
+	Description   string         `json:"description"`
+	ID            int64          `json:"id"`
+	ISO31661      string         `json:"iso_3166_1"`
+	ISO6391       string         `json:"iso_639_1"`
+	ItemCount     int            `json:"item_count"`
+	Name          string         `json:"name"`
+	Page          int            `json:"page"`
+	PosterPath    string         `json:"poster_path"`
+	Public        int            `json:"public"`
+	Results       []ListItemV4   `json:"results"`
+	Revenue       any            `json:"revenue"`
+	Runtime       int            `json:"runtime"`
+	SortBy        any            `json:"sort_by"`
+	TotalPages    int            `json:"total_pages"`
+	TotalResults  int            `json:"total_results"`
+}

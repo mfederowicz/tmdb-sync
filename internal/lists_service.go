@@ -12,6 +12,7 @@ import (
 // ListsService handles communication with the /list endpoints of the TMDB
 // API. Read endpoints (Details, Check Item Status) are public; mutation
 // endpoints (Create, Add/Remove Movie, Clear, Delete) require a v3 session.
+// The V4-suffixed methods use the v4 API and the v4 user access token.
 type ListsService Service
 
 // GetList fetches details for a single list by TMDB list id.
@@ -168,4 +169,47 @@ func (s *ListsService) DeleteList(ctx context.Context, listID string, sessionID 
 	}
 
 	return status, resp, nil
+}
+
+// GetListV4 fetches a v4 list, walking the item pages until TMDB reports no
+// more (total_pages) or pagesLimit is reached (0 = unlimited). The user
+// access token is optional: without it only public lists are readable.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-details
+func (s *ListsService) GetListV4(ctx context.Context, accessToken, listID string, pagesLimit int, opts uri.ListV4Options) (*str.ListV4, error) {
+	var reqOpts []RequestOption
+	if accessToken != "" {
+		reqOpts = append(reqOpts, withUserToken(accessToken))
+	}
+
+	list := new(str.ListV4)
+	_, err := FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.ListItemV4], error) {
+		opts.Page = page
+		urlStr, err := uri.AddQuery(fmt.Sprintf("list/%s", listID), &opts)
+		if err != nil {
+			return PageResult[str.ListItemV4]{}, err
+		}
+
+		req, err := s.client.NewRequestV4(http.MethodGet, urlStr, nil, reqOpts...)
+		if err != nil {
+			return PageResult[str.ListItemV4]{}, err
+		}
+
+		body := new(str.ListV4)
+		if _, err := s.client.Do(ctx, req, body); err != nil {
+			return PageResult[str.ListItemV4]{}, err
+		}
+		results := body.Results
+		if page == 1 {
+			*list = *body
+			list.Results = nil
+		}
+		list.Results = append(list.Results, results...)
+		return PageResult[str.ListItemV4]{Results: results, Page: body.Page, TotalPages: body.TotalPages}, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
 }

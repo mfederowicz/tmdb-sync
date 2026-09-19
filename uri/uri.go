@@ -328,3 +328,10 @@ func encodeParams(values url.Values) string {
 	}
 	return buf.String()
 }
+
+// ListV4Options carries the query parameters of GET /4/list/{list_id}.
+type ListV4Options struct {
+	Page     int    `url:"page,omitempty"`
+	Language string `url:"language,omitempty"`
+	SortBy   string `url:"sort_by,omitempty"`
+}

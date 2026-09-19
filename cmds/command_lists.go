@@ -4,12 +4,15 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"slices"
+	"strings"
 
 	"github.com/mfederowicz/tmdb-sync/cfg"
 	"github.com/mfederowicz/tmdb-sync/cli"
 	"github.com/mfederowicz/tmdb-sync/handlers"
 	"github.com/mfederowicz/tmdb-sync/internal"
 	"github.com/mfederowicz/tmdb-sync/str"
+	"github.com/mfederowicz/tmdb-sync/uri"
 
 	"github.com/spf13/afero"
 )
@@ -22,6 +25,9 @@ var listsSessionActions = map[string]bool{
 	"clear":        true,
 	"delete":       true,
 }
+
+// listsV4Actions are the `lists` actions implemented for -v4.
+var listsV4Actions = []string{"details"}
 
 // ListsCmd is the "lists" module. Read actions (details, item-status) are
 // public; mutation actions (create, add-movie, remove-movie, clear, delete)
@@ -48,11 +54,27 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	name := flagSet.String("name", "", "list name, required for -a create")
 	description := flagSet.String("description", "", "list description, used by -a create")
 	language := flagSet.String("language", "", "list language (ISO 639-1), used by -a create")
+	v3 := flagSet.Bool("v3", false, "use the v3 API (default)")
+	v4 := flagSet.Bool("v4", false, "use the v4 API (optionally with `auth -v4 -a login` for private lists); actions: details")
+	sortBy := flagSet.String("sort-by", "", "v4 only: sort order of the items, for -a details (e.g. original_order.asc, vote_average.desc)")
+	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "v4 only: item pages limit for -a details (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
-	if listsSessionActions[*action] {
+	version, err := resolveAPIVersion(*v3, *v4)
+	if err != nil {
+		return fmt.Errorf("lists: %w", err)
+	}
+	v4Mode := version == apiV4
+	if v4Mode && *action != "" && !slices.Contains(listsV4Actions, *action) {
+		return fmt.Errorf("lists: action %q is not available with -v4 (v4 actions: %s)", *action, strings.Join(listsV4Actions, ", "))
+	}
+	if !v4Mode && *sortBy != "" {
+		return fmt.Errorf("lists: -sort-by needs -v4")
+	}
+
+	if !v4Mode && listsSessionActions[*action] {
 		if err := cli.HandleToken(fs, config, client, options); err != nil {
 			return fmt.Errorf("lists: %w", err)
 		}
@@ -66,6 +88,15 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	case "details":
 		if *listID == "" {
 			return fmt.Errorf("lists: -i <list_id> is required for -a details")
+		}
+		if v4Mode {
+			accessToken := ""
+			if options.AccessTokenV4 != nil {
+				accessToken = options.AccessTokenV4.AccessToken
+			}
+			handler = handlers.ListsDetailsHandler{ListID: *listID, V4: true, AccessToken: accessToken, PagesLimit: *pagesLimit, V4Options: uri.ListV4Options{Language: *language, SortBy: *sortBy}}
+			params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
+			break
 		}
 		handler = handlers.ListsDetailsHandler{ListID: *listID}
 		params = []string{fmt.Sprintf("id-%s", *listID)}

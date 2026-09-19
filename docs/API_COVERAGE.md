@@ -244,7 +244,7 @@ account id).
 - [x] Watchlist TV Shows — `GET /4/account/{account_object_id}/tv/watchlist`
 
 ## v4 — Lists 🔒 for mutation and private lists
-- [ ] Details — `GET /4/list/{list_id}`
+- [x] Details — `GET /4/list/{list_id}`
 - [ ] Create — `POST /4/list`
 - [ ] Update — `PUT /4/list/{list_id}`
 - [ ] Delete — `DELETE /4/list/{list_id}` *(reference documents it as `/4/{list_id}`, likely a
