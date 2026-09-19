@@ -49,8 +49,9 @@ and a cached user access token from `tmdb-sync auth -v4 -a login` (no v3 session
 | `rated-movies` | `tmdb-sync account -v4 -a rated-movies` | `account_rated-movies_v4.json` |
 | `rated-tv` | `tmdb-sync account -v4 -a rated-tv` | `account_rated-tv_v4.json` |
 | `recommended-movies` | `tmdb-sync account -v4 -a recommended-movies` | `account_recommended-movies_v4.json` |
+| `recommended-tv` | `tmdb-sync account -v4 -a recommended-tv` | `account_recommended-tv_v4.json` |
 
-`recommended-movies` exists only in v4; without `-v4` it fails with a hint.
+`recommended-movies` and `recommended-tv` exist only in v4; without `-v4` they fail with a hint.
 
 Note: v4 rated items carry the user's rating as `account_rating` (`{created_at, value}`) instead
 of v3's flat `rating`.

@@ -594,3 +594,31 @@ func TestAccountGetRecommendedMoviesV4(t *testing.T) {
 		t.Errorf("movies = %+v, want Pulp Fiction", movies)
 	}
 }
+
+func TestAccountGetRecommendedTVV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/tv/recommendations", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":        1,
+			"total_pages": 1,
+			"results":     []map[string]any{{"id": 1396, "name": "Breaking Bad"}},
+		})
+	})
+
+	shows, err := client.Account.GetRecommendedTVV4(context.Background(), "usertok", "acc123", 0)
+	if err != nil {
+		t.Fatalf("GetRecommendedTVV4() error = %v", err)
+	}
+	if len(shows) != 1 || shows[0].ID != 1396 {
+		t.Errorf("shows = %+v, want Breaking Bad", shows)
+	}
+}

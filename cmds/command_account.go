@@ -32,10 +32,10 @@ func isSessionInvalid(err error) bool {
 }
 
 // accountV4Actions are the `account` actions implemented for -v4.
-var accountV4Actions = []string{"lists", "favorite-movies", "favorite-tv", "rated-movies", "rated-tv", "recommended-movies"}
+var accountV4Actions = []string{"lists", "favorite-movies", "favorite-tv", "rated-movies", "rated-tv", "recommended-movies", "recommended-tv"}
 
 // accountV4OnlyActions are the `account` actions that exist only in v4.
-var accountV4OnlyActions = []string{"recommended-movies"}
+var accountV4OnlyActions = []string{"recommended-movies", "recommended-tv"}
 
 // AccountCmd is the "account" 🔒 module. Every action requires a v3 session,
 // established on demand via cli.HandleToken.
@@ -62,7 +62,7 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 	watchlist := flagSet.Bool("watchlist", true, "used by -a add-watchlist: true adds, false removes")
 	favorite := flagSet.Bool("favorite", true, "used by -a add-favorite: true adds, false removes")
 	v3 := flagSet.Bool("v3", false, "use the v3 API (default)")
-	v4 := flagSet.Bool("v4", false, "use the v4 API: needs `auth -v4 -a login` first; actions: lists, favorite-movies, favorite-tv, rated-movies, rated-tv, recommended-movies")
+	v4 := flagSet.Bool("v4", false, "use the v4 API: needs `auth -v4 -a login` first; actions: lists, favorite-movies, favorite-tv, rated-movies, rated-tv, recommended-movies, recommended-tv")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit for every list action: favorite-*, lists, rated-*, recommended-*, watchlist-* (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
@@ -165,6 +165,9 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 		params = []string{fmt.Sprintf("id-%d", id)}
 	case "recommended-movies":
 		handler = handlers.AccountRecommendedMoviesHandler{AccessToken: options.AccessTokenV4.AccessToken, AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
+		params = []string{"v4"}
+	case "recommended-tv":
+		handler = handlers.AccountRecommendedTVHandler{AccessToken: options.AccessTokenV4.AccessToken, AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
 		params = []string{"v4"}
 	case "lists":
 		if v4Mode {
