@@ -49,5 +49,5 @@ func execWatchProviders(fs afero.Fs, client *internal.Client, config *cfg.Config
 		return err
 	}
 
-	return writeResult(fs, config, "watch-providers", *action, result)
+	return writeResult(fs, config, "watch-providers", *action, result, setFlagParams(flagSet, "a")...)
 }

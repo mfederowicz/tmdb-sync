@@ -29,6 +29,10 @@ schedule.
 
 ### Fixed
 
+- Output files no longer overwrite each other: `search`, `discover`, `changes` and
+  `watch-providers` now append the flags you set (e.g. `-year`, `-with-genres`, `-start-date`) to the
+  file name, and a query with accents, CJK or punctuation, or an overlong name, gets a short hash
+  suffix. File names for runs without extra flags or special characters are unchanged.
 - `tv-seasons` and `tv-episodes` now require `-s` (and `-e`) instead of silently defaulting to
   season 0 / episode 0, so a forgotten flag no longer returns the Specials season. `-s 0` still
   works.

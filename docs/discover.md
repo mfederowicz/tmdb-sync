@@ -25,3 +25,7 @@ Notes:
 - `d` is the module's `Abbrev` — `tmdb-sync d -a movie ...` also works.
 - More TMDB discover filters exist beyond this set; add them to `uri.DiscoverMovieOptions`/
   `uri.DiscoverTVOptions` and the corresponding command flags as needed.
+
+Output file names: every flag you set (other than `-a` and `-pages-limit`) is appended to the name
+as `<flag>-<value>`, so runs with different filters write different files. With no extra flags the
+name is unchanged. Values with characters outside `a-z 0-9 _ . -` add a short hash suffix.

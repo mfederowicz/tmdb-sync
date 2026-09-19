@@ -84,5 +84,5 @@ func execDiscover(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *s
 		return err
 	}
 
-	return writeResult(fs, config, "discover", *action, result)
+	return writeResult(fs, config, "discover", *action, result, setFlagParams(flagSet, "a", "pages-limit")...)
 }

@@ -10,13 +10,17 @@ Search TMDB for collections, companies, keywords, movies, people, and TV shows.
 | `movies`     | `tmdb-sync search -a movies -query matrix`     | `search_movies_query-matrix.json`     |
 | `multi`      | `tmdb-sync search -a multi -query matrix`      | `search_multi_query-matrix.json`      |
 | `people`     | `tmdb-sync search -a people -query keanu`      | `search_people_query-keanu.json`      |
-| `tv`         | `tmdb-sync search -a tv -query "breaking bad"` | `search_tv_query-breaking bad.json`   |
+| `tv`         | `tmdb-sync search -a tv -query "breaking bad"` | `search_tv_query-breaking-bad.json`   |
 
 Notes:
 - `-query <query>` is required for all actions.
 - `-language`, `-include-adult` apply to `collections`, `movies`, `multi`, `people`, and `tv`.
 - `-region` applies to `collections` and `movies`.
 - `-year`, `-primary-release-year` apply to `movies`; `-year`, `-first-air-date-year` apply to `tv`.
+- Output file names: any other flag you set is appended (`-year 1999` gives
+  `search_movies_query-matrix_year-1999.json`), so runs that differ only by a filter don't
+  overwrite each other. A query with characters outside `a-z 0-9 _ . -` (accents, CJK, punctuation)
+  or an overlong name gets a short hash suffix, e.g. `search_movies_query-Am-lie_1a2b3c4d.json`.
 - Results are paginated; `-pages-limit` caps how many pages are walked (default: `pages_limit`
   from config, `0` = unlimited), same as other list actions.
 - `sr` is the module's `Abbrev` — `tmdb-sync sr -a movies -query matrix` also works.

@@ -50,5 +50,5 @@ func execChanges(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *st
 		return err
 	}
 
-	return writeResult(fs, config, "changes", *action, result)
+	return writeResult(fs, config, "changes", *action, result, setFlagParams(flagSet, "a", "pages-limit")...)
 }

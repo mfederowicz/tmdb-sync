@@ -12,3 +12,7 @@ Notes:
 - `-language` (ISO 639-1) is optional for all three actions.
 - `-watch-region` (ISO 3166-1) is optional and only used by `movie-providers`/`tv-providers`.
 - `wp` is the module's `Abbrev` — `tmdb-sync wp -a available-regions` also works.
+
+Output file names: every flag you set (other than `-a` and `-pages-limit`) is appended to the name
+as `<flag>-<value>`, so runs with different filters write different files. With no extra flags the
+name is unchanged. Values with characters outside `a-z 0-9 _ . -` add a short hash suffix.

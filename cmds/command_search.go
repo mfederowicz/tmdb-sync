@@ -121,6 +121,6 @@ func execSearch(fs afero.Fs, client *internal.Client, config *cfg.Config, _ *str
 		return err
 	}
 
-	params := []string{fmt.Sprintf("query-%s", *query)}
+	params := append([]string{fmt.Sprintf("query-%s", *query)}, setFlagParams(flagSet, "a", "query", "pages-limit")...)
 	return writeResult(fs, config, "search", *action, result, params...)
 }
