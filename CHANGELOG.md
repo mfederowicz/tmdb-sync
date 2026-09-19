@@ -22,6 +22,18 @@ schedule.
 
 ### Fixed
 
+## [0.26.0] - 2026-09-19
+
+### Added
+
+- `auth` module (v4 only, needs `-v4` and `read_access_token`): `-a request-token`,
+  `-a access-token -request-token <token>`, `-a login` (browser approval flow), and `-a logout`.
+  The user access token and v4 `account_id` are cached (mode `0600`) at the new
+  `access_token_path` config key (default `~/.config/tmdb-sync/access_token.json`), never in
+  `output_dir`.
+- v4 client plumbing: `NewRequestV4` targets `https://api.themoviedb.org/4/` with the bearer token
+  only (no `api_key`), and shared `-v3`/`-v4` flag resolution for the upcoming v4 `account`/`lists`.
+
 ## [0.25.0] - 2026-09-19
 
 ### Added
