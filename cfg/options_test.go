@@ -1,6 +1,8 @@
 package cfg
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/mfederowicz/tmdb-sync/consts"
@@ -40,5 +42,60 @@ func TestOptionsFromConfig_NoAccessToken(t *testing.T) {
 	}
 	if options.AccessTokenV4 != nil {
 		t.Errorf("AccessTokenV4 = %+v, want nil", options.AccessTokenV4)
+	}
+}
+
+func TestWriters_CreateParentDirAndPrivateMode(t *testing.T) {
+	writers := map[string]func(fs afero.Fs, path string) error{
+		"session": func(fs afero.Fs, path string) error {
+			return WriteSession(fs, path, &str.Session{SessionID: "s"})
+		},
+		"account": func(fs afero.Fs, path string) error {
+			return WriteAccount(fs, path, &str.Account{ID: 1})
+		},
+		"guest session": func(fs afero.Fs, path string) error {
+			return WriteGuestSession(fs, path, &str.GuestSession{GuestSessionID: "g"})
+		},
+		"access token": func(fs afero.Fs, path string) error {
+			return WriteAccessToken(fs, path, &str.AccessTokenV4{AccessToken: "t"})
+		},
+	}
+
+	for name, write := range writers {
+		t.Run(name, func(t *testing.T) {
+			// A real filesystem: MemMapFs creates parents implicitly and would hide the bug.
+			fs := afero.NewOsFs()
+			path := filepath.Join(t.TempDir(), "missing", "config", "file.json")
+
+			if err := write(fs, path); err != nil {
+				t.Fatalf("write into a missing directory: %v", err)
+			}
+			info, err := fs.Stat(path)
+			if err != nil {
+				t.Fatalf("stat: %v", err)
+			}
+			if info.Mode().Perm() != consts.X600 {
+				t.Errorf("perm = %o, want %o", info.Mode().Perm(), consts.X600)
+			}
+		})
+	}
+}
+
+func TestWriters_TightenExistingFileMode(t *testing.T) {
+	fs := afero.NewOsFs()
+	path := filepath.Join(t.TempDir(), "session.json")
+	if err := os.WriteFile(path, []byte("{}"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := WriteSession(fs, path, &str.Session{SessionID: "s"}); err != nil {
+		t.Fatalf("WriteSession() error = %v", err)
+	}
+	info, err := os.Stat(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if info.Mode().Perm() != consts.X600 {
+		t.Errorf("perm = %o, want %o after rewriting a 0644 file", info.Mode().Perm(), consts.X600)
 	}
 }

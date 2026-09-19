@@ -3,6 +3,7 @@ package cfg
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 
 	"github.com/mfederowicz/tmdb-sync/consts"
 	"github.com/mfederowicz/tmdb-sync/internal"
@@ -50,6 +51,20 @@ func OptionsFromConfig(fs afero.Fs, config *Config) (*str.Options, error) {
 	return options, nil
 }
 
+// writePrivateFile writes data to path readable by the owner only, creating
+// the parent directory if needed (a fresh machine has no config dir yet). The
+// explicit chmod tightens a file left over from earlier versions, since
+// WriteFile applies the mode only when it creates the file.
+func writePrivateFile(fs afero.Fs, path string, data []byte) error {
+	if err := fs.MkdirAll(filepath.Dir(path), consts.X700); err != nil {
+		return err
+	}
+	if err := afero.WriteFile(fs, path, data, consts.X600); err != nil {
+		return err
+	}
+	return fs.Chmod(path, consts.X600)
+}
+
 func readSession(fs afero.Fs, path string) (*str.Session, error) {
 	data, err := afero.ReadFile(fs, path)
 	if err != nil {
@@ -64,14 +79,14 @@ func readSession(fs afero.Fs, path string) (*str.Session, error) {
 	return &session, nil
 }
 
-// WriteSession persists a session to disk at path, using afero for testability
-// but os.WriteFile-equivalent permissions.
+// WriteSession persists a session to disk at path, readable by the owner only
+// since the session id authorises actions on the user's account.
 func WriteSession(fs afero.Fs, path string, session *str.Session) error {
 	data, err := json.Marshal(session)
 	if err != nil {
 		return err
 	}
-	return afero.WriteFile(fs, path, data, consts.X644)
+	return writePrivateFile(fs, path, data)
 }
 
 func readAccount(fs afero.Fs, path string) (*str.Account, error) {
@@ -96,7 +111,7 @@ func WriteAccount(fs afero.Fs, path string, account *str.Account) error {
 	if err != nil {
 		return err
 	}
-	return afero.WriteFile(fs, path, data, consts.X644)
+	return writePrivateFile(fs, path, data)
 }
 
 func readGuestSession(fs afero.Fs, path string) (*str.GuestSession, error) {
@@ -121,7 +136,7 @@ func WriteGuestSession(fs afero.Fs, path string, guestSession *str.GuestSession)
 	if err != nil {
 		return err
 	}
-	return afero.WriteFile(fs, path, data, consts.X644)
+	return writePrivateFile(fs, path, data)
 }
 
 func readAccessToken(fs afero.Fs, path string) (*str.AccessTokenV4, error) {
@@ -145,5 +160,5 @@ func WriteAccessToken(fs afero.Fs, path string, accessToken *str.AccessTokenV4) 
 	if err != nil {
 		return err
 	}
-	return afero.WriteFile(fs, path, data, consts.X600)
+	return writePrivateFile(fs, path, data)
 }
