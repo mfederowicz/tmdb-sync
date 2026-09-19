@@ -45,3 +45,4 @@ and a cached user access token from `tmdb-sync auth -v4 -a login` (no v3 session
 |---------|-------------------------------------|------------------------|
 | `lists` | `tmdb-sync account -v4 -a lists`    | `account_lists_v4.json` |
 | `favorite-movies` | `tmdb-sync account -v4 -a favorite-movies` | `account_favorite-movies_v4.json` |
+| `favorite-tv` | `tmdb-sync account -v4 -a favorite-tv` | `account_favorite-tv_v4.json` |

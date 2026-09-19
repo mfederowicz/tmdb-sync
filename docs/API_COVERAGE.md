@@ -235,7 +235,7 @@ Path parameter is the v4 `account_object_id` returned by Create Access Token (no
 account id).
 - [x] Lists — `GET /4/account/{account_object_id}/lists`
 - [x] Favorite Movies — `GET /4/account/{account_object_id}/movie/favorites`
-- [ ] Favorite TV Shows — `GET /4/account/{account_object_id}/tv/favorites`
+- [x] Favorite TV Shows — `GET /4/account/{account_object_id}/tv/favorites`
 - [ ] Rated Movies — `GET /4/account/{account_object_id}/movie/rated`
 - [ ] Rated TV Shows — `GET /4/account/{account_object_id}/tv/rated`
 - [ ] Recommended Movies — `GET /4/account/{account_object_id}/movie/recommendations`
