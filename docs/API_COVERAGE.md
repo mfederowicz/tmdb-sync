@@ -27,20 +27,19 @@ after the session-auth plumbing from phase 2 exists but before any account comma
 
 ## Authentication
 Used internally by the session flow (`internal/auth_service.go`, `cli/session.go`), not exposed as
-a CLI action, except `CreateGuestSession` (see below). `CreateRequestToken`/`CreateSession` back
+a CLI action, except `CreateGuestSession` and `DeleteSession` (see below). `CreateRequestToken`/`CreateSession` back
 the `account` module's login flow (`cli.HandleToken`); `ValidateKey` backs a startup credentials
 preflight (`main.go`), and a 401 from any `account` call now transparently re-triggers login via
 `cli.CreateSessionInteractively` (`cmds/command_account.go`'s `execAccountAttempt`).
 `CreateGuestSession` is wired in as `guest-sessions -a create`, giving a caller a
 `guest_session_id` for the `guest-sessions` module's `rated-*` actions without a full account
-login. `DeleteSession` is implemented and unit-tested but **not usable/wired-in yet** — marked
-unchecked deliberately (not an oversight): TMDB has no equivalent delete for guest sessions (they
-just expire after 60 min idle), and there's no planned explicit account-logout feature either, so
-no organic caller has been identified. Revisit if that changes.
+login. `DeleteSession` is wired in as `auth -a logout` (v3), which also removes the cached session
+and account files. TMDB has no equivalent delete for guest sessions (they just expire after 60 min
+idle).
 - [x] Create Guest Session — `GET /authentication/guest_session/new`
 - [x] Create Request Token — `GET /authentication/token/new`
 - [x] Create Session — `POST /authentication/session/new`
-- [ ] Delete Session (logout) — `DELETE /authentication/session`
+- [x] Delete Session (logout) — `DELETE /authentication/session`
 - [x] Validate Key — `GET /authentication`
 
 ## Certifications
