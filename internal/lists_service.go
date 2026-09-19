@@ -299,3 +299,20 @@ func (s *ListsService) UpdateItemsV4(ctx context.Context, accessToken, listID st
 
 	return result, nil
 }
+
+// RemoveItemsV4 removes movies and TV shows from a list in one request.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-remove-items
+func (s *ListsService) RemoveItemsV4(ctx context.Context, accessToken, listID string, items []str.ListMediaV4) (*str.ListItemsResponseV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodDelete, fmt.Sprintf("list/%s/items", listID), &str.ListItemsRequestV4{Items: items}, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	result := new(str.ListItemsResponseV4)
+	if _, err := s.client.Do(ctx, req, result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
