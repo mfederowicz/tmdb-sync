@@ -18,4 +18,7 @@ Notes:
   session.
 - `-language`, `-sort-by` (`created_at.asc`/`created_at.desc`), and `-pages-limit` are optional for
   the three `rated-*` actions.
+- To populate a guest session's ratings, rate with `movies|tv|tv-episodes -a add-rating ... -guest`
+  (rates as the cached guest session even when an account session exists); the `rated-*` actions
+  return 404 for a session that is expired or unknown.
 - `gs` is the module's `Abbrev` — `tmdb-sync gs -a create` also works.

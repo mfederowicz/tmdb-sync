@@ -50,12 +50,16 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a credits, images, videos")
 	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
 	value := flagSet.Float64("value", 0, "rating value (0.5-10.0, in 0.5 increments), required for -a add-rating")
-	guestSessionID := flagSet.String("guest-session-id", "", "guest session id (alternative to account session, used by -a add-rating): omit to use the one cached by `guest-sessions -a create`, if no account session is set up")
+	guestSessionID := flagSet.String("guest-session-id", "", "guest session id (alternative to account session, used by -a add-rating): omit to use the one cached by `guest-sessions -a create`, if no account session is set up (or pass -guest)")
+	guest := flagSet.Bool("guest", false, "rate as the guest session cached by `guest-sessions -a create`, ignoring the account session (used by -a add-rating)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
-	ratingGuestSessionID := resolveRatingGuestSessionID(*action, *guestSessionID, options)
+	ratingGuestSessionID, err := resolveRatingGuestSessionID(*action, *guestSessionID, *guest, options)
+	if err != nil {
+		return fmt.Errorf("tv-episodes: %w", err)
+	}
 	usingGuestSession := ratingGuestSessionID != ""
 
 	if tvEpisodesSessionActions[*action] && !usingGuestSession {

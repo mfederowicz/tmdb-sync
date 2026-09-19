@@ -41,6 +41,9 @@ Notes:
   `reviews`, `similar`, `videos` (TMDB doesn't accept it on the other paginated/latest actions).
 - `-include-image-language` applies only to `images`.
 - `-value <rating>` (0.5-10.0, in 0.5 increments) is required for `add-rating`.
+- `-guest` (with `add-rating`) rates as the guest session cached by `guest-sessions -a create`,
+  ignoring any account session; it errors if no guest session is cached. `-guest-session-id <id>`
+  picks a specific guest session instead.
 - `account-states`, `add-rating`, and `delete-rating` are 🔒 — they establish a v3 session on
   demand the same way the `movies` module does, including transparent re-login on a stale session.
 - `tv` has no `Abbrev` shorter than its own name.

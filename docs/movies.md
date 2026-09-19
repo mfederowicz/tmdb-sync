@@ -39,6 +39,9 @@ Notes:
 - `-country` applies only to `alternative-titles`.
 - `-include-image-language` applies only to `images`.
 - `-value <rating>` (0.5-10.0, in 0.5 increments) is required for `add-rating`.
+- `-guest` (with `add-rating`) rates as the guest session cached by `guest-sessions -a create`,
+  ignoring any account session; it errors if no guest session is cached. `-guest-session-id <id>`
+  picks a specific guest session instead.
 - `account-states`, `add-rating`, and `delete-rating` are 🔒 — they establish a v3 session on
   demand the same way the `account` module does, including transparent re-login on a stale
   session. `add-rating`/`delete-rating` use the existing v3-session plumbing directly; they don't

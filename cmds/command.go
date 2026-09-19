@@ -2,6 +2,8 @@
 package cmds
 
 import (
+	"errors"
+
 	"github.com/mfederowicz/tmdb-sync/cfg"
 	"github.com/mfederowicz/tmdb-sync/internal"
 	"github.com/mfederowicz/tmdb-sync/str"
@@ -18,23 +20,30 @@ type Command struct {
 }
 
 // resolveRatingGuestSessionID resolves the guest session id to use for an
-// add-rating action: an explicit -guest-session-id flag wins; otherwise, if
-// no account session is set up, it falls back to the guest session cached by
-// `guest-sessions -a create`. Returns "" for any other action, or when an
+// add-rating action: an explicit -guest-session-id flag wins; then -guest
+// selects the guest session cached by `guest-sessions -a create` (an error if
+// none is cached); otherwise, if no account session is set up, it falls back
+// to the cached guest session. Returns "" for any other action, or when an
 // account session is available (movie/tv/tv-episode add-rating then rates on
 // behalf of the account session as before).
-func resolveRatingGuestSessionID(action, guestSessionIDFlag string, options *str.Options) string {
+func resolveRatingGuestSessionID(action, guestSessionIDFlag string, guest bool, options *str.Options) (string, error) {
 	if action != "add-rating" {
-		return ""
+		return "", nil
 	}
 	if guestSessionIDFlag != "" {
-		return guestSessionIDFlag
+		return guestSessionIDFlag, nil
+	}
+	if guest {
+		if options.GuestSession == nil || options.GuestSession.GuestSessionID == "" {
+			return "", errors.New("no cached guest session, run guest-sessions -a create (or pass -guest-session-id)")
+		}
+		return options.GuestSession.GuestSessionID, nil
 	}
 	if options.Session != nil && options.Session.SessionID != "" {
-		return ""
+		return "", nil
 	}
 	if options.GuestSession != nil {
-		return options.GuestSession.GuestSessionID
+		return options.GuestSession.GuestSessionID, nil
 	}
-	return ""
+	return "", nil
 }

@@ -58,12 +58,16 @@ func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config,
 	country := flagSet.String("country", "", "ISO 3166-1 country code, used by -a alternative-titles")
 	language := flagSet.String("language", "", "ISO 639-1 language code, used by -a credits, images, videos")
 	includeImageLanguage := flagSet.String("include-image-language", "", "comma-separated language codes, used by -a images")
-	guestSessionID := flagSet.String("guest-session-id", "", "guest session id (alternative to account session, used by -a add-rating): omit to use the one cached by `guest-sessions -a create`, if no account session is set up")
+	guestSessionID := flagSet.String("guest-session-id", "", "guest session id (alternative to account session, used by -a add-rating): omit to use the one cached by `guest-sessions -a create`, if no account session is set up (or pass -guest)")
+	guest := flagSet.Bool("guest", false, "rate as the guest session cached by `guest-sessions -a create`, ignoring the account session (used by -a add-rating)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
-	ratingGuestSessionID := resolveRatingGuestSessionID(*action, *guestSessionID, options)
+	ratingGuestSessionID, err := resolveRatingGuestSessionID(*action, *guestSessionID, *guest, options)
+	if err != nil {
+		return fmt.Errorf("movies: %w", err)
+	}
 	usingGuestSession := ratingGuestSessionID != ""
 
 	if moviesSessionActions[*action] && !usingGuestSession {
