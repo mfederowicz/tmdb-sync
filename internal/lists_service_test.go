@@ -335,3 +335,40 @@ func TestListsDeleteListV4(t *testing.T) {
 		t.Errorf("DeleteListV4() = %+v", status)
 	}
 }
+
+func TestListsAddItemsV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8/items", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		var body str.ListItemsRequestV4
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if len(body.Items) != 2 || body.Items[0] != (str.ListMediaV4{MediaType: "movie", MediaID: 100}) || body.Items[1] != (str.ListMediaV4{MediaType: "tv", MediaID: 200}) {
+			t.Errorf("items = %+v", body.Items)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success": true, "status_code": 1,
+			"results": []any{
+				map[string]any{"media_id": 100, "media_type": "movie", "success": true},
+				map[string]any{"media_id": 200, "media_type": "tv", "success": true},
+			},
+		})
+	})
+
+	result, err := client.Lists.AddItemsV4(context.Background(), "usertok", "8", []str.ListMediaV4{{MediaType: "movie", MediaID: 100}, {MediaType: "tv", MediaID: 200}})
+	if err != nil {
+		t.Fatalf("AddItemsV4() error = %v", err)
+	}
+	if !result.Success || len(result.Results) != 2 || !result.Results[1].Success {
+		t.Errorf("AddItemsV4() = %+v", result)
+	}
+}

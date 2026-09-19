@@ -130,3 +130,30 @@ type ListStatusV4 struct {
 	StatusMessage string `json:"status_message"`
 	Success       bool   `json:"success"`
 }
+
+// ListMediaV4 is a media entry sent to the v4 items endpoints.
+type ListMediaV4 struct {
+	MediaType string `json:"media_type"`
+	MediaID   int64  `json:"media_id"`
+}
+
+// ListItemsRequestV4 is the body of POST /4/list/{list_id}/items.
+type ListItemsRequestV4 struct {
+	Items []ListMediaV4 `json:"items"`
+}
+
+// ListItemResultV4 is the per-item outcome reported by the v4 items endpoints.
+type ListItemResultV4 struct {
+	MediaID   int64  `json:"media_id"`
+	MediaType string `json:"media_type"`
+	Success   bool   `json:"success"`
+	Error     any    `json:"error,omitempty"`
+}
+
+// ListItemsResponseV4 is the response of the v4 items endpoints.
+type ListItemsResponseV4 struct {
+	Results       []ListItemResultV4 `json:"results"`
+	StatusCode    int                `json:"status_code"`
+	StatusMessage string             `json:"status_message"`
+	Success       bool               `json:"success"`
+}

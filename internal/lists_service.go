@@ -265,3 +265,20 @@ func (s *ListsService) DeleteListV4(ctx context.Context, accessToken, listID str
 
 	return status, nil
 }
+
+// AddItemsV4 adds movies and TV shows to a list in one request.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-add-items
+func (s *ListsService) AddItemsV4(ctx context.Context, accessToken, listID string, items []str.ListMediaV4) (*str.ListItemsResponseV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodPost, fmt.Sprintf("list/%s/items", listID), &str.ListItemsRequestV4{Items: items}, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	result := new(str.ListItemsResponseV4)
+	if _, err := s.client.Do(ctx, req, result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
