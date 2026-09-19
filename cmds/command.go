@@ -3,6 +3,11 @@ package cmds
 
 import (
 	"errors"
+	"flag"
+	"fmt"
+	"math"
+	"slices"
+	"strings"
 
 	"github.com/mfederowicz/tmdb-sync/cfg"
 	"github.com/mfederowicz/tmdb-sync/internal"
@@ -46,4 +51,38 @@ func resolveRatingGuestSessionID(action, guestSessionIDFlag string, guest bool, 
 		return options.GuestSession.GuestSessionID, nil
 	}
 	return "", nil
+}
+
+// validateRatingValue checks -value for add-rating up front (before any login):
+// TMDB accepts only 0.5 to 10.0 in 0.5 steps. Other actions are ignored.
+func validateRatingValue(module, action string, value float64) error {
+	if action != "add-rating" {
+		return nil
+	}
+	if value == 0 {
+		return fmt.Errorf("%s: -value <rating> is required for -a add-rating", module)
+	}
+	if value < 0.5 || value > 10 || math.Mod(value*2, 1) != 0 {
+		return fmt.Errorf("%s: -value must be between 0.5 and 10.0 in 0.5 steps, got %v", module, value)
+	}
+	return nil
+}
+
+// requireSeasonEpisodeFlags errors when a known action runs without an explicit
+// -s (and -e, if withEpisode). Season and episode 0 are valid (specials), so a
+// zero default can't tell "omitted" from "asked for specials"; the flag set can.
+// Unknown actions are left for the caller's own unknown-action error.
+func requireSeasonEpisodeFlags(flagSet *flag.FlagSet, module, action, actionsHelp string, withEpisode bool) error {
+	if !slices.Contains(strings.Split(actionsHelp, ", "), action) {
+		return nil
+	}
+	set := map[string]bool{}
+	flagSet.Visit(func(f *flag.Flag) { set[f.Name] = true })
+	if !set["s"] {
+		return fmt.Errorf("%s: -s <season_number> is required for -a %s (0 = specials)", module, action)
+	}
+	if withEpisode && !set["e"] {
+		return fmt.Errorf("%s: -e <episode_number> is required for -a %s", module, action)
+	}
+	return nil
 }
