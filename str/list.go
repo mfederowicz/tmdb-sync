@@ -74,30 +74,29 @@ type ListItemV4 struct {
 }
 
 // ListV4 is the response shape for GET /4/list/{list_id}. Results holds the
-// items of every fetched page. TMDB's reference types public as boolean,
-// revenue as integer and sort_by as string, but its v4 account lists send
-// integers and strings for the same fields, so those three stay untyped.
+// items of every fetched page. Comments maps "<media_type>:<id>" to the
+// item's comment, null when it has none.
 type ListV4 struct {
-	AverageRating float64        `json:"average_rating"`
-	BackdropPath  string         `json:"backdrop_path"`
-	Comments      map[string]any `json:"comments"`
-	CreatedBy     ListCreatorV4  `json:"created_by"`
-	Description   string         `json:"description"`
-	ID            int64          `json:"id"`
-	ISO31661      string         `json:"iso_3166_1"`
-	ISO6391       string         `json:"iso_639_1"`
-	ItemCount     int            `json:"item_count"`
-	Name          string         `json:"name"`
-	ObjectIDs     map[string]any `json:"object_ids"`
-	Page          int            `json:"page"`
-	PosterPath    string         `json:"poster_path"`
-	Public        any            `json:"public"`
-	Results       []ListItemV4   `json:"results"`
-	Revenue       any            `json:"revenue"`
-	Runtime       int            `json:"runtime"`
-	SortBy        any            `json:"sort_by"`
-	TotalPages    int            `json:"total_pages"`
-	TotalResults  int            `json:"total_results"`
+	AverageRating float64            `json:"average_rating"`
+	BackdropPath  string             `json:"backdrop_path"`
+	Comments      map[string]*string `json:"comments"`
+	CreatedBy     ListCreatorV4      `json:"created_by"`
+	Description   string             `json:"description"`
+	ID            int64              `json:"id"`
+	ISO31661      string             `json:"iso_3166_1"`
+	ISO6391       string             `json:"iso_639_1"`
+	ItemCount     int                `json:"item_count"`
+	Name          string             `json:"name"`
+	ObjectIDs     map[string]any     `json:"object_ids"`
+	Page          int                `json:"page"`
+	PosterPath    string             `json:"poster_path"`
+	Public        bool               `json:"public"`
+	Results       []ListItemV4       `json:"results"`
+	Revenue       int64              `json:"revenue"`
+	Runtime       int                `json:"runtime"`
+	SortBy        string             `json:"sort_by"`
+	TotalPages    int                `json:"total_pages"`
+	TotalResults  int                `json:"total_results"`
 }
 
 // ListCreateRequestV4 is the body of POST /4/list.

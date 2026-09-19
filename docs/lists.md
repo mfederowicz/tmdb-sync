@@ -44,8 +44,8 @@ Notes:
   (ISO 3166-1) are required, `-description` and `-public` (default private) are optional.
 - `-v4 -a update` needs `auth -v4 -a login` and at least one of `-name`, `-description`, `-public`
   (`-public=false` makes it private), `-sort-by`, `-backdrop-path`; only the flags you pass are sent.
-- `-v4 -a delete` needs `auth -v4 -a login`. It calls `DELETE /4/list/{list_id}`; TMDB's reference
-  documents the path as `/4/{list_id}`, which looks like a typo (to be confirmed against the live API).
+- `-v4 -a delete` needs `auth -v4 -a login`. It calls `DELETE /4/list/{list_id}` (TMDB's reference
+  prints the path as `/4/{list_id}`, which is a typo, confirmed against the live API).
 - `-v4 -a add-items` needs `auth -v4 -a login` and one or more `-item movie:<id>` / `-item tv:<id>`;
   the output has TMDB's per-item `results`.
 - `-v4 -a update-items` sets the comment of items already on the list: `-item movie:<id>:<comment>`
@@ -55,5 +55,4 @@ Notes:
 - `-v4 -a item-status` takes `-media-type movie|tv` and `-media-id`, and needs `auth -v4 -a login`
   (TMDB's reference says the caller must own the list).
 - `-v4 -a clear` needs `auth -v4 -a login`. It sends `GET /4/list/{list_id}/clear` as TMDB's reference
-  documents it (a destructive GET; to be confirmed against the live API) and removes every item; the
-  output includes `items_deleted`.
+  documents it (a destructive GET) and removes every item; the output includes `items_deleted`.
