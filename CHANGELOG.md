@@ -18,6 +18,14 @@ schedule.
 
 ### Added
 
+- `account -v4` (needs `-v4`, `read_access_token` and a cached user token from `auth -v4 -a login`;
+  no v3 session and no `-i`): `-a lists`, `favorite-movies`, `favorite-tv`, `rated-movies`,
+  `rated-tv`, `watchlist-movies`, `watchlist-tv`, and the v4-only `recommended-movies` and
+  `recommended-tv`. Results are written as `account_<action>_v4.json`.
+- `account -v4` accepts `-language <code>` (favorites, rated, recommended, watchlist) and
+  `-sort-by created_at.asc|created_at.desc` (favorites, rated, watchlist); using one where the
+  endpoint doesn't take it, or without `-v4`, is an error.
+
 ### Changed
 
 ### Fixed

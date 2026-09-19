@@ -39,6 +39,14 @@ type AccountListOptions struct {
 	Page      int    `url:"page,omitempty"`
 }
 
+// AccountV4Options carries the query parameters of the v4 account list
+// endpoints; which of Language/SortBy an endpoint accepts varies.
+type AccountV4Options struct {
+	Page     int    `url:"page,omitempty"`
+	Language string `url:"language,omitempty"`
+	SortBy   string `url:"sort_by,omitempty"`
+}
+
 // RatingOptions carries the session_id or guest_session_id query parameter
 // accepted by movie/tv/tv-episode add-rating (🔒) endpoints, which take
 // either an account session or a guest session.

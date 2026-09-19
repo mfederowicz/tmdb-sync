@@ -7,6 +7,8 @@ aiming for full TMDB v3 API coverage, one module at a time.
 
 🚧 **In progress**, one module at a time. Implemented so far:
 
+- [`account`](docs/account.md) ✅ — 🔒 details, favorites, watchlist, lists, rated (v3 session or `-v4`),
+  plus v4 recommendations.
 - [`auth`](docs/auth.md) ✅ — v4 login: request token, access token, logout.
 - [`certifications`](docs/certifications.md) ✅ — movie/tv certifications, by country.
 - [`changes`](docs/changes.md) ✅ — movie/tv/person change lists.

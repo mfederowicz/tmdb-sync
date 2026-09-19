@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/mfederowicz/tmdb-sync/str"
+	"github.com/mfederowicz/tmdb-sync/uri"
 )
 
 func TestGetAccountDetails(t *testing.T) {
@@ -374,5 +375,336 @@ func TestGetWatchlistTV(t *testing.T) {
 	}
 	if len(shows) != 1 || shows[0].ID != 1396 {
 		t.Errorf("GetWatchlistTV() = %+v, want one show with ID=1396", shows)
+	}
+}
+
+func TestAccountGetListsV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/lists", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		page := r.URL.Query().Get("page")
+		id := 1
+		if page == "2" {
+			id = 2
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          id,
+			"total_pages":   2,
+			"total_results": 2,
+			"results": []map[string]any{
+				{
+					"id": id, "name": "list", "public": 1, "number_of_items": 3, "created_at": "2024-01-01 00:00:00 UTC",
+					"account_object_id": "acc123", "adult": 0, "featured": 1, "sort_by": 2, "revenue": "1000000",
+				},
+			},
+		})
+	})
+
+	lists, err := client.Account.GetListsV4(context.Background(), "usertok", "acc123", 0)
+	if err != nil {
+		t.Fatalf("GetListsV4() error = %v", err)
+	}
+	if len(lists) != 2 || lists[0].ID != 1 || lists[1].ID != 2 || lists[0].NumberOfItems != 3 || lists[0].Public != 1 ||
+		lists[0].SortBy != 2 || lists[0].Revenue != "1000000" || lists[0].Featured != 1 || lists[0].AccountObjectID != "acc123" {
+		t.Errorf("lists = %+v, want two pages of results", lists)
+	}
+}
+
+func TestAccountGetListsV4_PagesLimit(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	calls := 0
+	mux.HandleFunc("/account/acc123/lists", func(w http.ResponseWriter, _ *http.Request) {
+		calls++
+		json.NewEncoder(w).Encode(map[string]any{"page": calls, "total_pages": 5, "results": []map[string]any{{"id": calls}}})
+	})
+
+	lists, err := client.Account.GetListsV4(context.Background(), "usertok", "acc123", 1)
+	if err != nil {
+		t.Fatalf("GetListsV4() error = %v", err)
+	}
+	if calls != 1 || len(lists) != 1 {
+		t.Errorf("calls = %d, lists = %d, want 1 and 1", calls, len(lists))
+	}
+}
+
+func TestAccountGetListsV4_NeedsReadToken(t *testing.T) {
+	client, _, teardown := setupV4()
+	defer teardown()
+
+	if _, err := client.Account.GetListsV4(context.Background(), "usertok", "acc123", 1); err == nil {
+		t.Error("GetListsV4() error = nil, want error without read_access_token")
+	}
+}
+
+func TestAccountGetFavoriteMoviesV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/movie/favorites", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		page := 1
+		if r.URL.Query().Get("page") == "2" {
+			page = 2
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":        page,
+			"total_pages": 2,
+			"results": []map[string]any{{
+				"id": 550 + page, "title": "Fight Club", "genre_ids": []int{18, 53}, "poster_path": "/p.jpg", "backdrop_path": "/b.jpg",
+			}},
+		})
+	})
+
+	movies, err := client.Account.GetFavoriteMoviesV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
+	if err != nil {
+		t.Fatalf("GetFavoriteMoviesV4() error = %v", err)
+	}
+	if len(movies) != 2 || movies[0].ID != 551 || movies[1].ID != 552 ||
+		len(movies[0].GenreIDs) != 2 || movies[0].PosterPath != "/p.jpg" || movies[0].BackdropPath != "/b.jpg" {
+		t.Errorf("movies = %+v, want two pages of results", movies)
+	}
+}
+
+func TestAccountGetFavoriteTVV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/tv/favorites", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":        1,
+			"total_pages": 1,
+			"results": []map[string]any{{
+				"id": 1399, "name": "Game of Thrones", "genre_ids": []int{10765}, "origin_country": []string{"US"}, "poster_path": "/p.jpg",
+			}},
+		})
+	})
+
+	shows, err := client.Account.GetFavoriteTVV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
+	if err != nil {
+		t.Fatalf("GetFavoriteTVV4() error = %v", err)
+	}
+	if len(shows) != 1 || shows[0].ID != 1399 || len(shows[0].GenreIDs) != 1 ||
+		len(shows[0].OriginCountry) != 1 || shows[0].OriginCountry[0] != "US" || shows[0].PosterPath != "/p.jpg" {
+		t.Errorf("shows = %+v, want Game of Thrones", shows)
+	}
+}
+
+func TestAccountGetRatedMoviesV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/movie/rated", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":        1,
+			"total_pages": 1,
+			"results": []map[string]any{{
+				"id": 550, "title": "Fight Club",
+				"account_rating": map[string]any{"created_at": "2024-01-01 00:00:00 UTC", "value": 9},
+			}},
+		})
+	})
+
+	movies, err := client.Account.GetRatedMoviesV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
+	if err != nil {
+		t.Fatalf("GetRatedMoviesV4() error = %v", err)
+	}
+	if len(movies) != 1 || movies[0].ID != 550 || movies[0].AccountRating == nil || movies[0].AccountRating.Value != 9 {
+		t.Errorf("movies = %+v, want Fight Club rated 9", movies)
+	}
+}
+
+func TestAccountGetRatedTVV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/tv/rated", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":        1,
+			"total_pages": 1,
+			"results": []map[string]any{{
+				"id": 1399, "name": "Game of Thrones",
+				"account_rating": map[string]any{"created_at": "2024-01-01 00:00:00 UTC", "value": 10},
+			}},
+		})
+	})
+
+	shows, err := client.Account.GetRatedTVV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
+	if err != nil {
+		t.Fatalf("GetRatedTVV4() error = %v", err)
+	}
+	if len(shows) != 1 || shows[0].ID != 1399 || shows[0].AccountRating == nil || shows[0].AccountRating.Value != 10 {
+		t.Errorf("shows = %+v, want Game of Thrones rated 10", shows)
+	}
+}
+
+func TestAccountGetRecommendedMoviesV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/movie/recommendations", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":        1,
+			"total_pages": 1,
+			"results":     []map[string]any{{"id": 680, "title": "Pulp Fiction", "media_type": "movie"}},
+		})
+	})
+
+	movies, err := client.Account.GetRecommendedMoviesV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
+	if err != nil {
+		t.Fatalf("GetRecommendedMoviesV4() error = %v", err)
+	}
+	if len(movies) != 1 || movies[0].ID != 680 || movies[0].MediaType != "movie" {
+		t.Errorf("movies = %+v, want Pulp Fiction", movies)
+	}
+}
+
+func TestAccountGetRecommendedTVV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/tv/recommendations", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":        1,
+			"total_pages": 1,
+			"results":     []map[string]any{{"id": 1396, "name": "Breaking Bad"}},
+		})
+	})
+
+	shows, err := client.Account.GetRecommendedTVV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
+	if err != nil {
+		t.Fatalf("GetRecommendedTVV4() error = %v", err)
+	}
+	if len(shows) != 1 || shows[0].ID != 1396 {
+		t.Errorf("shows = %+v, want Breaking Bad", shows)
+	}
+}
+
+func TestAccountGetWatchlistMoviesV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/movie/watchlist", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":        1,
+			"total_pages": 1,
+			"results":     []map[string]any{{"id": 603, "title": "The Matrix"}},
+		})
+	})
+
+	movies, err := client.Account.GetWatchlistMoviesV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
+	if err != nil {
+		t.Fatalf("GetWatchlistMoviesV4() error = %v", err)
+	}
+	if len(movies) != 1 || movies[0].ID != 603 {
+		t.Errorf("movies = %+v, want The Matrix", movies)
+	}
+}
+
+func TestAccountGetWatchlistTVV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/tv/watchlist", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":        1,
+			"total_pages": 1,
+			"results":     []map[string]any{{"id": 1668, "name": "Friends", "media_type": "tv"}},
+		})
+	})
+
+	shows, err := client.Account.GetWatchlistTVV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
+	if err != nil {
+		t.Fatalf("GetWatchlistTVV4() error = %v", err)
+	}
+	if len(shows) != 1 || shows[0].ID != 1668 || shows[0].MediaType != "tv" {
+		t.Errorf("shows = %+v, want Friends", shows)
+	}
+}
+
+func TestAccountGetFavoriteMoviesV4_QueryOptions(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/account/acc123/movie/favorites", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		if q.Get("language") != "pl-PL" || q.Get("sort_by") != "created_at.desc" || q.Get("page") != "1" {
+			t.Errorf("query = %q, want language, sort_by and page", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"page": 1, "total_pages": 1, "results": []map[string]any{{"id": 1}}})
+	})
+
+	_, err := client.Account.GetFavoriteMoviesV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{Language: "pl-PL", SortBy: "created_at.desc"})
+	if err != nil {
+		t.Fatalf("GetFavoriteMoviesV4() error = %v", err)
 	}
 }

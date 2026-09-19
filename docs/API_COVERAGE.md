@@ -233,15 +233,15 @@ rather than replacing it. Bearer token only — never `api_key`; account/list ca
 ## v4 — Account 🔒
 Path parameter is the v4 `account_object_id` returned by Create Access Token (not the v3 numeric
 account id).
-- [ ] Lists — `GET /4/account/{account_object_id}/lists`
-- [ ] Favorite Movies — `GET /4/account/{account_object_id}/movie/favorites`
-- [ ] Favorite TV Shows — `GET /4/account/{account_object_id}/tv/favorites`
-- [ ] Rated Movies — `GET /4/account/{account_object_id}/movie/rated`
-- [ ] Rated TV Shows — `GET /4/account/{account_object_id}/tv/rated`
-- [ ] Recommended Movies — `GET /4/account/{account_object_id}/movie/recommendations`
-- [ ] Recommended TV Shows — `GET /4/account/{account_object_id}/tv/recommendations`
-- [ ] Watchlist Movies — `GET /4/account/{account_object_id}/movie/watchlist`
-- [ ] Watchlist TV Shows — `GET /4/account/{account_object_id}/tv/watchlist`
+- [x] Lists — `GET /4/account/{account_object_id}/lists`
+- [x] Favorite Movies — `GET /4/account/{account_object_id}/movie/favorites`
+- [x] Favorite TV Shows — `GET /4/account/{account_object_id}/tv/favorites`
+- [x] Rated Movies — `GET /4/account/{account_object_id}/movie/rated`
+- [x] Rated TV Shows — `GET /4/account/{account_object_id}/tv/rated`
+- [x] Recommended Movies — `GET /4/account/{account_object_id}/movie/recommendations`
+- [x] Recommended TV Shows — `GET /4/account/{account_object_id}/tv/recommendations`
+- [x] Watchlist Movies — `GET /4/account/{account_object_id}/movie/watchlist`
+- [x] Watchlist TV Shows — `GET /4/account/{account_object_id}/tv/watchlist`
 
 ## v4 — Lists 🔒 for mutation and private lists
 - [ ] Details — `GET /4/list/{list_id}`

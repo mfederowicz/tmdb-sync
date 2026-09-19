@@ -34,7 +34,7 @@ pages_limit = 10       # cap on pages walked by -all; 0 = unlimited (bounded by 
 - `-c <path>` — path to the config file (default `~/tmdb-sync.toml`)
 - `-v` — verbose output
 - `-version` — print version and exit
-- `-v3` / `-v4` — *(v4 phase; implemented for `auth`, planned for `account`/`lists`)* API version for modules that exist in both (`account`,
+- `-v3` / `-v4` — *(v4 phase; implemented for `auth` and `account`, planned for `lists`)* API version for modules that exist in both (`account`,
   `lists`, plus `auth` for v4 login); v3 is the default, both together is an error. See
   [v3 vs v4](#v3-vs-v4-planned).
 

@@ -33,3 +33,33 @@ Notes:
 - If TMDB reports the cached session as no longer valid (HTTP 401 — e.g. it expired or was
   revoked from the TMDB website), the action transparently re-runs the browser-approval login
   flow and retries once, instead of failing outright.
+
+## v4 (`-v4`)
+
+`account -v4 -a <action>` uses the TMDB v4 API instead. It needs `read_access_token` in the config
+and a cached user access token from `tmdb-sync auth -v4 -a login` (no v3 session, no `-i`: the v4
+`account_object_id` is read from the cached token file). Output files carry a `_v4` suffix and
+`-pages-limit` works as in v3. Combining `-v3` and `-v4` is an error.
+
+| action  | example                             | output file            |
+|---------|-------------------------------------|------------------------|
+| `lists` | `tmdb-sync account -v4 -a lists`    | `account_lists_v4.json` |
+| `favorite-movies` | `tmdb-sync account -v4 -a favorite-movies` | `account_favorite-movies_v4.json` |
+| `favorite-tv` | `tmdb-sync account -v4 -a favorite-tv` | `account_favorite-tv_v4.json` |
+| `rated-movies` | `tmdb-sync account -v4 -a rated-movies` | `account_rated-movies_v4.json` |
+| `rated-tv` | `tmdb-sync account -v4 -a rated-tv` | `account_rated-tv_v4.json` |
+| `recommended-movies` | `tmdb-sync account -v4 -a recommended-movies` | `account_recommended-movies_v4.json` |
+| `recommended-tv` | `tmdb-sync account -v4 -a recommended-tv` | `account_recommended-tv_v4.json` |
+| `watchlist-movies` | `tmdb-sync account -v4 -a watchlist-movies` | `account_watchlist-movies_v4.json` |
+| `watchlist-tv` | `tmdb-sync account -v4 -a watchlist-tv` | `account_watchlist-tv_v4.json` |
+
+`recommended-movies` and `recommended-tv` exist only in v4; without `-v4` they fail with a hint.
+
+Note: v4 rated items carry the user's rating as `account_rating` (`{created_at, value}`) instead
+of v3's flat `rating`.
+
+Optional v4 query flags (using one on an action that doesn't take it, or without `-v4`, is an
+error instead of being silently ignored):
+- `-language <code>` (e.g. `en-US`) — `favorite-*`, `rated-*`, `recommended-*`, `watchlist-*`.
+- `-sort-by created_at.asc|created_at.desc` — `favorite-*`, `rated-*`, `watchlist-*`.
+`lists` takes neither.

@@ -25,3 +25,9 @@ const (
 	MediaTypeMovie = "movie"
 	MediaTypeTV    = "tv"
 )
+
+// TMDB v4 sort_by values for the account favorites/rated/watchlist endpoints.
+const (
+	SortByCreatedAtAsc  = "created_at.asc"
+	SortByCreatedAtDesc = "created_at.desc"
+)
