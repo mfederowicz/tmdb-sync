@@ -1,6 +1,7 @@
-# TMDB v3 API Coverage Checklist
+# TMDB API Coverage Checklist (v3 + v4)
 
-Tracks progress toward "near-100% v3 coverage" (`PRD.md`). Check an item off only once it has:
+Tracks progress toward "near-100% v3 coverage" (`PRD.md`), followed by the v4 phase (the `## v4 —`
+sections at the end, all unchecked until implemented). Check an item off only once it has:
 a `cmds`/`handlers` entry, an `internal` service method with an `httptest`-backed test, and (for
 non-trivial response shapes) a `docs/<module>.md` reference entry.
 
@@ -215,3 +216,42 @@ no organic caller has been identified. Revisit if that changes.
 - [x] Available Regions — `GET /watch/providers/regions`
 - [x] Movie Providers — `GET /watch/providers/movie`
 - [x] TV Providers — `GET /watch/providers/tv`
+
+# v4
+
+TMDB v4 is a small, separate API (base `https://api.themoviedb.org/4/`) that complements v3
+rather than replacing it. Bearer token only — never `api_key`; account/list calls use the user
+`access_token` from the v4 auth flow. Selected per command with `-v4` (v3 is the default), see
+`PRD.md`'s v4 plan and `CLI.md`. Endpoints below are from the TMDB v4 reference
+(developer.themoviedb.org/v4/reference), checked 2026-09-19 — re-verify each before implementing.
+
+## v4 — Auth
+- [ ] Create Request Token — `POST /4/auth/request_token`
+- [ ] Create Access Token — `POST /4/auth/access_token`
+- [ ] Delete Access Token (logout) — `DELETE /4/auth/access_token`
+
+## v4 — Account 🔒
+Path parameter is the v4 `account_object_id` returned by Create Access Token (not the v3 numeric
+account id).
+- [ ] Lists — `GET /4/account/{account_object_id}/lists`
+- [ ] Favorite Movies — `GET /4/account/{account_object_id}/movie/favorites`
+- [ ] Favorite TV Shows — `GET /4/account/{account_object_id}/tv/favorites`
+- [ ] Rated Movies — `GET /4/account/{account_object_id}/movie/rated`
+- [ ] Rated TV Shows — `GET /4/account/{account_object_id}/tv/rated`
+- [ ] Recommended Movies — `GET /4/account/{account_object_id}/movie/recommendations`
+- [ ] Recommended TV Shows — `GET /4/account/{account_object_id}/tv/recommendations`
+- [ ] Watchlist Movies — `GET /4/account/{account_object_id}/movie/watchlist`
+- [ ] Watchlist TV Shows — `GET /4/account/{account_object_id}/tv/watchlist`
+
+## v4 — Lists 🔒 for mutation and private lists
+- [ ] Details — `GET /4/list/{list_id}`
+- [ ] Create — `POST /4/list`
+- [ ] Update — `PUT /4/list/{list_id}`
+- [ ] Delete — `DELETE /4/list/{list_id}` *(reference documents it as `/4/{list_id}`, likely a
+      typo — verify against the live API)*
+- [ ] Add Items — `POST /4/list/{list_id}/items`
+- [ ] Update Items — `PUT /4/list/{list_id}/items`
+- [ ] Remove Items — `DELETE /4/list/{list_id}/items`
+- [ ] Check Item Status — `GET /4/list/{list_id}/item_status`
+- [ ] Clear — `GET /4/list/{list_id}/clear` *(reference documents it as GET — verify against the
+      live API)*

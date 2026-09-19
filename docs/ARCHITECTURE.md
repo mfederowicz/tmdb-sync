@@ -126,8 +126,23 @@ TMDB v3 has its own request-token/session flow, independent of v4:
 4. Session persisted to `session_path` (JSON file).
 
 `Client.Auth` (v3) and a future `Client.AuthV4` are separate fields/services/files by design —
-adding v4 means new files (`internal/auth_v4_service.go`, a new `cli` flow, a `cfg.AuthVersion`
-switch already reserved in `Config`), never edits to the v3 files above.
+adding v4 means new files (`internal/auth_v4_service.go`, a new `cli` flow), never edits to the v3
+files above.
+
+### v4 design (planned)
+
+- **Version is per invocation, not a config mode.** Overlapping modules (`account`, `lists`) take
+  `-v3` (default) / `-v4`; one shared helper in `cmds/` resolves the flag (both set = error, a
+  v4-only action without `-v4` = error with a hint) and the module's `Exec` dispatches to the v3 or
+  v4 service. The existing `cfg.AuthVersion` field (`auth_version`, default `"v3"`) is superseded by
+  the flags and stays unused.
+- **Client.** v4 gets its own base URL (`https://api.themoviedb.org/4/`) and request builder:
+  bearer token only, and `api_key` is never appended. v3 request building is unchanged.
+- **Auth flow.** `POST /4/auth/request_token` → user approves at
+  `https://www.themoviedb.org/auth/access?request_token=…` (via `cli/browser.go`) →
+  `POST /4/auth/access_token` returns `access_token` + `account_id`, persisted to its own file
+  (analogous to `session_path`). v4 account/list calls use that user access token; a missing
+  `read_access_token` or user token fails early with a clear message.
 
 Two more `Client.Auth` methods have real callers beyond the login flow itself: `main.go` calls
 `ValidateKey` once at startup as a credentials preflight (fails fast on a misconfigured
