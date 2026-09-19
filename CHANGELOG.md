@@ -18,6 +18,10 @@ schedule.
 
 ### Added
 
+- `auth -a logout` (v3, no `-v4`): invalidates the cached v3 session at TMDB and deletes the
+  session and account cache files; errors if no session is cached. The result is written as
+  `auth_logout_v3.json`. `auth -v4 -a logout` is unchanged.
+
 ### Changed
 
 ### Fixed

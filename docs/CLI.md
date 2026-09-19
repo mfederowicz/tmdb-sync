@@ -54,7 +54,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | module            | actions (examples)                          |
 |-------------------|----------------------------------------------|
 | `account`         | 🔒 `details`, `favorites`, `watchlist`, `rated`, `lists`, `add-favorite`, `add-watchlist` |
-| `auth` ✅ v4 only ([docs](auth.md)) | `login -v4`, `request-token -v4`, `access-token -v4 -request-token <token>`, `logout -v4` |
+| `auth` ✅ v4, plus v3 logout ([docs](auth.md)) | `login -v4`, `request-token -v4`, `access-token -v4 -request-token <token>`, `logout -v4`, `logout` (v3) |
 | `certifications` ✅ ([docs](certifications.md)) | `movie`, `tv` |
 | `changes` ✅ ([docs](changes.md)) | `movie`, `tv`, `person` |
 | `collections` ✅ ([docs](collections.md)) | `details -i <id>`, `images -i <id>`, `translations -i <id>` |
