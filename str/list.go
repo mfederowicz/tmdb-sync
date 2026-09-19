@@ -159,3 +159,13 @@ type ListItemsResponseV4 struct {
 	StatusMessage string             `json:"status_message"`
 	Success       bool               `json:"success"`
 }
+
+// ListItemStatusV4 is the response of GET /4/list/{list_id}/item_status.
+type ListItemStatusV4 struct {
+	ID            int64  `json:"id"`
+	MediaID       int64  `json:"media_id"`
+	MediaType     string `json:"media_type"`
+	StatusCode    int    `json:"status_code"`
+	StatusMessage string `json:"status_message"`
+	Success       bool   `json:"success"`
+}

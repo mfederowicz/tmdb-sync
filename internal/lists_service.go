@@ -316,3 +316,30 @@ func (s *ListsService) RemoveItemsV4(ctx context.Context, accessToken, listID st
 
 	return result, nil
 }
+
+// GetItemStatusV4 reports whether a movie or TV show is on a list. The user
+// access token is optional: without it only public lists can be checked.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-check-item-status
+func (s *ListsService) GetItemStatusV4(ctx context.Context, accessToken, listID, mediaType string, mediaID int64) (*str.ListItemStatusV4, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("list/%s/item_status", listID), &uri.ListItemStatusV4Options{MediaID: mediaID, MediaType: mediaType})
+	if err != nil {
+		return nil, err
+	}
+
+	var reqOpts []RequestOption
+	if accessToken != "" {
+		reqOpts = append(reqOpts, withUserToken(accessToken))
+	}
+	req, err := s.client.NewRequestV4(http.MethodGet, urlStr, nil, reqOpts...)
+	if err != nil {
+		return nil, err
+	}
+
+	status := new(str.ListItemStatusV4)
+	if _, err := s.client.Do(ctx, req, status); err != nil {
+		return nil, err
+	}
+
+	return status, nil
+}

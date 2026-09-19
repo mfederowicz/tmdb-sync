@@ -440,3 +440,31 @@ func TestListsRemoveItemsV4(t *testing.T) {
 		t.Errorf("RemoveItemsV4() = %+v", result)
 	}
 }
+
+func TestListsGetItemStatusV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8/item_status", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer read" {
+			t.Errorf("Authorization = %q, want read token", got)
+		}
+		q := r.URL.Query()
+		if q.Get("media_id") != "100" || q.Get("media_type") != "tv" {
+			t.Errorf("query = %q, want media_id=100&media_type=tv", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"id": 8, "media_id": 100, "media_type": "tv", "success": true, "status_code": 1})
+	})
+
+	status, err := client.Lists.GetItemStatusV4(context.Background(), "", "8", "tv", 100)
+	if err != nil {
+		t.Fatalf("GetItemStatusV4() error = %v", err)
+	}
+	if status.ID != 8 || status.MediaID != 100 || !status.Success {
+		t.Errorf("GetItemStatusV4() = %+v", status)
+	}
+}

@@ -335,3 +335,10 @@ type ListV4Options struct {
 	Language string `url:"language,omitempty"`
 	SortBy   string `url:"sort_by,omitempty"`
 }
+
+// ListItemStatusV4Options carries the query parameters of
+// GET /4/list/{list_id}/item_status.
+type ListItemStatusV4Options struct {
+	MediaID   int64  `url:"media_id"`
+	MediaType string `url:"media_type"`
+}

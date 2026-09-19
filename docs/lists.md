@@ -33,6 +33,7 @@ Notes:
 | `add-items` 🔒 | `tmdb-sync lists -v4 -a add-items -i 8 -item movie:100 -item tv:200` | `lists_add-items_id-8_v4.json` |
 | `update-items` 🔒 | `tmdb-sync lists -v4 -a update-items -i 8 -item "movie:100:my comment"` | `lists_update-items_id-8_v4.json` |
 | `remove-items` 🔒 | `tmdb-sync lists -v4 -a remove-items -i 8 -item movie:100 -item tv:200` | `lists_remove-items_id-8_v4.json` |
+| `item-status` | `tmdb-sync lists -v4 -a item-status -i 8 -media-type tv -media-id 100` | `lists_item-status_id-8_media-100_v4.json` |
 
 - `-v4 -a details` walks every item page (`-pages-limit`, default from config, 0 = unlimited) and
   merges the items into `results`. `-language` and `-sort-by` (e.g. `original_order.asc`) are optional.
@@ -50,3 +51,5 @@ Notes:
   (repeatable, comment required, may contain colons). `add-items` rejects comments.
 - `-v4 -a remove-items` needs `auth -v4 -a login` and one or more `-item movie:<id>` / `-item tv:<id>`;
   the output has TMDB's per-item `results`. The ids are sent as a JSON body on the DELETE request.
+- `-v4 -a item-status` takes `-media-type movie|tv` and `-media-id`; like `details` it works on public
+  lists with only `read_access_token` and uses the user token when cached.
