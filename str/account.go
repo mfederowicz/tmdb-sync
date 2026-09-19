@@ -93,3 +93,9 @@ type RatedMovieV4 struct {
 	Movie
 	AccountRating *AccountRatingV4 `json:"account_rating"`
 }
+
+// RatedTVV4 is a TV show in GET /4/account/{account_object_id}/tv/rated.
+type RatedTVV4 struct {
+	TV
+	AccountRating *AccountRatingV4 `json:"account_rating"`
+}

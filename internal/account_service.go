@@ -467,3 +467,11 @@ func (s *AccountService) GetFavoriteTVV4(ctx context.Context, accessToken, accou
 func (s *AccountService) GetRatedMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.RatedMovieV4, error) {
 	return fetchAccountV4[str.RatedMovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/rated", accountID), pagesLimit)
 }
+
+// GetRatedTVV4 returns a v4 account's rated TV shows, walking pages until
+// TMDB reports no more (total_pages) or pagesLimit is reached (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/account-rated-tv
+func (s *AccountService) GetRatedTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.RatedTVV4, error) {
+	return fetchAccountV4[str.RatedTVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/rated", accountID), pagesLimit)
+}

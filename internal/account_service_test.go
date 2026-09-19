@@ -535,3 +535,34 @@ func TestAccountGetRatedMoviesV4(t *testing.T) {
 		t.Errorf("movies = %+v, want Fight Club rated 9", movies)
 	}
 }
+
+func TestAccountGetRatedTVV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/tv/rated", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":        1,
+			"total_pages": 1,
+			"results": []map[string]any{{
+				"id": 1399, "name": "Game of Thrones",
+				"account_rating": map[string]any{"created_at": "2024-01-01 00:00:00 UTC", "value": 10},
+			}},
+		})
+	})
+
+	shows, err := client.Account.GetRatedTVV4(context.Background(), "usertok", "acc123", 0)
+	if err != nil {
+		t.Fatalf("GetRatedTVV4() error = %v", err)
+	}
+	if len(shows) != 1 || shows[0].ID != 1399 || shows[0].AccountRating == nil || shows[0].AccountRating.Value != 10 {
+		t.Errorf("shows = %+v, want Game of Thrones rated 10", shows)
+	}
+}
