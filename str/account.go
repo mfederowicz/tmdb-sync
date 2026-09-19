@@ -92,14 +92,54 @@ type AccountRatingV4 struct {
 	Value     float64 `json:"value"`
 }
 
+// MovieV4 is a movie item in the v4 account list endpoints. MediaType is only
+// sent by the recommendations and watchlist endpoints.
+type MovieV4 struct {
+	Adult            bool    `json:"adult"`
+	BackdropPath     string  `json:"backdrop_path"`
+	GenreIDs         []int   `json:"genre_ids"`
+	ID               int64   `json:"id"`
+	MediaType        string  `json:"media_type,omitempty"`
+	OriginalLanguage string  `json:"original_language"`
+	OriginalTitle    string  `json:"original_title"`
+	Overview         string  `json:"overview"`
+	Popularity       float64 `json:"popularity"`
+	PosterPath       string  `json:"poster_path"`
+	ReleaseDate      string  `json:"release_date"`
+	Title            string  `json:"title"`
+	Video            bool    `json:"video"`
+	VoteAverage      float64 `json:"vote_average"`
+	VoteCount        int     `json:"vote_count"`
+}
+
+// TVV4 is a TV show item in the v4 account list endpoints. MediaType is only
+// sent by the recommendations and watchlist endpoints.
+type TVV4 struct {
+	Adult            bool     `json:"adult"`
+	BackdropPath     string   `json:"backdrop_path"`
+	FirstAirDate     string   `json:"first_air_date"`
+	GenreIDs         []int    `json:"genre_ids"`
+	ID               int64    `json:"id"`
+	MediaType        string   `json:"media_type,omitempty"`
+	Name             string   `json:"name"`
+	OriginCountry    []string `json:"origin_country"`
+	OriginalLanguage string   `json:"original_language"`
+	OriginalName     string   `json:"original_name"`
+	Overview         string   `json:"overview"`
+	Popularity       float64  `json:"popularity"`
+	PosterPath       string   `json:"poster_path"`
+	VoteAverage      float64  `json:"vote_average"`
+	VoteCount        int      `json:"vote_count"`
+}
+
 // RatedMovieV4 is a movie in GET /4/account/{account_object_id}/movie/rated.
 type RatedMovieV4 struct {
-	Movie
+	MovieV4
 	AccountRating *AccountRatingV4 `json:"account_rating"`
 }
 
 // RatedTVV4 is a TV show in GET /4/account/{account_object_id}/tv/rated.
 type RatedTVV4 struct {
-	TV
+	TVV4
 	AccountRating *AccountRatingV4 `json:"account_rating"`
 }

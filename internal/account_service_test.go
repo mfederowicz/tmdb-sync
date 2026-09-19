@@ -468,7 +468,9 @@ func TestAccountGetFavoriteMoviesV4(t *testing.T) {
 		json.NewEncoder(w).Encode(map[string]any{
 			"page":        page,
 			"total_pages": 2,
-			"results":     []map[string]any{{"id": 550 + page, "title": "Fight Club"}},
+			"results": []map[string]any{{
+				"id": 550 + page, "title": "Fight Club", "genre_ids": []int{18, 53}, "poster_path": "/p.jpg", "backdrop_path": "/b.jpg",
+			}},
 		})
 	})
 
@@ -476,7 +478,8 @@ func TestAccountGetFavoriteMoviesV4(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetFavoriteMoviesV4() error = %v", err)
 	}
-	if len(movies) != 2 || movies[0].ID != 551 || movies[1].ID != 552 {
+	if len(movies) != 2 || movies[0].ID != 551 || movies[1].ID != 552 ||
+		len(movies[0].GenreIDs) != 2 || movies[0].PosterPath != "/p.jpg" || movies[0].BackdropPath != "/b.jpg" {
 		t.Errorf("movies = %+v, want two pages of results", movies)
 	}
 }
@@ -496,7 +499,9 @@ func TestAccountGetFavoriteTVV4(t *testing.T) {
 		json.NewEncoder(w).Encode(map[string]any{
 			"page":        1,
 			"total_pages": 1,
-			"results":     []map[string]any{{"id": 1399, "name": "Game of Thrones"}},
+			"results": []map[string]any{{
+				"id": 1399, "name": "Game of Thrones", "genre_ids": []int{10765}, "origin_country": []string{"US"}, "poster_path": "/p.jpg",
+			}},
 		})
 	})
 
@@ -504,7 +509,8 @@ func TestAccountGetFavoriteTVV4(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetFavoriteTVV4() error = %v", err)
 	}
-	if len(shows) != 1 || shows[0].ID != 1399 {
+	if len(shows) != 1 || shows[0].ID != 1399 || len(shows[0].GenreIDs) != 1 ||
+		len(shows[0].OriginCountry) != 1 || shows[0].OriginCountry[0] != "US" || shows[0].PosterPath != "/p.jpg" {
 		t.Errorf("shows = %+v, want Game of Thrones", shows)
 	}
 }
@@ -586,7 +592,7 @@ func TestAccountGetRecommendedMoviesV4(t *testing.T) {
 		json.NewEncoder(w).Encode(map[string]any{
 			"page":        1,
 			"total_pages": 1,
-			"results":     []map[string]any{{"id": 680, "title": "Pulp Fiction"}},
+			"results":     []map[string]any{{"id": 680, "title": "Pulp Fiction", "media_type": "movie"}},
 		})
 	})
 
@@ -594,7 +600,7 @@ func TestAccountGetRecommendedMoviesV4(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetRecommendedMoviesV4() error = %v", err)
 	}
-	if len(movies) != 1 || movies[0].ID != 680 {
+	if len(movies) != 1 || movies[0].ID != 680 || movies[0].MediaType != "movie" {
 		t.Errorf("movies = %+v, want Pulp Fiction", movies)
 	}
 }
@@ -670,7 +676,7 @@ func TestAccountGetWatchlistTVV4(t *testing.T) {
 		json.NewEncoder(w).Encode(map[string]any{
 			"page":        1,
 			"total_pages": 1,
-			"results":     []map[string]any{{"id": 1668, "name": "Friends"}},
+			"results":     []map[string]any{{"id": 1668, "name": "Friends", "media_type": "tv"}},
 		})
 	})
 
@@ -678,7 +684,7 @@ func TestAccountGetWatchlistTVV4(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetWatchlistTVV4() error = %v", err)
 	}
-	if len(shows) != 1 || shows[0].ID != 1668 {
+	if len(shows) != 1 || shows[0].ID != 1668 || shows[0].MediaType != "tv" {
 		t.Errorf("shows = %+v, want Friends", shows)
 	}
 }

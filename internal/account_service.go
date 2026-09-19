@@ -447,8 +447,8 @@ func (s *AccountService) GetListsV4(ctx context.Context, accessToken, accountID 
 // (0 = unlimited).
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-favorite-movies
-func (s *AccountService) GetFavoriteMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.Movie, error) {
-	return fetchAccountV4[str.Movie](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/favorites", accountID), pagesLimit)
+func (s *AccountService) GetFavoriteMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.MovieV4, error) {
+	return fetchAccountV4[str.MovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/favorites", accountID), pagesLimit)
 }
 
 // GetFavoriteTVV4 returns a v4 account's favorited TV shows, walking pages
@@ -456,8 +456,8 @@ func (s *AccountService) GetFavoriteMoviesV4(ctx context.Context, accessToken, a
 // (0 = unlimited).
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-favorite-tv
-func (s *AccountService) GetFavoriteTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.TV, error) {
-	return fetchAccountV4[str.TV](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/favorites", accountID), pagesLimit)
+func (s *AccountService) GetFavoriteTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.TVV4, error) {
+	return fetchAccountV4[str.TVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/favorites", accountID), pagesLimit)
 }
 
 // GetRatedMoviesV4 returns a v4 account's rated movies, walking pages until
@@ -481,8 +481,8 @@ func (s *AccountService) GetRatedTVV4(ctx context.Context, accessToken, accountI
 // reached (0 = unlimited). There is no v3 equivalent.
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-recommended-movies
-func (s *AccountService) GetRecommendedMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.Movie, error) {
-	return fetchAccountV4[str.Movie](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/recommendations", accountID), pagesLimit)
+func (s *AccountService) GetRecommendedMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.MovieV4, error) {
+	return fetchAccountV4[str.MovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/recommendations", accountID), pagesLimit)
 }
 
 // GetRecommendedTVV4 returns TV show recommendations for a v4 account,
@@ -490,8 +490,8 @@ func (s *AccountService) GetRecommendedMoviesV4(ctx context.Context, accessToken
 // reached (0 = unlimited). There is no v3 equivalent.
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-recommended-tv
-func (s *AccountService) GetRecommendedTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.TV, error) {
-	return fetchAccountV4[str.TV](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/recommendations", accountID), pagesLimit)
+func (s *AccountService) GetRecommendedTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.TVV4, error) {
+	return fetchAccountV4[str.TVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/recommendations", accountID), pagesLimit)
 }
 
 // GetWatchlistMoviesV4 returns a v4 account's watchlisted movies, walking
@@ -499,8 +499,8 @@ func (s *AccountService) GetRecommendedTVV4(ctx context.Context, accessToken, ac
 // (0 = unlimited).
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-watchlist-movies
-func (s *AccountService) GetWatchlistMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.Movie, error) {
-	return fetchAccountV4[str.Movie](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/watchlist", accountID), pagesLimit)
+func (s *AccountService) GetWatchlistMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.MovieV4, error) {
+	return fetchAccountV4[str.MovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/watchlist", accountID), pagesLimit)
 }
 
 // GetWatchlistTVV4 returns a v4 account's watchlisted TV shows, walking pages
@@ -508,6 +508,6 @@ func (s *AccountService) GetWatchlistMoviesV4(ctx context.Context, accessToken, 
 // (0 = unlimited).
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-watchlist-tv
-func (s *AccountService) GetWatchlistTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.TV, error) {
-	return fetchAccountV4[str.TV](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/watchlist", accountID), pagesLimit)
+func (s *AccountService) GetWatchlistTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.TVV4, error) {
+	return fetchAccountV4[str.TVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/watchlist", accountID), pagesLimit)
 }
