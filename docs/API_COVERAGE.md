@@ -226,7 +226,7 @@ rather than replacing it. Bearer token only — never `api_key`; account/list ca
 (developer.themoviedb.org/v4/reference), checked 2026-09-19 — re-verify each before implementing.
 
 ## v4 — Auth
-- [ ] Create Request Token — `POST /4/auth/request_token`
+- [x] Create Request Token — `POST /4/auth/request_token`
 - [ ] Create Access Token — `POST /4/auth/access_token`
 - [ ] Delete Access Token (logout) — `DELETE /4/auth/access_token`
 
