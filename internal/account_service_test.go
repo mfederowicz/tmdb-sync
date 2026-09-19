@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/mfederowicz/tmdb-sync/str"
+	"github.com/mfederowicz/tmdb-sync/uri"
 )
 
 func TestGetAccountDetails(t *testing.T) {
@@ -474,7 +475,7 @@ func TestAccountGetFavoriteMoviesV4(t *testing.T) {
 		})
 	})
 
-	movies, err := client.Account.GetFavoriteMoviesV4(context.Background(), "usertok", "acc123", 0)
+	movies, err := client.Account.GetFavoriteMoviesV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
 	if err != nil {
 		t.Fatalf("GetFavoriteMoviesV4() error = %v", err)
 	}
@@ -505,7 +506,7 @@ func TestAccountGetFavoriteTVV4(t *testing.T) {
 		})
 	})
 
-	shows, err := client.Account.GetFavoriteTVV4(context.Background(), "usertok", "acc123", 0)
+	shows, err := client.Account.GetFavoriteTVV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
 	if err != nil {
 		t.Fatalf("GetFavoriteTVV4() error = %v", err)
 	}
@@ -537,7 +538,7 @@ func TestAccountGetRatedMoviesV4(t *testing.T) {
 		})
 	})
 
-	movies, err := client.Account.GetRatedMoviesV4(context.Background(), "usertok", "acc123", 0)
+	movies, err := client.Account.GetRatedMoviesV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
 	if err != nil {
 		t.Fatalf("GetRatedMoviesV4() error = %v", err)
 	}
@@ -568,7 +569,7 @@ func TestAccountGetRatedTVV4(t *testing.T) {
 		})
 	})
 
-	shows, err := client.Account.GetRatedTVV4(context.Background(), "usertok", "acc123", 0)
+	shows, err := client.Account.GetRatedTVV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
 	if err != nil {
 		t.Fatalf("GetRatedTVV4() error = %v", err)
 	}
@@ -596,7 +597,7 @@ func TestAccountGetRecommendedMoviesV4(t *testing.T) {
 		})
 	})
 
-	movies, err := client.Account.GetRecommendedMoviesV4(context.Background(), "usertok", "acc123", 0)
+	movies, err := client.Account.GetRecommendedMoviesV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
 	if err != nil {
 		t.Fatalf("GetRecommendedMoviesV4() error = %v", err)
 	}
@@ -624,7 +625,7 @@ func TestAccountGetRecommendedTVV4(t *testing.T) {
 		})
 	})
 
-	shows, err := client.Account.GetRecommendedTVV4(context.Background(), "usertok", "acc123", 0)
+	shows, err := client.Account.GetRecommendedTVV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
 	if err != nil {
 		t.Fatalf("GetRecommendedTVV4() error = %v", err)
 	}
@@ -652,7 +653,7 @@ func TestAccountGetWatchlistMoviesV4(t *testing.T) {
 		})
 	})
 
-	movies, err := client.Account.GetWatchlistMoviesV4(context.Background(), "usertok", "acc123", 0)
+	movies, err := client.Account.GetWatchlistMoviesV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
 	if err != nil {
 		t.Fatalf("GetWatchlistMoviesV4() error = %v", err)
 	}
@@ -680,11 +681,30 @@ func TestAccountGetWatchlistTVV4(t *testing.T) {
 		})
 	})
 
-	shows, err := client.Account.GetWatchlistTVV4(context.Background(), "usertok", "acc123", 0)
+	shows, err := client.Account.GetWatchlistTVV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{})
 	if err != nil {
 		t.Fatalf("GetWatchlistTVV4() error = %v", err)
 	}
 	if len(shows) != 1 || shows[0].ID != 1668 || shows[0].MediaType != "tv" {
 		t.Errorf("shows = %+v, want Friends", shows)
+	}
+}
+
+func TestAccountGetFavoriteMoviesV4_QueryOptions(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/account/acc123/movie/favorites", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		if q.Get("language") != "pl-PL" || q.Get("sort_by") != "created_at.desc" || q.Get("page") != "1" {
+			t.Errorf("query = %q, want language, sort_by and page", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"page": 1, "total_pages": 1, "results": []map[string]any{{"id": 1}}})
+	})
+
+	_, err := client.Account.GetFavoriteMoviesV4(context.Background(), "usertok", "acc123", 0, uri.AccountV4Options{Language: "pl-PL", SortBy: "created_at.desc"})
+	if err != nil {
+		t.Fatalf("GetFavoriteMoviesV4() error = %v", err)
 	}
 }

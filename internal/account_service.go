@@ -414,9 +414,10 @@ type pagedV4[T any] struct {
 
 // fetchAccountV4 walks every page (up to pagesLimit, 0 = unlimited) of the v4
 // account endpoint at path, authenticated with the user access token.
-func fetchAccountV4[T any](ctx context.Context, s *AccountService, accessToken, path string, pagesLimit int) ([]T, error) {
+func fetchAccountV4[T any](ctx context.Context, s *AccountService, accessToken, path string, pagesLimit int, opts uri.AccountV4Options) ([]T, error) {
 	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[T], error) {
-		urlStr, err := uri.AddQuery(path, &uri.PageOptions{Page: page})
+		opts.Page = page
+		urlStr, err := uri.AddQuery(path, &opts)
 		if err != nil {
 			return PageResult[T]{}, err
 		}
@@ -439,7 +440,7 @@ func fetchAccountV4[T any](ctx context.Context, s *AccountService, accessToken, 
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-lists
 func (s *AccountService) GetListsV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.AccountListV4, error) {
-	return fetchAccountV4[str.AccountListV4](ctx, s, accessToken, fmt.Sprintf("account/%s/lists", accountID), pagesLimit)
+	return fetchAccountV4[str.AccountListV4](ctx, s, accessToken, fmt.Sprintf("account/%s/lists", accountID), pagesLimit, uri.AccountV4Options{})
 }
 
 // GetFavoriteMoviesV4 returns a v4 account's favorited movies, walking pages
@@ -447,8 +448,8 @@ func (s *AccountService) GetListsV4(ctx context.Context, accessToken, accountID 
 // (0 = unlimited).
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-favorite-movies
-func (s *AccountService) GetFavoriteMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.MovieV4, error) {
-	return fetchAccountV4[str.MovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/favorites", accountID), pagesLimit)
+func (s *AccountService) GetFavoriteMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int, opts uri.AccountV4Options) ([]str.MovieV4, error) {
+	return fetchAccountV4[str.MovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/favorites", accountID), pagesLimit, opts)
 }
 
 // GetFavoriteTVV4 returns a v4 account's favorited TV shows, walking pages
@@ -456,24 +457,24 @@ func (s *AccountService) GetFavoriteMoviesV4(ctx context.Context, accessToken, a
 // (0 = unlimited).
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-favorite-tv
-func (s *AccountService) GetFavoriteTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.TVV4, error) {
-	return fetchAccountV4[str.TVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/favorites", accountID), pagesLimit)
+func (s *AccountService) GetFavoriteTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int, opts uri.AccountV4Options) ([]str.TVV4, error) {
+	return fetchAccountV4[str.TVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/favorites", accountID), pagesLimit, opts)
 }
 
 // GetRatedMoviesV4 returns a v4 account's rated movies, walking pages until
 // TMDB reports no more (total_pages) or pagesLimit is reached (0 = unlimited).
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-rated-movies
-func (s *AccountService) GetRatedMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.RatedMovieV4, error) {
-	return fetchAccountV4[str.RatedMovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/rated", accountID), pagesLimit)
+func (s *AccountService) GetRatedMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int, opts uri.AccountV4Options) ([]str.RatedMovieV4, error) {
+	return fetchAccountV4[str.RatedMovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/rated", accountID), pagesLimit, opts)
 }
 
 // GetRatedTVV4 returns a v4 account's rated TV shows, walking pages until
 // TMDB reports no more (total_pages) or pagesLimit is reached (0 = unlimited).
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-rated-tv
-func (s *AccountService) GetRatedTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.RatedTVV4, error) {
-	return fetchAccountV4[str.RatedTVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/rated", accountID), pagesLimit)
+func (s *AccountService) GetRatedTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int, opts uri.AccountV4Options) ([]str.RatedTVV4, error) {
+	return fetchAccountV4[str.RatedTVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/rated", accountID), pagesLimit, opts)
 }
 
 // GetRecommendedMoviesV4 returns movie recommendations for a v4 account,
@@ -481,8 +482,8 @@ func (s *AccountService) GetRatedTVV4(ctx context.Context, accessToken, accountI
 // reached (0 = unlimited). There is no v3 equivalent.
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-recommended-movies
-func (s *AccountService) GetRecommendedMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.MovieV4, error) {
-	return fetchAccountV4[str.MovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/recommendations", accountID), pagesLimit)
+func (s *AccountService) GetRecommendedMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int, opts uri.AccountV4Options) ([]str.MovieV4, error) {
+	return fetchAccountV4[str.MovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/recommendations", accountID), pagesLimit, opts)
 }
 
 // GetRecommendedTVV4 returns TV show recommendations for a v4 account,
@@ -490,8 +491,8 @@ func (s *AccountService) GetRecommendedMoviesV4(ctx context.Context, accessToken
 // reached (0 = unlimited). There is no v3 equivalent.
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-recommended-tv
-func (s *AccountService) GetRecommendedTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.TVV4, error) {
-	return fetchAccountV4[str.TVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/recommendations", accountID), pagesLimit)
+func (s *AccountService) GetRecommendedTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int, opts uri.AccountV4Options) ([]str.TVV4, error) {
+	return fetchAccountV4[str.TVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/recommendations", accountID), pagesLimit, opts)
 }
 
 // GetWatchlistMoviesV4 returns a v4 account's watchlisted movies, walking
@@ -499,8 +500,8 @@ func (s *AccountService) GetRecommendedTVV4(ctx context.Context, accessToken, ac
 // (0 = unlimited).
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-watchlist-movies
-func (s *AccountService) GetWatchlistMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.MovieV4, error) {
-	return fetchAccountV4[str.MovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/watchlist", accountID), pagesLimit)
+func (s *AccountService) GetWatchlistMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int, opts uri.AccountV4Options) ([]str.MovieV4, error) {
+	return fetchAccountV4[str.MovieV4](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/watchlist", accountID), pagesLimit, opts)
 }
 
 // GetWatchlistTVV4 returns a v4 account's watchlisted TV shows, walking pages
@@ -508,6 +509,6 @@ func (s *AccountService) GetWatchlistMoviesV4(ctx context.Context, accessToken, 
 // (0 = unlimited).
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-watchlist-tv
-func (s *AccountService) GetWatchlistTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.TVV4, error) {
-	return fetchAccountV4[str.TVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/watchlist", accountID), pagesLimit)
+func (s *AccountService) GetWatchlistTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int, opts uri.AccountV4Options) ([]str.TVV4, error) {
+	return fetchAccountV4[str.TVV4](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/watchlist", accountID), pagesLimit, opts)
 }

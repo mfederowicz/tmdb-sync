@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/mfederowicz/tmdb-sync/internal"
+	"github.com/mfederowicz/tmdb-sync/uri"
 )
 
 // AccountWatchlistMoviesHandler handles `account -a watchlist-movies` (v3) and
@@ -15,12 +16,13 @@ type AccountWatchlistMoviesHandler struct {
 	V4          bool
 	AccessToken string
 	V4AccountID string
+	V4Options   uri.AccountV4Options
 }
 
 // Handle fetches an account's watchlisted movies.
 func (h AccountWatchlistMoviesHandler) Handle(ctx context.Context, client *internal.Client) (any, error) {
 	if h.V4 {
-		movies, err := client.Account.GetWatchlistMoviesV4(ctx, h.AccessToken, h.V4AccountID, h.PagesLimit)
+		movies, err := client.Account.GetWatchlistMoviesV4(ctx, h.AccessToken, h.V4AccountID, h.PagesLimit, h.V4Options)
 		if err != nil {
 			return nil, err
 		}

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/mfederowicz/tmdb-sync/internal"
+	"github.com/mfederowicz/tmdb-sync/uri"
 )
 
 // AccountFavoriteTVHandler handles `account -a favorite-tv` (v3) and
@@ -15,12 +16,13 @@ type AccountFavoriteTVHandler struct {
 	V4          bool
 	AccessToken string
 	V4AccountID string
+	V4Options   uri.AccountV4Options
 }
 
 // Handle fetches an account's favorited TV shows.
 func (h AccountFavoriteTVHandler) Handle(ctx context.Context, client *internal.Client) (any, error) {
 	if h.V4 {
-		shows, err := client.Account.GetFavoriteTVV4(ctx, h.AccessToken, h.V4AccountID, h.PagesLimit)
+		shows, err := client.Account.GetFavoriteTVV4(ctx, h.AccessToken, h.V4AccountID, h.PagesLimit, h.V4Options)
 		if err != nil {
 			return nil, err
 		}

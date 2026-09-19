@@ -14,6 +14,7 @@ import (
 	"github.com/mfederowicz/tmdb-sync/consts"
 	"github.com/mfederowicz/tmdb-sync/handlers"
 	"github.com/mfederowicz/tmdb-sync/internal"
+	"github.com/mfederowicz/tmdb-sync/uri"
 	"github.com/spf13/afero"
 
 	"github.com/mfederowicz/tmdb-sync/str"
@@ -33,6 +34,12 @@ func isSessionInvalid(err error) bool {
 
 // accountV4Actions are the `account` actions implemented for -v4.
 var accountV4Actions = []string{"lists", "favorite-movies", "favorite-tv", "rated-movies", "rated-tv", "recommended-movies", "recommended-tv", "watchlist-movies", "watchlist-tv"}
+
+// accountV4SortActions accept -sort-by with -v4; accountV4LanguageActions accept -language.
+var (
+	accountV4SortActions     = []string{"favorite-movies", "favorite-tv", "rated-movies", "rated-tv", "watchlist-movies", "watchlist-tv"}
+	accountV4LanguageActions = append([]string{"recommended-movies", "recommended-tv"}, accountV4SortActions...)
+)
 
 // accountV4OnlyActions are the `account` actions that exist only in v4.
 var accountV4OnlyActions = []string{"recommended-movies", "recommended-tv"}
@@ -63,6 +70,8 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 	favorite := flagSet.Bool("favorite", true, "used by -a add-favorite: true adds, false removes")
 	v3 := flagSet.Bool("v3", false, "use the v3 API (default)")
 	v4 := flagSet.Bool("v4", false, "use the v4 API: needs `auth -v4 -a login` first; actions: lists, favorite-movies, favorite-tv, rated-movies, rated-tv, recommended-movies, recommended-tv, watchlist-movies, watchlist-tv")
+	language := flagSet.String("language", "", "v4 only: language code (e.g. en-US), for favorite-*, rated-*, recommended-*, watchlist-*")
+	sortBy := flagSet.String("sort-by", "", "v4 only: created_at.asc or created_at.desc, for favorite-*, rated-*, watchlist-*")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit for every list action: favorite-*, lists, rated-*, recommended-*, watchlist-* (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
@@ -75,6 +84,11 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 	v4Mode := version == apiV4
 	if !v4Mode && slices.Contains(accountV4OnlyActions, *action) {
 		return fmt.Errorf("account: action %q exists only in v4, add -v4", *action)
+	}
+
+	v4Options := uri.AccountV4Options{Language: *language, SortBy: *sortBy}
+	if err := validateAccountV4Options(v4Mode, *action, v4Options); err != nil {
+		return fmt.Errorf("account: %w", err)
 	}
 
 	var id int64
@@ -143,7 +157,7 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 		params = []string{fmt.Sprintf("id-%d", id), *mediaType, fmt.Sprintf("media-%d", *mediaID)}
 	case "favorite-movies":
 		if v4Mode {
-			handler = handlers.AccountFavoriteMoviesHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
+			handler = handlers.AccountFavoriteMoviesHandler{V4: true, V4Options: v4Options, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
 			params = []string{"v4"}
 			break
 		}
@@ -154,7 +168,7 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 		params = []string{fmt.Sprintf("id-%d", id)}
 	case "favorite-tv":
 		if v4Mode {
-			handler = handlers.AccountFavoriteTVHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
+			handler = handlers.AccountFavoriteTVHandler{V4: true, V4Options: v4Options, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
 			params = []string{"v4"}
 			break
 		}
@@ -164,10 +178,10 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 		handler = handlers.AccountFavoriteTVHandler{AccountID: id, SessionID: options.Session.SessionID, PagesLimit: *pagesLimit}
 		params = []string{fmt.Sprintf("id-%d", id)}
 	case "recommended-movies":
-		handler = handlers.AccountRecommendedMoviesHandler{AccessToken: options.AccessTokenV4.AccessToken, AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
+		handler = handlers.AccountRecommendedMoviesHandler{AccessToken: options.AccessTokenV4.AccessToken, AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit, Options: v4Options}
 		params = []string{"v4"}
 	case "recommended-tv":
-		handler = handlers.AccountRecommendedTVHandler{AccessToken: options.AccessTokenV4.AccessToken, AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
+		handler = handlers.AccountRecommendedTVHandler{AccessToken: options.AccessTokenV4.AccessToken, AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit, Options: v4Options}
 		params = []string{"v4"}
 	case "lists":
 		if v4Mode {
@@ -182,7 +196,7 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 		params = []string{fmt.Sprintf("id-%d", id)}
 	case "rated-movies":
 		if v4Mode {
-			handler = handlers.AccountRatedMoviesHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
+			handler = handlers.AccountRatedMoviesHandler{V4: true, V4Options: v4Options, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
 			params = []string{"v4"}
 			break
 		}
@@ -193,7 +207,7 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 		params = []string{fmt.Sprintf("id-%d", id)}
 	case "rated-tv":
 		if v4Mode {
-			handler = handlers.AccountRatedTVHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
+			handler = handlers.AccountRatedTVHandler{V4: true, V4Options: v4Options, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
 			params = []string{"v4"}
 			break
 		}
@@ -210,7 +224,7 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 		params = []string{fmt.Sprintf("id-%d", id)}
 	case "watchlist-movies":
 		if v4Mode {
-			handler = handlers.AccountWatchlistMoviesHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
+			handler = handlers.AccountWatchlistMoviesHandler{V4: true, V4Options: v4Options, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
 			params = []string{"v4"}
 			break
 		}
@@ -221,7 +235,7 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 		params = []string{fmt.Sprintf("id-%d", id)}
 	case "watchlist-tv":
 		if v4Mode {
-			handler = handlers.AccountWatchlistTVHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
+			handler = handlers.AccountWatchlistTVHandler{V4: true, V4Options: v4Options, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
 			params = []string{"v4"}
 			break
 		}
@@ -255,4 +269,27 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 	}
 
 	return writeResult(fs, config, "account", *action, result, params...)
+}
+
+// validateAccountV4Options rejects -language/-sort-by outside -v4 or on an
+// action whose v4 endpoint doesn't take them, so a flag is never silently ignored.
+func validateAccountV4Options(v4Mode bool, action string, opts uri.AccountV4Options) error {
+	if opts.Language == "" && opts.SortBy == "" {
+		return nil
+	}
+	if !v4Mode {
+		return errors.New("-language and -sort-by are only available with -v4")
+	}
+	if opts.Language != "" && !slices.Contains(accountV4LanguageActions, action) {
+		return fmt.Errorf("-language is not supported by -a %s", action)
+	}
+	if opts.SortBy != "" {
+		if !slices.Contains(accountV4SortActions, action) {
+			return fmt.Errorf("-sort-by is not supported by -a %s", action)
+		}
+		if opts.SortBy != consts.SortByCreatedAtAsc && opts.SortBy != consts.SortByCreatedAtDesc {
+			return fmt.Errorf("-sort-by must be %s or %s", consts.SortByCreatedAtAsc, consts.SortByCreatedAtDesc)
+		}
+	}
+	return nil
 }

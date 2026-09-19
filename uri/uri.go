@@ -39,10 +39,12 @@ type AccountListOptions struct {
 	Page      int    `url:"page,omitempty"`
 }
 
-// PageOptions carries only the page query parameter, for paginated endpoints
-// that need no other query (e.g. the v4 account lists).
-type PageOptions struct {
-	Page int `url:"page,omitempty"`
+// AccountV4Options carries the query parameters of the v4 account list
+// endpoints; which of Language/SortBy an endpoint accepts varies.
+type AccountV4Options struct {
+	Page     int    `url:"page,omitempty"`
+	Language string `url:"language,omitempty"`
+	SortBy   string `url:"sort_by,omitempty"`
 }
 
 // RatingOptions carries the session_id or guest_session_id query parameter

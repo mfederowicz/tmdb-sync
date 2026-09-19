@@ -131,6 +131,10 @@ func TestExecAccountV4_Errors(t *testing.T) {
 		{"v3-only action", loggedIn, []string{"-v4", "-a", "rated-tv-episodes"}},
 		{"v4-only action without -v4", loggedIn, []string{"-a", "recommended-movies"}},
 		{"v4-only tv action without -v4", loggedIn, []string{"-a", "recommended-tv"}},
+		{"language without -v4", loggedIn, []string{"-a", "lists", "-language", "pl-PL"}},
+		{"language on lists", loggedIn, []string{"-v4", "-a", "lists", "-language", "pl-PL"}},
+		{"sort-by on recommended", loggedIn, []string{"-v4", "-a", "recommended-tv", "-sort-by", "created_at.asc"}},
+		{"invalid sort-by", loggedIn, []string{"-v4", "-a", "favorite-tv", "-sort-by", "name"}},
 		{"both versions", loggedIn, []string{"-v3", "-v4", "-a", "lists"}},
 	}
 	for _, tt := range tests {

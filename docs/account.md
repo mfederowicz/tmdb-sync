@@ -57,3 +57,9 @@ and a cached user access token from `tmdb-sync auth -v4 -a login` (no v3 session
 
 Note: v4 rated items carry the user's rating as `account_rating` (`{created_at, value}`) instead
 of v3's flat `rating`.
+
+Optional v4 query flags (using one on an action that doesn't take it, or without `-v4`, is an
+error instead of being silently ignored):
+- `-language <code>` (e.g. `en-US`) — `favorite-*`, `rated-*`, `recommended-*`, `watchlist-*`.
+- `-sort-by created_at.asc|created_at.desc` — `favorite-*`, `rated-*`, `watchlist-*`.
+`lists` takes neither.
