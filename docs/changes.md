@@ -14,3 +14,7 @@ Notes:
 - All three actions walk every page up to `-pages-limit` (default: `pages_limit` from config,
   `0` = unlimited), same as `movies -a popular`.
 - `ch` is the module's `Abbrev` — `tmdb-sync ch -a movie` also works.
+
+Output file names: every flag you set (other than `-a` and `-pages-limit`) is appended to the name
+as `<flag>-<value>`, so runs with different filters write different files. With no extra flags the
+name is unchanged. Values with characters outside `a-z 0-9 _ . -` add a short hash suffix.

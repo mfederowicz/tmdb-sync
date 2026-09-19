@@ -29,6 +29,10 @@ schedule.
 
 ### Fixed
 
+- Output files no longer overwrite each other: `search`, `discover`, `changes` and
+  `watch-providers` now append the flags you set (e.g. `-year`, `-with-genres`, `-start-date`) to the
+  file name, and a query with accents, CJK or punctuation, or an overlong name, gets a short hash
+  suffix. File names for runs without extra flags or special characters are unchanged.
 - `account` with a missing or unknown `-a` no longer starts the browser login flow before reporting
   the error.
 - A 401 on a `-v4` `account` or `lists` call no longer triggers the v3 login flow (which could not
