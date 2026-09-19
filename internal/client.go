@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -140,14 +141,14 @@ func (c *Client) NewRequest(method, urlStr string, body any, opts ...RequestOpti
 		return nil, err
 	}
 
-	if c.Debug {
-		printer.Println("tmdb-sync: request URL:", u.String())
-	}
-
 	if apiKey, ok := c.headers[APIKeyParam]; ok {
 		q := u.Query()
 		q.Set(APIKeyParam, fmt.Sprintf("%v", apiKey))
 		u.RawQuery = q.Encode()
+	}
+
+	if c.Debug {
+		printer.Println("tmdb-sync: request URL:", uri.SanitizeURL(u).String())
 	}
 
 	var buf io.ReadWriter
@@ -172,7 +173,29 @@ func (c *Client) NewRequest(method, urlStr string, body any, opts ...RequestOpti
 		opt(req)
 	}
 
+	if c.Debug {
+		printRequestHeaders(req)
+	}
+
 	return req, nil
+}
+
+// printRequestHeaders prints the request headers in sorted order, redacting the Authorization value.
+func printRequestHeaders(req *http.Request) {
+	names := make([]string, 0, len(req.Header))
+	for name := range req.Header {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+
+	printer.Println("tmdb-sync: request headers:")
+	for _, name := range names {
+		value := strings.Join(req.Header[name], ", ")
+		if http.CanonicalHeaderKey(name) == "Authorization" {
+			value = "<redacted>"
+		}
+		printer.Println("  " + name + ": " + value)
+	}
 }
 
 func (c *Client) requestSetHeaders(r *http.Request, body any) *http.Request {
