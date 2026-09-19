@@ -64,6 +64,10 @@ func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config,
 		return err
 	}
 
+	if err := validateRatingValue("movies", *action, *value); err != nil {
+		return err
+	}
+
 	ratingGuestSessionID, err := resolveRatingGuestSessionID(*action, *guestSessionID, *guest, options)
 	if err != nil {
 		return fmt.Errorf("movies: %w", err)
@@ -187,9 +191,6 @@ func execMoviesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config,
 	case "add-rating":
 		if *movieID == 0 {
 			return fmt.Errorf("movies: -i <movie_id> is required for -a add-rating")
-		}
-		if *value == 0 {
-			return fmt.Errorf("movies: -value <rating> is required for -a add-rating")
 		}
 		sessionID := ""
 		if !usingGuestSession {

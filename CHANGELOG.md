@@ -33,6 +33,11 @@ schedule.
   `watch-providers` now append the flags you set (e.g. `-year`, `-with-genres`, `-start-date`) to the
   file name, and a query with accents, CJK or punctuation, or an overlong name, gets a short hash
   suffix. File names for runs without extra flags or special characters are unchanged.
+- `tv-seasons` and `tv-episodes` now require `-s` (and `-e`) instead of silently defaulting to
+  season 0 / episode 0, so a forgotten flag no longer returns the Specials season. `-s 0` still
+  works.
+- `add-rating` (`movies`, `tv`, `tv-episodes`) now rejects a `-value` outside 0.5 to 10.0 in 0.5
+  steps before any login or API call.
 - `account` with a missing or unknown `-a` no longer starts the browser login flow before reporting
   the error.
 - A 401 on a `-v4` `account` or `lists` call no longer triggers the v3 login flow (which could not
