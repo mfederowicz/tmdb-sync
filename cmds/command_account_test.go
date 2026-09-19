@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/mfederowicz/tmdb-sync/cfg"
@@ -144,5 +145,95 @@ func TestExecAccountV4_Errors(t *testing.T) {
 				t.Error("execAccount() error = nil, want error")
 			}
 		})
+	}
+}
+
+// stubRefreshSession swaps refreshSession for the test's duration and reports
+// how many times it was called.
+func stubRefreshSession(t *testing.T, fn func() (*str.Session, error)) *int {
+	t.Helper()
+	calls := 0
+	old := refreshSession
+	refreshSession = func(afero.Fs, *cfg.Config, *internal.Client) (*str.Session, error) {
+		calls++
+		return fn()
+	}
+	t.Cleanup(func() { refreshSession = old })
+	return &calls
+}
+
+func TestExecAccount_RejectsBadActionBeforeLogin(t *testing.T) {
+	for name, args := range map[string][]string{
+		"missing action": {},
+		"unknown action": {"-a", "bogus"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			client, mux, teardown := setupAccountClient()
+			defer teardown()
+
+			hits := 0
+			mux.HandleFunc("/", func(http.ResponseWriter, *http.Request) { hits++ })
+
+			// No cached session: HandleToken would start the login flow (a request to TMDB).
+			err := execAccount(afero.NewMemMapFs(), client, cfg.DefaultConfig(), &str.Options{}, args)
+			if err == nil {
+				t.Fatal("execAccount() error = nil, want error")
+			}
+			if hits != 0 {
+				t.Errorf("server hit %d times, want 0: the login flow started before the action was validated", hits)
+			}
+		})
+	}
+}
+
+func TestExecAccountV4_Unauthorized_DoesNotStartV3Login(t *testing.T) {
+	client, mux, teardown := setupAccountClient()
+	defer teardown()
+	client.BaseURLV4, _ = url.Parse(client.BaseURL.String())
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/account/acc123/lists", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(`{"status_code":3,"status_message":"Authentication failed","success":false}`))
+	})
+	refreshCalls := stubRefreshSession(t, func() (*str.Session, error) {
+		return &str.Session{SessionID: "new"}, nil
+	})
+
+	options := &str.Options{AccessTokenV4: &str.AccessTokenV4{AccessToken: "stale", AccountID: "acc123"}}
+	err := execAccount(afero.NewMemMapFs(), client, cfg.DefaultConfig(), options, []string{"-v4", "-a", "lists"})
+
+	if err == nil || !strings.Contains(err.Error(), "auth -v4 -a login") {
+		t.Errorf("error = %v, want a hint to run `auth -v4 -a login`", err)
+	}
+	if !isSessionInvalid(err) {
+		t.Errorf("error = %v, want the original 401 still matchable", err)
+	}
+	if *refreshCalls != 0 {
+		t.Errorf("v3 re-login ran %d times for a v4 401, want 0", *refreshCalls)
+	}
+}
+
+func TestExecAccount_ReloginFailureIsReported(t *testing.T) {
+	client, mux, teardown := setupAccountClient()
+	defer teardown()
+
+	mux.HandleFunc("/account/123/rated/tv", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(`{"status_code":3,"status_message":"Authentication failed","success":false}`))
+	})
+	stubRefreshSession(t, func() (*str.Session, error) { return nil, errors.New("stdin closed") })
+
+	options := &str.Options{
+		Session: &str.Session{Success: true, SessionID: "old-session"},
+		Account: &str.Account{ID: 123},
+	}
+	err := execAccount(afero.NewMemMapFs(), client, cfg.DefaultConfig(), options, []string{"-a", "rated-tv"})
+
+	if err == nil || !strings.Contains(err.Error(), "stdin closed") {
+		t.Errorf("error = %v, want it to include the re-login failure", err)
+	}
+	if !isSessionInvalid(err) {
+		t.Errorf("error = %v, want the original 401 still matchable", err)
 	}
 }

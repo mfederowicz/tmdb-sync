@@ -29,6 +29,12 @@ schedule.
 
 ### Fixed
 
+- `account` with a missing or unknown `-a` no longer starts the browser login flow before reporting
+  the error.
+- A 401 on a `-v4` `account` or `lists` call no longer triggers the v3 login flow (which could not
+  fix it); the error now suggests `auth -v4 -a login`.
+- When the automatic re-login after a 401 fails, the error now includes why, instead of only the
+  original 401.
 - `pages_limit = 0` in the config file now means "all pages", as documented, instead of being
   ignored in favour of the default of 10. A negative `pages_limit` is rejected with an error.
 - `output_dir` now expands a leading `~`, instead of creating a directory literally named `~`.

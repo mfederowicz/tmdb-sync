@@ -115,10 +115,9 @@ func execTVSeasonsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Conf
 	result, err := handler.Handle(context.Background(), client)
 	if err != nil {
 		if !retried && tvSeasonsSessionActions[*action] && isSessionInvalid(err) {
-			if newSession, refreshErr := refreshSession(fs, config, client); refreshErr == nil {
-				options.Session = newSession
+			return reloginAndRetry(fs, config, client, options, err, func() error {
 				return execTVSeasonsAttempt(fs, client, config, options, args, true)
-			}
+			})
 		}
 		return err
 	}

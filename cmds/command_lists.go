@@ -260,11 +260,13 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 
 	result, err := handler.Handle(context.Background(), client)
 	if err != nil {
-		if !retried && listsSessionActions[*action] && isSessionInvalid(err) {
-			if newSession, refreshErr := refreshSession(fs, config, client); refreshErr == nil {
-				options.Session = newSession
+		if !retried && listsSessionActions[*action] && !v4Mode && isSessionInvalid(err) {
+			return reloginAndRetry(fs, config, client, options, err, func() error {
 				return execListsAttempt(fs, client, config, options, args, true)
-			}
+			})
+		}
+		if v4Mode && isSessionInvalid(err) {
+			return fmt.Errorf("%w (run `auth -v4 -a login` to refresh the v4 access token)", err)
 		}
 		return err
 	}

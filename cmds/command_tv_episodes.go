@@ -141,10 +141,9 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 	result, err := handler.Handle(context.Background(), client)
 	if err != nil {
 		if !retried && tvEpisodesSessionActions[*action] && !usingGuestSession && isSessionInvalid(err) {
-			if newSession, refreshErr := refreshSession(fs, config, client); refreshErr == nil {
-				options.Session = newSession
+			return reloginAndRetry(fs, config, client, options, err, func() error {
 				return execTVEpisodesAttempt(fs, client, config, options, args, true)
-			}
+			})
 		}
 		return err
 	}

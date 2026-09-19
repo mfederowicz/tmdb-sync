@@ -32,6 +32,21 @@ func isSessionInvalid(err error) bool {
 	return errors.As(err, &errResp) && errResp.StatusCode == http.StatusUnauthorized
 }
 
+// reloginAndRetry runs one interactive v3 re-login after a 401 and, on success,
+// stores the fresh session and calls retry. If the re-login itself fails, its
+// reason is appended to the original error instead of being dropped.
+func reloginAndRetry(fs afero.Fs, config *cfg.Config, client *internal.Client, options *str.Options, cause error, retry func() error) error {
+	newSession, refreshErr := refreshSession(fs, config, client)
+	if refreshErr != nil {
+		return fmt.Errorf("%w (re-login failed: %v)", cause, refreshErr)
+	}
+	options.Session = newSession
+	return retry()
+}
+
+// accountV3Actions are the `account` actions available without -v4.
+var accountV3Actions = []string{"details", "add-watchlist", "add-favorite", "favorite-movies", "favorite-tv", "lists", "rated-movies", "rated-tv", "rated-tv-episodes", "watchlist-movies", "watchlist-tv"}
+
 // accountV4Actions are the `account` actions implemented for -v4.
 var accountV4Actions = []string{"lists", "favorite-movies", "favorite-tv", "rated-movies", "rated-tv", "recommended-movies", "recommended-tv", "watchlist-movies", "watchlist-tv"}
 
@@ -100,6 +115,14 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 			return fmt.Errorf("account: no v4 access token cached at %s, run `auth -v4 -a login` first", config.AccessTokenPath)
 		}
 	} else {
+		// Reject a missing or unknown action before HandleToken, which may open
+		// the browser login flow.
+		if *action == "" {
+			return fmt.Errorf("account: -a is required (action: %s)", strings.Join(accountV3Actions, ", "))
+		}
+		if !slices.Contains(accountV3Actions, *action) {
+			return fmt.Errorf("account: unknown action %q", *action)
+		}
 		if err := cli.HandleToken(fs, config, client, options); err != nil {
 			return fmt.Errorf("account: %w", err)
 		}
@@ -250,11 +273,13 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 
 	result, err := handler.Handle(context.Background(), client)
 	if err != nil {
-		if !retried && isSessionInvalid(err) {
-			if newSession, refreshErr := refreshSession(fs, config, client); refreshErr == nil {
-				options.Session = newSession
+		if !retried && !v4Mode && isSessionInvalid(err) {
+			return reloginAndRetry(fs, config, client, options, err, func() error {
 				return execAccountAttempt(fs, client, config, options, args, true)
-			}
+			})
+		}
+		if v4Mode && isSessionInvalid(err) {
+			return fmt.Errorf("%w (run `auth -v4 -a login` to refresh the v4 access token)", err)
 		}
 		return err
 	}
