@@ -224,10 +224,9 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 	result, err := handler.Handle(context.Background(), client)
 	if err != nil {
 		if !retried && tvSessionActions[*action] && !usingGuestSession && isSessionInvalid(err) {
-			if newSession, refreshErr := refreshSession(fs, config, client); refreshErr == nil {
-				options.Session = newSession
+			return reloginAndRetry(fs, config, client, options, err, func() error {
 				return execTVAttempt(fs, client, config, options, args, true)
-			}
+			})
 		}
 		return err
 	}
