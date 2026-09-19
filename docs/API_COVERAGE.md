@@ -247,11 +247,9 @@ account id).
 - [x] Details — `GET /4/list/{list_id}`
 - [x] Create — `POST /4/list`
 - [x] Update — `PUT /4/list/{list_id}`
-- [x] Delete — `DELETE /4/list/{list_id}` *(reference documents it as `/4/{list_id}`, likely a
-      typo — verify against the live API)*
+- [x] Delete — `DELETE /4/list/{list_id}` *(reference prints `/4/{list_id}`, a typo — verified live)*
 - [x] Add Items — `POST /4/list/{list_id}/items`
 - [x] Update Items — `PUT /4/list/{list_id}/items`
 - [x] Remove Items — `DELETE /4/list/{list_id}/items`
 - [x] Check Item Status — `GET /4/list/{list_id}/item_status`
-- [x] Clear — `GET /4/list/{list_id}/clear` *(reference documents it as GET — verify against the
-      live API)*
+- [x] Clear — `GET /4/list/{list_id}/clear` *(GET, as documented — verified live)*

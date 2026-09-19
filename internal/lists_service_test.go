@@ -215,6 +215,8 @@ func TestListsGetListV4(t *testing.T) {
 		}
 		json.NewEncoder(w).Encode(map[string]any{
 			"id": 8, "name": "mine", "page": json.Number(page), "total_pages": 2, "total_results": 2,
+			"public": true, "revenue": 100853753, "sort_by": "original_order.asc",
+			"comments": map[string]any{"movie:1": "great", "tv:2": nil},
 			"created_by": map[string]any{"username": "me"},
 			"results":    []any{item},
 		})
@@ -226,6 +228,15 @@ func TestListsGetListV4(t *testing.T) {
 	}
 	if list.ID != 8 || list.Name != "mine" || list.CreatedBy.Username != "me" {
 		t.Errorf("GetListV4() = %+v", list)
+	}
+	if !list.Public || list.Revenue != 100853753 || list.SortBy != "original_order.asc" {
+		t.Errorf("public/revenue/sort_by = %v/%v/%q", list.Public, list.Revenue, list.SortBy)
+	}
+	if c := list.Comments["movie:1"]; c == nil || *c != "great" {
+		t.Errorf("comments = %v", list.Comments)
+	}
+	if c, ok := list.Comments["tv:2"]; !ok || c != nil {
+		t.Errorf("tv:2 comment = %v, want present and nil", c)
 	}
 	if len(list.Results) != 2 || list.Results[0].Title != "one" || list.Results[1].Name != "two" {
 		t.Errorf("Results = %+v, want both pages merged", list.Results)
