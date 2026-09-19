@@ -28,6 +28,10 @@ schedule.
 
 ### Changed
 
+- Internal refactor, no behavior change: the v4 auth service methods, tests and types now live in
+  the v3 auth files (`Client.Auth.*V4`, `str.RequestTokenV4`/`AccessTokenV4`) instead of separate
+  `*_v4` files, matching how v4 account is laid out.
+
 ### Fixed
 
 ## [0.26.0] - 2026-09-19

@@ -8,8 +8,9 @@ import (
 	"github.com/mfederowicz/tmdb-sync/str"
 )
 
-// AuthService handles communication with the TMDB v3 authentication
-// endpoints (request token + session, https://developer.themoviedb.org/reference/authentication-create-request-token).
+// AuthService handles communication with the TMDB authentication endpoints:
+// v3 (request token + session, https://developer.themoviedb.org/reference/authentication-create-request-token)
+// and, in the V4-suffixed methods, v4 (request token + user access token).
 type AuthService Service
 
 // CreateRequestToken requests a new, unapproved request token.
@@ -98,6 +99,77 @@ func (s *AuthService) DeleteSession(ctx context.Context, sessionID string) (*str
 	}{SessionID: sessionID}
 
 	req, err := s.client.NewRequest(http.MethodDelete, "authentication/session", body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	status := new(str.AuthStatus)
+	resp, err := s.client.Do(ctx, req, status)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return status, resp, nil
+}
+
+// CreateRequestTokenV4 requests a new, unapproved v4 request token. redirectTo
+// is optional: when set, TMDB redirects the browser there after approval.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/auth-create-request-token
+func (s *AuthService) CreateRequestTokenV4(ctx context.Context, redirectTo string) (*str.RequestTokenV4, *str.Response, error) {
+	var body any
+	if redirectTo != "" {
+		body = struct {
+			RedirectTo string `json:"redirect_to"`
+		}{RedirectTo: redirectTo}
+	}
+
+	req, err := s.client.NewRequestV4(http.MethodPost, "auth/request_token", body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	token := new(str.RequestTokenV4)
+	resp, err := s.client.Do(ctx, req, token)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return token, resp, nil
+}
+
+// CreateAccessTokenV4 exchanges an approved v4 request token for a user access
+// token and account id.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/auth-create-access-token
+func (s *AuthService) CreateAccessTokenV4(ctx context.Context, requestToken string) (*str.AccessTokenV4, *str.Response, error) {
+	body := struct {
+		RequestToken string `json:"request_token"`
+	}{RequestToken: requestToken}
+
+	req, err := s.client.NewRequestV4(http.MethodPost, "auth/access_token", body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	accessToken := new(str.AccessTokenV4)
+	resp, err := s.client.Do(ctx, req, accessToken)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return accessToken, resp, nil
+}
+
+// DeleteAccessTokenV4 logs out by invalidating a v4 user access token.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/auth-delete-access-token
+func (s *AuthService) DeleteAccessTokenV4(ctx context.Context, accessToken string) (*str.AuthStatus, *str.Response, error) {
+	body := struct {
+		AccessToken string `json:"access_token"`
+	}{AccessToken: accessToken}
+
+	req, err := s.client.NewRequestV4(http.MethodDelete, "auth/access_token", body)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -32,8 +32,9 @@ If in doubt about a pattern, follow the existing shape rather than inventing som
     and map non-2xx into `str.ErrorResponse` / `AbuseRateLimitError` (429, or a request
     short-circuited locally before a known `RateLimitReset`).
   - `service.go`: `Service{client *Client}` — the shared base every `*Service` type converts from.
-  - `auth_service.go`: TMDB **v3** auth only (`CreateRequestToken`, `CreateSession` against
-    `authentication/token/new` / `authentication/session/new`), exposed as `Client.Auth`.
+  - `auth_service.go`: TMDB auth, exposed as `Client.Auth`: v3 (`CreateRequestToken`,
+    `CreateSession` against `authentication/token/new` / `authentication/session/new`) plus the
+    `V4`-suffixed v4 methods (`CreateRequestTokenV4`, `CreateAccessTokenV4`, `DeleteAccessTokenV4`).
   - `<x>_service.go` per module (`movies_service.go`, `configuration_service.go`, ...), exposed as
     `Client.<X>`.
 - `cli/` — interactive helpers: `session.go` (`HandleToken`: checks `options.Session.Valid()`,
@@ -125,9 +126,12 @@ TMDB v3 has its own request-token/session flow, independent of v4:
 3. `POST /3/authentication/session/new` (with the approved `request_token`) → `session_id`.
 4. Session persisted to `session_path` (JSON file).
 
-`Client.Auth` (v3) and a future `Client.AuthV4` are separate fields/services/files by design —
-adding v4 means new files (`internal/auth_v4_service.go`, a new `cli` flow), never edits to the v3
-files above.
+v4 lives next to v3 rather than in parallel files: `Client.Auth` carries the `V4`-suffixed v4
+methods (`internal/auth_service.go`), `str/` keeps the v4 structs beside their v3 counterparts
+(`RequestTokenV4` in `request_token.go`, `AccessTokenV4` in `session.go`), and v4 is a new `cli`
+flow (`cli/access_token.go`). The same convention applies to every v4 endpoint of an existing
+module (e.g. `AccountService.GetListsV4`, a `V4` flag on the handler, a `-v4` branch in the
+command); only a v4-only action gets its own handler file.
 
 ### v4 design (planned)
 

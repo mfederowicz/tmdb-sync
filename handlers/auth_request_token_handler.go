@@ -13,7 +13,7 @@ type AuthRequestTokenHandler struct {
 
 // Handle requests a new v4 request token.
 func (h AuthRequestTokenHandler) Handle(ctx context.Context, client *internal.Client) (any, error) {
-	token, _, err := client.AuthV4.CreateRequestToken(ctx, h.RedirectTo)
+	token, _, err := client.Auth.CreateRequestTokenV4(ctx, h.RedirectTo)
 	if err != nil {
 		return nil, err
 	}
