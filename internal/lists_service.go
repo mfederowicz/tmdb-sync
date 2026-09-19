@@ -317,8 +317,9 @@ func (s *ListsService) RemoveItemsV4(ctx context.Context, accessToken, listID st
 	return result, nil
 }
 
-// GetItemStatusV4 reports whether a movie or TV show is on a list. The user
-// access token is optional: without it only public lists can be checked.
+// GetItemStatusV4 reports whether a movie or TV show is on a list. TMDB's
+// reference says the caller must own the list, so pass the user access token;
+// an empty one falls back to the read token.
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/list-check-item-status
 func (s *ListsService) GetItemStatusV4(ctx context.Context, accessToken, listID, mediaType string, mediaID int64) (*str.ListItemStatusV4, error) {
@@ -348,13 +349,13 @@ func (s *ListsService) GetItemStatusV4(ctx context.Context, accessToken, listID,
 // this as a GET request.
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/list-clear
-func (s *ListsService) ClearListV4(ctx context.Context, accessToken, listID string) (*str.ListStatusV4, error) {
+func (s *ListsService) ClearListV4(ctx context.Context, accessToken, listID string) (*str.ListClearResponseV4, error) {
 	req, err := s.client.NewRequestV4(http.MethodGet, fmt.Sprintf("list/%s/clear", listID), nil, withUserToken(accessToken))
 	if err != nil {
 		return nil, err
 	}
 
-	status := new(str.ListStatusV4)
+	status := new(str.ListClearResponseV4)
 	if _, err := s.client.Do(ctx, req, status); err != nil {
 		return nil, err
 	}

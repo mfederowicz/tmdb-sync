@@ -82,7 +82,7 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	if !v4Mode && (*sortBy != "" || *country != "" || visited["public"] || *backdropPath != "" || len(items) > 0 || *mediaType != "") {
 		return fmt.Errorf("lists: -sort-by, -country, -public, -backdrop-path, -item and -media-type need -v4")
 	}
-	if v4Mode && *action != "" && (options.AccessTokenV4 == nil || options.AccessTokenV4.AccessToken == "") && *action != "details" && *action != "item-status" {
+	if v4Mode && *action != "" && (options.AccessTokenV4 == nil || options.AccessTokenV4.AccessToken == "") && *action != "details" {
 		return fmt.Errorf("lists: no v4 access token cached at %s, run `auth -v4 -a login` first", config.AccessTokenPath)
 	}
 
@@ -123,11 +123,7 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 			if *mediaType != "movie" && *mediaType != "tv" {
 				return fmt.Errorf("lists: -media-type movie|tv is required for -v4 -a item-status")
 			}
-			accessToken := ""
-			if options.AccessTokenV4 != nil {
-				accessToken = options.AccessTokenV4.AccessToken
-			}
-			handler = handlers.ListsItemStatusHandler{V4: true, AccessToken: accessToken, ListID: *listID, MovieID: *movieID, MediaType: *mediaType}
+			handler = handlers.ListsItemStatusHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, ListID: *listID, MovieID: *movieID, MediaType: *mediaType}
 			params = []string{fmt.Sprintf("id-%s", *listID), fmt.Sprintf("media-%d", *movieID), "v4"}
 			break
 		}

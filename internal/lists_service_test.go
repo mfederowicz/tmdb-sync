@@ -481,14 +481,14 @@ func TestListsClearListV4(t *testing.T) {
 		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
 			t.Errorf("Authorization = %q, want user token", got)
 		}
-		json.NewEncoder(w).Encode(map[string]any{"success": true, "status_code": 1})
+		json.NewEncoder(w).Encode(map[string]any{"success": true, "status_code": 1, "id": 8, "items_deleted": 3})
 	})
 
 	status, err := client.Lists.ClearListV4(context.Background(), "usertok", "8")
 	if err != nil {
 		t.Fatalf("ClearListV4() error = %v", err)
 	}
-	if !status.Success {
+	if !status.Success || status.ItemsDeleted != 3 || status.ID != 8 {
 		t.Errorf("ClearListV4() = %+v", status)
 	}
 }

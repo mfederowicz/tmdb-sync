@@ -52,7 +52,8 @@ Notes:
   (repeatable, comment required, may contain colons). `add-items` rejects comments.
 - `-v4 -a remove-items` needs `auth -v4 -a login` and one or more `-item movie:<id>` / `-item tv:<id>`;
   the output has TMDB's per-item `results`. The ids are sent as a JSON body on the DELETE request.
-- `-v4 -a item-status` takes `-media-type movie|tv` and `-media-id`; like `details` it works on public
-  lists with only `read_access_token` and uses the user token when cached.
+- `-v4 -a item-status` takes `-media-type movie|tv` and `-media-id`, and needs `auth -v4 -a login`
+  (TMDB's reference says the caller must own the list).
 - `-v4 -a clear` needs `auth -v4 -a login`. It sends `GET /4/list/{list_id}/clear` as TMDB's reference
-  documents it (a destructive GET; to be confirmed against the live API) and removes every item.
+  documents it (a destructive GET; to be confirmed against the live API) and removes every item; the
+  output includes `items_deleted`.

@@ -42,6 +42,7 @@ type ListItemRequest struct {
 
 // ListCreatorV4 is the created_by object of a v4 list.
 type ListCreatorV4 struct {
+	AvatarPath   string `json:"avatar_path"`
 	GravatarHash string `json:"gravatar_hash"`
 	ID           string `json:"id"`
 	Name         string `json:"name"`
@@ -73,7 +74,9 @@ type ListItemV4 struct {
 }
 
 // ListV4 is the response shape for GET /4/list/{list_id}. Results holds the
-// items of every fetched page.
+// items of every fetched page. TMDB's reference types public as boolean,
+// revenue as integer and sort_by as string, but its v4 account lists send
+// integers and strings for the same fields, so those three stay untyped.
 type ListV4 struct {
 	AverageRating float64        `json:"average_rating"`
 	BackdropPath  string         `json:"backdrop_path"`
@@ -85,9 +88,10 @@ type ListV4 struct {
 	ISO6391       string         `json:"iso_639_1"`
 	ItemCount     int            `json:"item_count"`
 	Name          string         `json:"name"`
+	ObjectIDs     map[string]any `json:"object_ids"`
 	Page          int            `json:"page"`
 	PosterPath    string         `json:"poster_path"`
-	Public        int            `json:"public"`
+	Public        any            `json:"public"`
 	Results       []ListItemV4   `json:"results"`
 	Revenue       any            `json:"revenue"`
 	Runtime       int            `json:"runtime"`
@@ -165,6 +169,15 @@ type ListItemStatusV4 struct {
 	ID            int64  `json:"id"`
 	MediaID       int64  `json:"media_id"`
 	MediaType     string `json:"media_type"`
+	StatusCode    int    `json:"status_code"`
+	StatusMessage string `json:"status_message"`
+	Success       bool   `json:"success"`
+}
+
+// ListClearResponseV4 is the response of GET /4/list/{list_id}/clear.
+type ListClearResponseV4 struct {
+	ID            int64  `json:"id"`
+	ItemsDeleted  int    `json:"items_deleted"`
 	StatusCode    int    `json:"status_code"`
 	StatusMessage string `json:"status_message"`
 	Success       bool   `json:"success"`
