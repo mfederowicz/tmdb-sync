@@ -33,6 +33,9 @@ pages_limit = 10       # cap on pages walked by -all; 0 = unlimited (bounded by 
 - `-c <path>` — path to the config file (default `~/tmdb-sync.toml`)
 - `-v` — verbose output
 - `-version` — print version and exit
+- `-v3` / `-v4` — *(planned, v4 phase)* API version for modules that exist in both (`account`,
+  `lists`, plus `auth` for v4 login); v3 is the default, both together is an error. See
+  [v3 vs v4](#v3-vs-v4-planned).
 
 ## Command shape
 
@@ -98,3 +101,26 @@ Every command writes its result as one JSON file, named `<module>_<action>[_<par
 `movies_details_id-550.json`, `movies_popular.json`), under `output_dir` (default: the current
 directory), and prints a one-line `wrote <path>` confirmation — the file is the product, not the
 terminal output. Read/process the file with `jq`, a script, etc.
+
+## v3 vs v4 (planned)
+
+v4 is a small API (auth, account, lists) on base `/4/` that complements v3. Overlapping modules
+take `-v4`; without a flag they use v3. v4 needs `read_access_token` and a user token from
+`tmdb-sync auth -v4 -a login`.
+
+```sh
+tmdb-sync account -a favorite-movies         # v3 (default), needs the v3 session
+tmdb-sync account -v4 -a favorite-movies     # v4, needs the v4 user access token
+```
+
+| feature | v3 (`account`/`lists`) | v4 (`-v4`) |
+|---|---|---|
+| favorite movies/TV | `GET /account/{id}/favorite/movies` | `GET /4/account/{id}/movie/favorites` |
+| rated movies/TV | `GET /account/{id}/rated/movies` | `GET /4/account/{id}/movie/rated` |
+| watchlist movies/TV | `GET /account/{id}/watchlist/movies` | `GET /4/account/{id}/movie/watchlist` |
+| account lists | `GET /account/{id}/lists` | `GET /4/account/{id}/lists` |
+| recommendations | — (v4 only) | `GET /4/account/{id}/movie/recommendations` |
+| list add/remove items | one item per call (`add_item`/`remove_item`) | batched `POST`/`DELETE /4/list/{id}/items` |
+
+A v4-only action without `-v4` (or a v3-only action with it) fails with a hint. See `PRD.md`'s v4
+plan and `API_COVERAGE.md`'s `## v4 —` sections.

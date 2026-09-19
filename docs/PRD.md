@@ -43,8 +43,8 @@ line or from other tooling that shells out to it.
    reviews, credits — module by module, tracked in `API_COVERAGE.md`.
 4. **v3 account coverage**: favorites, watchlist, ratings, lists — using the session auth built
    in phase 2.
-5. **v4 phase** (out of scope until v3 is ~100%): v4 auth, v4-only endpoints, added alongside v3
-   code, not replacing it.
+5. **v4 phase** (v3 is complete; planned, see [v4 plan](#v4-plan)): v4 auth, v4-only endpoints,
+   added alongside v3 code, not replacing it.
 
 ## Success criteria
 
@@ -58,3 +58,27 @@ line or from other tooling that shells out to it.
 
 See `API_COVERAGE.md` for the concrete, checkable endpoint list, and `ARCHITECTURE.md` for how
 new modules get added without touching existing ones.
+
+## v4 plan
+
+v4 is 21 endpoints (auth 3, account 9, lists 9 — see `API_COVERAGE.md`'s `## v4 —` sections) on
+base `/4/`, complementing v3 rather than replacing it.
+
+**Version selection.** `-v3` / `-v4` flags on the modules that overlap (`account`, `lists`), like
+`ping -4/-6`; **v3 is the default**. Giving both is an error. The version is a property of the
+invocation, not a global mode (`auth_version` in the config is superseded by the flags). A v4-only
+action without `-v4` (e.g. `account -a recommended-movies`) errors with a hint instead of
+switching silently, and vice versa. v4 needs `read_access_token` plus the user token from
+`auth -v4 -a login`; v4 requests never carry `api_key`.
+
+**Branches** (one module per PR; endpoint count per branch confirmed with the maintainer first):
+1. Docs (this plan, coverage checklist, `CLI.md`/`ARCHITECTURE.md` design).
+2. v4 client plumbing + auth (`auth -v4 -a login|logout`, token persistence).
+3. `account -v4` (9 endpoints, likely two branches).
+4. `lists -v4` (9 endpoints, likely read/write split).
+
+**Open questions, to verify against the live API before documenting behavior:**
+- Whether v3 and v4 share data (lists, ratings, favorites), and how the v3 `account_id` relates
+  to the v4 `account_object_id`.
+- v4 response shapes vs. v3 (each endpoint likely needs its own `str/` type).
+- The reference's delete-list path (`/4/{list_id}`) and clear-list method (`GET`).
