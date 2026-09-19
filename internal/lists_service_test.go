@@ -248,3 +248,34 @@ func TestListsGetListV4_PublicWithoutUserToken(t *testing.T) {
 		t.Fatalf("GetListV4() error = %v", err)
 	}
 }
+
+func TestListsCreateListV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if body["name"] != "mine" || body["iso_639_1"] != "en" || body["iso_3166_1"] != "US" || body["public"] != true {
+			t.Errorf("body = %v", body)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"id": 77, "success": true, "status_code": 1})
+	})
+
+	created, err := client.Lists.CreateListV4(context.Background(), "usertok", &str.ListCreateRequestV4{Name: "mine", ISO6391: "en", ISO31661: "US", Public: true})
+	if err != nil {
+		t.Fatalf("CreateListV4() error = %v", err)
+	}
+	if created.ID != 77 || !created.Success {
+		t.Errorf("CreateListV4() = %+v", created)
+	}
+}

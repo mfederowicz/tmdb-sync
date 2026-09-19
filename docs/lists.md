@@ -27,8 +27,11 @@ Notes:
 | action    | example                                                  | output file                |
 |-----------|-----------------------------------------------------------|----------------------------|
 | `details` | `tmdb-sync lists -v4 -a details -i 8 -language en-US`     | `lists_details_id-8_v4.json` |
+| `create` 🔒 | `tmdb-sync lists -v4 -a create -name "x" -language en -country US -public` | `lists_create_id-<id>_v4.json` |
 
 - `-v4 -a details` walks every item page (`-pages-limit`, default from config, 0 = unlimited) and
   merges the items into `results`. `-language` and `-sort-by` (e.g. `original_order.asc`) are optional.
 - Public lists need only `read_access_token`; if `auth -v4 -a login` was run, the user token is sent
   so private lists you own are readable too.
+- `-v4 -a create` needs `auth -v4 -a login` first; `-name`, `-language` (ISO 639-1) and `-country`
+  (ISO 3166-1) are required, `-description` and `-public` (default private) are optional.

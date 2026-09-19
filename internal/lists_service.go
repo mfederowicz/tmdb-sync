@@ -213,3 +213,20 @@ func (s *ListsService) GetListV4(ctx context.Context, accessToken, listID string
 
 	return list, nil
 }
+
+// CreateListV4 creates a list owned by the v4 user access token's account.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-create
+func (s *ListsService) CreateListV4(ctx context.Context, accessToken string, body *str.ListCreateRequestV4) (*str.ListCreateResponseV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodPost, "list", body, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	created := new(str.ListCreateResponseV4)
+	if _, err := s.client.Do(ctx, req, created); err != nil {
+		return nil, err
+	}
+
+	return created, nil
+}

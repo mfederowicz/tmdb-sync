@@ -95,3 +95,20 @@ type ListV4 struct {
 	TotalPages    int            `json:"total_pages"`
 	TotalResults  int            `json:"total_results"`
 }
+
+// ListCreateRequestV4 is the body of POST /4/list.
+type ListCreateRequestV4 struct {
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	ISO6391     string `json:"iso_639_1"`
+	ISO31661    string `json:"iso_3166_1"`
+	Public      bool   `json:"public"`
+}
+
+// ListCreateResponseV4 is the response of POST /4/list.
+type ListCreateResponseV4 struct {
+	ID            int64  `json:"id"`
+	StatusCode    int    `json:"status_code"`
+	StatusMessage string `json:"status_message"`
+	Success       bool   `json:"success"`
+}

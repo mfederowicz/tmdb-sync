@@ -27,7 +27,7 @@ var listsSessionActions = map[string]bool{
 }
 
 // listsV4Actions are the `lists` actions implemented for -v4.
-var listsV4Actions = []string{"details"}
+var listsV4Actions = []string{"details", "create"}
 
 // ListsCmd is the "lists" module. Read actions (details, item-status) are
 // public; mutation actions (create, add-movie, remove-movie, clear, delete)
@@ -55,8 +55,10 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	description := flagSet.String("description", "", "list description, used by -a create")
 	language := flagSet.String("language", "", "list language (ISO 639-1), used by -a create")
 	v3 := flagSet.Bool("v3", false, "use the v3 API (default)")
-	v4 := flagSet.Bool("v4", false, "use the v4 API (optionally with `auth -v4 -a login` for private lists); actions: details")
+	v4 := flagSet.Bool("v4", false, "use the v4 API (optionally with `auth -v4 -a login` for private lists); actions: details, create")
 	sortBy := flagSet.String("sort-by", "", "v4 only: sort order of the items, for -a details (e.g. original_order.asc, vote_average.desc)")
+	country := flagSet.String("country", "", "v4 only: list country (ISO 3166-1, e.g. US), required for -a create")
+	public := flagSet.Bool("public", false, "v4 only: make the list public, used by -a create")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "v4 only: item pages limit for -a details (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
@@ -70,8 +72,11 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	if v4Mode && *action != "" && !slices.Contains(listsV4Actions, *action) {
 		return fmt.Errorf("lists: action %q is not available with -v4 (v4 actions: %s)", *action, strings.Join(listsV4Actions, ", "))
 	}
-	if !v4Mode && *sortBy != "" {
-		return fmt.Errorf("lists: -sort-by needs -v4")
+	if !v4Mode && (*sortBy != "" || *country != "" || *public) {
+		return fmt.Errorf("lists: -sort-by, -country and -public need -v4")
+	}
+	if v4Mode && *action != "" && (options.AccessTokenV4 == nil || options.AccessTokenV4.AccessToken == "") && *action != "details" {
+		return fmt.Errorf("lists: no v4 access token cached at %s, run `auth -v4 -a login` first", config.AccessTokenPath)
 	}
 
 	if !v4Mode && listsSessionActions[*action] {
@@ -112,6 +117,14 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	case "create":
 		if *name == "" {
 			return fmt.Errorf("lists: -name <name> is required for -a create")
+		}
+		if v4Mode {
+			if *language == "" || *country == "" {
+				return fmt.Errorf("lists: -language and -country are required for -v4 -a create")
+			}
+			handler = handlers.ListsCreateHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, Name: *name, Description: *description, Language: *language, Country: *country, Public: *public}
+			params = []string{"v4"}
+			break
 		}
 		handler = handlers.ListsCreateHandler{
 			SessionID:   options.Session.SessionID,
@@ -166,6 +179,9 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 
 	if created, ok := result.(*str.ListCreateResponse); ok && len(params) == 0 {
 		params = []string{fmt.Sprintf("id-%d", created.ListID)}
+	}
+	if created, ok := result.(*str.ListCreateResponseV4); ok {
+		params = []string{fmt.Sprintf("id-%d", created.ID), "v4"}
 	}
 
 	return writeResult(fs, config, "lists", *action, result, params...)
