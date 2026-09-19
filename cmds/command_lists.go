@@ -4,12 +4,15 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"slices"
+	"strings"
 
 	"github.com/mfederowicz/tmdb-sync/cfg"
 	"github.com/mfederowicz/tmdb-sync/cli"
 	"github.com/mfederowicz/tmdb-sync/handlers"
 	"github.com/mfederowicz/tmdb-sync/internal"
 	"github.com/mfederowicz/tmdb-sync/str"
+	"github.com/mfederowicz/tmdb-sync/uri"
 
 	"github.com/spf13/afero"
 )
@@ -22,6 +25,9 @@ var listsSessionActions = map[string]bool{
 	"clear":        true,
 	"delete":       true,
 }
+
+// listsV4Actions are the `lists` actions implemented for -v4.
+var listsV4Actions = []string{"details", "create", "update", "delete", "add-items", "update-items", "remove-items", "item-status", "clear"}
 
 // ListsCmd is the "lists" module. Read actions (details, item-status) are
 // public; mutation actions (create, add-movie, remove-movie, clear, delete)
@@ -48,11 +54,39 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	name := flagSet.String("name", "", "list name, required for -a create")
 	description := flagSet.String("description", "", "list description, used by -a create")
 	language := flagSet.String("language", "", "list language (ISO 639-1), used by -a create")
+	v3 := flagSet.Bool("v3", false, "use the v3 API (default)")
+	v4 := flagSet.Bool("v4", false, "use the v4 API (optionally with `auth -v4 -a login` for private lists); actions: details, create, update, delete, add-items, update-items, remove-items, item-status, clear")
+	sortBy := flagSet.String("sort-by", "", "v4 only: sort order of the items, for -a details (e.g. original_order.asc, vote_average.desc)")
+	country := flagSet.String("country", "", "v4 only: list country (ISO 3166-1, e.g. US), required for -a create")
+	public := flagSet.Bool("public", false, "v4 only: make the list public, used by -a create")
+	var items itemFlag
+	flagSet.Var(&items, "item", "v4 only: media as movie:<id> or tv:<id>, repeatable, required for -a add-items, update-items and remove-items; update-items needs a comment: movie:<id>:<comment>")
+	mediaType := flagSet.String("media-type", "", "v4 only: movie or tv, required for -a item-status")
+	backdropPath := flagSet.String("backdrop-path", "", "v4 only: backdrop image path, used by -a update")
+	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "v4 only: item pages limit for -a details (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
-	if listsSessionActions[*action] {
+	visited := map[string]bool{}
+	flagSet.Visit(func(f *flag.Flag) { visited[f.Name] = true })
+
+	version, err := resolveAPIVersion(*v3, *v4)
+	if err != nil {
+		return fmt.Errorf("lists: %w", err)
+	}
+	v4Mode := version == apiV4
+	if v4Mode && *action != "" && !slices.Contains(listsV4Actions, *action) {
+		return fmt.Errorf("lists: action %q is not available with -v4 (v4 actions: %s)", *action, strings.Join(listsV4Actions, ", "))
+	}
+	if !v4Mode && (*sortBy != "" || *country != "" || visited["public"] || *backdropPath != "" || len(items) > 0 || *mediaType != "") {
+		return fmt.Errorf("lists: -sort-by, -country, -public, -backdrop-path, -item and -media-type need -v4")
+	}
+	if v4Mode && *action != "" && (options.AccessTokenV4 == nil || options.AccessTokenV4.AccessToken == "") && *action != "details" {
+		return fmt.Errorf("lists: no v4 access token cached at %s, run `auth -v4 -a login` first", config.AccessTokenPath)
+	}
+
+	if !v4Mode && listsSessionActions[*action] {
 		if err := cli.HandleToken(fs, config, client, options); err != nil {
 			return fmt.Errorf("lists: %w", err)
 		}
@@ -67,6 +101,15 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 		if *listID == "" {
 			return fmt.Errorf("lists: -i <list_id> is required for -a details")
 		}
+		if v4Mode {
+			accessToken := ""
+			if options.AccessTokenV4 != nil {
+				accessToken = options.AccessTokenV4.AccessToken
+			}
+			handler = handlers.ListsDetailsHandler{ListID: *listID, V4: true, AccessToken: accessToken, PagesLimit: *pagesLimit, V4Options: uri.ListV4Options{Language: *language, SortBy: *sortBy}}
+			params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
+			break
+		}
 		handler = handlers.ListsDetailsHandler{ListID: *listID}
 		params = []string{fmt.Sprintf("id-%s", *listID)}
 	case "item-status":
@@ -76,11 +119,27 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 		if *movieID == 0 {
 			return fmt.Errorf("lists: -media-id <movie_id> is required for -a item-status")
 		}
+		if v4Mode {
+			if *mediaType != "movie" && *mediaType != "tv" {
+				return fmt.Errorf("lists: -media-type movie|tv is required for -v4 -a item-status")
+			}
+			handler = handlers.ListsItemStatusHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, ListID: *listID, MovieID: *movieID, MediaType: *mediaType}
+			params = []string{fmt.Sprintf("id-%s", *listID), fmt.Sprintf("media-%d", *movieID), "v4"}
+			break
+		}
 		handler = handlers.ListsItemStatusHandler{ListID: *listID, MovieID: *movieID}
 		params = []string{fmt.Sprintf("id-%s", *listID), fmt.Sprintf("media-%d", *movieID)}
 	case "create":
 		if *name == "" {
 			return fmt.Errorf("lists: -name <name> is required for -a create")
+		}
+		if v4Mode {
+			if *language == "" || *country == "" {
+				return fmt.Errorf("lists: -language and -country are required for -v4 -a create")
+			}
+			handler = handlers.ListsCreateHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, Name: *name, Description: *description, Language: *language, Country: *country, Public: *public}
+			params = []string{"v4"}
+			break
 		}
 		handler = handlers.ListsCreateHandler{
 			SessionID:   options.Session.SessionID,
@@ -88,6 +147,73 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 			Description: *description,
 			Language:    *language,
 		}
+	case "update":
+		if !v4Mode {
+			return fmt.Errorf("lists: -a update exists only in v4, add -v4")
+		}
+		if *listID == "" {
+			return fmt.Errorf("lists: -i <list_id> is required for -a update")
+		}
+		body := str.ListUpdateRequestV4{Name: *name, Description: *description, SortBy: *sortBy, BackdropPath: *backdropPath}
+		if visited["public"] {
+			body.Public = public
+		}
+		if body == (str.ListUpdateRequestV4{}) {
+			return fmt.Errorf("lists: -a update needs at least one of -name, -description, -public, -sort-by, -backdrop-path")
+		}
+		handler = handlers.ListsUpdateHandler{ListID: *listID, AccessToken: options.AccessTokenV4.AccessToken, Body: body}
+		params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
+	case "add-items":
+		if !v4Mode {
+			return fmt.Errorf("lists: -a add-items exists only in v4, add -v4")
+		}
+		if *listID == "" {
+			return fmt.Errorf("lists: -i <list_id> is required for -a add-items")
+		}
+		if len(items) == 0 {
+			return fmt.Errorf("lists: at least one -item <movie|tv>:<id> is required for -a add-items")
+		}
+		for _, item := range items {
+			if item.Comment != "" {
+				return fmt.Errorf("lists: comments in -item are only used by -a update-items")
+			}
+		}
+		handler = handlers.ListsAddItemsHandler{ListID: *listID, AccessToken: options.AccessTokenV4.AccessToken, Items: items}
+		params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
+	case "update-items":
+		if !v4Mode {
+			return fmt.Errorf("lists: -a update-items exists only in v4, add -v4")
+		}
+		if *listID == "" {
+			return fmt.Errorf("lists: -i <list_id> is required for -a update-items")
+		}
+		if len(items) == 0 {
+			return fmt.Errorf("lists: at least one -item <movie|tv>:<id>:<comment> is required for -a update-items")
+		}
+		for _, item := range items {
+			if item.Comment == "" {
+				return fmt.Errorf("lists: -item %s:%d needs a comment for -a update-items (movie:<id>:<comment>)", item.MediaType, item.MediaID)
+			}
+		}
+		handler = handlers.ListsUpdateItemsHandler{ListID: *listID, AccessToken: options.AccessTokenV4.AccessToken, Items: items}
+		params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
+	case "remove-items":
+		if !v4Mode {
+			return fmt.Errorf("lists: -a remove-items exists only in v4, add -v4")
+		}
+		if *listID == "" {
+			return fmt.Errorf("lists: -i <list_id> is required for -a remove-items")
+		}
+		if len(items) == 0 {
+			return fmt.Errorf("lists: at least one -item <movie|tv>:<id> is required for -a remove-items")
+		}
+		for _, item := range items {
+			if item.Comment != "" {
+				return fmt.Errorf("lists: comments in -item are only used by -a update-items")
+			}
+		}
+		handler = handlers.ListsRemoveItemsHandler{ListID: *listID, AccessToken: options.AccessTokenV4.AccessToken, Items: items}
+		params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
 	case "add-movie":
 		if *listID == "" {
 			return fmt.Errorf("lists: -i <list_id> is required for -a add-movie")
@@ -110,11 +236,21 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 		if *listID == "" {
 			return fmt.Errorf("lists: -i <list_id> is required for -a clear")
 		}
+		if v4Mode {
+			handler = handlers.ListsClearHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, ListID: *listID}
+			params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
+			break
+		}
 		handler = handlers.ListsClearHandler{ListID: *listID, SessionID: options.Session.SessionID}
 		params = []string{fmt.Sprintf("id-%s", *listID)}
 	case "delete":
 		if *listID == "" {
 			return fmt.Errorf("lists: -i <list_id> is required for -a delete")
+		}
+		if v4Mode {
+			handler = handlers.ListsDeleteHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, ListID: *listID}
+			params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
+			break
 		}
 		handler = handlers.ListsDeleteHandler{ListID: *listID, SessionID: options.Session.SessionID}
 		params = []string{fmt.Sprintf("id-%s", *listID)}
@@ -135,6 +271,9 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 
 	if created, ok := result.(*str.ListCreateResponse); ok && len(params) == 0 {
 		params = []string{fmt.Sprintf("id-%d", created.ListID)}
+	}
+	if created, ok := result.(*str.ListCreateResponseV4); ok {
+		params = []string{fmt.Sprintf("id-%d", created.ID), "v4"}
 	}
 
 	return writeResult(fs, config, "lists", *action, result, params...)

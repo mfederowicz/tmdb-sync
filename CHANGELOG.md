@@ -25,6 +25,14 @@ schedule.
 - `account -v4` accepts `-language <code>` (favorites, rated, recommended, watchlist) and
   `-sort-by created_at.asc|created_at.desc` (favorites, rated, watchlist); using one where the
   endpoint doesn't take it, or without `-v4`, is an error.
+- `lists -v4` (needs `-v4` and `read_access_token`; everything except `details`
+  also needs a cached user token from `auth -v4 -a login`): `-a details` (walks every item page,
+  `-language`, `-sort-by`, `-pages-limit`), `item-status` (`-media-type movie|tv`, `-media-id`),
+  and 🔒 `create` (`-name`, `-language`, `-country`, `-description`, `-public`), `update`
+  (`-name`, `-description`, `-public[=false]`, `-sort-by`, `-backdrop-path`), `delete`, `clear`,
+  and the batch actions `add-items`, `update-items` (comment per item) and `remove-items`, which
+  take repeatable `-item movie:<id>` / `-item tv:<id>[:<comment>]`. Results are written as
+  `lists_<action>_..._v4.json`.
 
 ### Changed
 

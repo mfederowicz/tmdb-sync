@@ -23,7 +23,7 @@ aiming for full TMDB v3 API coverage, one module at a time.
 - [`guest-sessions`](docs/guest-sessions.md) ✅ — guest session rated movies, TV shows, TV episodes.
 - [`keywords`](docs/keywords.md) ✅ — keyword details.
 - [`lists`](docs/lists.md) ✅ — list details, item status, and 🔒 create/add-movie/remove-movie/
-  clear/delete.
+  clear/delete (v3 session or `-v4`), plus v4 update and batch add/update/remove items.
 - [`movies`](docs/movies.md) ✅ — full movie module: details, lists, credits, images, videos,
   watch providers, and 🔒 account-states/add-rating/delete-rating.
 - [`networks`](docs/networks.md) ✅ — network details, alternative names, images.

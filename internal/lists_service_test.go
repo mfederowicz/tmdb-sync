@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/mfederowicz/tmdb-sync/uri"
+
 	"github.com/mfederowicz/tmdb-sync/str"
 )
 
@@ -188,5 +190,305 @@ func TestDeleteList(t *testing.T) {
 	}
 	if !status.Success {
 		t.Errorf("DeleteList() = %+v, want Success=true", status)
+	}
+}
+
+func TestListsGetListV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		if got := r.URL.Query().Get("language"); got != "en-US" {
+			t.Errorf("language = %q, want en-US", got)
+		}
+		page := r.URL.Query().Get("page")
+		item := map[string]any{"id": 1, "media_type": "movie", "title": "one"}
+		if page == "2" {
+			item = map[string]any{"id": 2, "media_type": "tv", "name": "two"}
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": 8, "name": "mine", "page": json.Number(page), "total_pages": 2, "total_results": 2,
+			"created_by": map[string]any{"username": "me"},
+			"results":    []any{item},
+		})
+	})
+
+	list, err := client.Lists.GetListV4(context.Background(), "usertok", "8", 0, uri.ListV4Options{Language: "en-US"})
+	if err != nil {
+		t.Fatalf("GetListV4() error = %v", err)
+	}
+	if list.ID != 8 || list.Name != "mine" || list.CreatedBy.Username != "me" {
+		t.Errorf("GetListV4() = %+v", list)
+	}
+	if len(list.Results) != 2 || list.Results[0].Title != "one" || list.Results[1].Name != "two" {
+		t.Errorf("Results = %+v, want both pages merged", list.Results)
+	}
+}
+
+func TestListsGetListV4_PublicWithoutUserToken(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer read" {
+			t.Errorf("Authorization = %q, want read token", got)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"id": 8, "page": 1, "total_pages": 1})
+	})
+
+	if _, err := client.Lists.GetListV4(context.Background(), "", "8", 0, uri.ListV4Options{}); err != nil {
+		t.Fatalf("GetListV4() error = %v", err)
+	}
+}
+
+func TestListsCreateListV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if body["name"] != "mine" || body["iso_639_1"] != "en" || body["iso_3166_1"] != "US" || body["public"] != true {
+			t.Errorf("body = %v", body)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"id": 77, "success": true, "status_code": 1})
+	})
+
+	created, err := client.Lists.CreateListV4(context.Background(), "usertok", &str.ListCreateRequestV4{Name: "mine", ISO6391: "en", ISO31661: "US", Public: true})
+	if err != nil {
+		t.Fatalf("CreateListV4() error = %v", err)
+	}
+	if created.ID != 77 || !created.Success {
+		t.Errorf("CreateListV4() = %+v", created)
+	}
+}
+
+func TestListsUpdateListV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if len(body) != 2 || body["name"] != "renamed" || body["public"] != false {
+			t.Errorf("body = %v, want only name and public=false", body)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"success": true, "status_code": 1})
+	})
+
+	public := false
+	status, err := client.Lists.UpdateListV4(context.Background(), "usertok", "8", &str.ListUpdateRequestV4{Name: "renamed", Public: &public})
+	if err != nil {
+		t.Fatalf("UpdateListV4() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("UpdateListV4() = %+v", status)
+	}
+}
+
+func TestListsDeleteListV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"success": true, "status_code": 1})
+	})
+
+	status, err := client.Lists.DeleteListV4(context.Background(), "usertok", "8")
+	if err != nil {
+		t.Fatalf("DeleteListV4() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("DeleteListV4() = %+v", status)
+	}
+}
+
+func TestListsAddItemsV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8/items", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		var body str.ListItemsRequestV4
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if len(body.Items) != 2 || body.Items[0] != (str.ListMediaV4{MediaType: "movie", MediaID: 100}) || body.Items[1] != (str.ListMediaV4{MediaType: "tv", MediaID: 200}) {
+			t.Errorf("items = %+v", body.Items)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success": true, "status_code": 1,
+			"results": []any{
+				map[string]any{"media_id": 100, "media_type": "movie", "success": true},
+				map[string]any{"media_id": 200, "media_type": "tv", "success": true},
+			},
+		})
+	})
+
+	result, err := client.Lists.AddItemsV4(context.Background(), "usertok", "8", []str.ListMediaV4{{MediaType: "movie", MediaID: 100}, {MediaType: "tv", MediaID: 200}})
+	if err != nil {
+		t.Fatalf("AddItemsV4() error = %v", err)
+	}
+	if !result.Success || len(result.Results) != 2 || !result.Results[1].Success {
+		t.Errorf("AddItemsV4() = %+v", result)
+	}
+}
+
+func TestListsUpdateItemsV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8/items", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		var body str.ListItemsRequestV4
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if len(body.Items) != 1 || body.Items[0] != (str.ListMediaV4{MediaType: "movie", MediaID: 100, Comment: "great"}) {
+			t.Errorf("items = %+v", body.Items)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success": true, "status_code": 1,
+			"results": []any{map[string]any{"media_id": 100, "media_type": "movie", "success": true}},
+		})
+	})
+
+	result, err := client.Lists.UpdateItemsV4(context.Background(), "usertok", "8", []str.ListMediaV4{{MediaType: "movie", MediaID: 100, Comment: "great"}})
+	if err != nil {
+		t.Fatalf("UpdateItemsV4() error = %v", err)
+	}
+	if !result.Success || len(result.Results) != 1 {
+		t.Errorf("UpdateItemsV4() = %+v", result)
+	}
+}
+
+func TestListsRemoveItemsV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8/items", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		var body str.ListItemsRequestV4
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if len(body.Items) != 1 || body.Items[0] != (str.ListMediaV4{MediaType: "tv", MediaID: 200}) {
+			t.Errorf("items = %+v", body.Items)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"success": true, "status_code": 1,
+			"results": []any{map[string]any{"media_id": 200, "media_type": "tv", "success": true}},
+		})
+	})
+
+	result, err := client.Lists.RemoveItemsV4(context.Background(), "usertok", "8", []str.ListMediaV4{{MediaType: "tv", MediaID: 200}})
+	if err != nil {
+		t.Fatalf("RemoveItemsV4() error = %v", err)
+	}
+	if !result.Success || len(result.Results) != 1 {
+		t.Errorf("RemoveItemsV4() = %+v", result)
+	}
+}
+
+func TestListsGetItemStatusV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8/item_status", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer read" {
+			t.Errorf("Authorization = %q, want read token", got)
+		}
+		q := r.URL.Query()
+		if q.Get("media_id") != "100" || q.Get("media_type") != "tv" {
+			t.Errorf("query = %q, want media_id=100&media_type=tv", r.URL.RawQuery)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"id": 8, "media_id": 100, "media_type": "tv", "success": true, "status_code": 1})
+	})
+
+	status, err := client.Lists.GetItemStatusV4(context.Background(), "", "8", "tv", 100)
+	if err != nil {
+		t.Fatalf("GetItemStatusV4() error = %v", err)
+	}
+	if status.ID != 8 || status.MediaID != 100 || !status.Success {
+		t.Errorf("GetItemStatusV4() = %+v", status)
+	}
+}
+
+func TestListsClearListV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8/clear", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"success": true, "status_code": 1, "id": 8, "items_deleted": 3})
+	})
+
+	status, err := client.Lists.ClearListV4(context.Background(), "usertok", "8")
+	if err != nil {
+		t.Fatalf("ClearListV4() error = %v", err)
+	}
+	if !status.Success || status.ItemsDeleted != 3 || status.ID != 8 {
+		t.Errorf("ClearListV4() = %+v", status)
 	}
 }

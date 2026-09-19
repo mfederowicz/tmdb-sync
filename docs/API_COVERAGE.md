@@ -244,14 +244,14 @@ account id).
 - [x] Watchlist TV Shows — `GET /4/account/{account_object_id}/tv/watchlist`
 
 ## v4 — Lists 🔒 for mutation and private lists
-- [ ] Details — `GET /4/list/{list_id}`
-- [ ] Create — `POST /4/list`
-- [ ] Update — `PUT /4/list/{list_id}`
-- [ ] Delete — `DELETE /4/list/{list_id}` *(reference documents it as `/4/{list_id}`, likely a
+- [x] Details — `GET /4/list/{list_id}`
+- [x] Create — `POST /4/list`
+- [x] Update — `PUT /4/list/{list_id}`
+- [x] Delete — `DELETE /4/list/{list_id}` *(reference documents it as `/4/{list_id}`, likely a
       typo — verify against the live API)*
-- [ ] Add Items — `POST /4/list/{list_id}/items`
-- [ ] Update Items — `PUT /4/list/{list_id}/items`
-- [ ] Remove Items — `DELETE /4/list/{list_id}/items`
-- [ ] Check Item Status — `GET /4/list/{list_id}/item_status`
-- [ ] Clear — `GET /4/list/{list_id}/clear` *(reference documents it as GET — verify against the
+- [x] Add Items — `POST /4/list/{list_id}/items`
+- [x] Update Items — `PUT /4/list/{list_id}/items`
+- [x] Remove Items — `DELETE /4/list/{list_id}/items`
+- [x] Check Item Status — `GET /4/list/{list_id}/item_status`
+- [x] Clear — `GET /4/list/{list_id}/clear` *(reference documents it as GET — verify against the
       live API)*

@@ -12,6 +12,7 @@ import (
 // ListsService handles communication with the /list endpoints of the TMDB
 // API. Read endpoints (Details, Check Item Status) are public; mutation
 // endpoints (Create, Add/Remove Movie, Clear, Delete) require a v3 session.
+// The V4-suffixed methods use the v4 API and the v4 user access token.
 type ListsService Service
 
 // GetList fetches details for a single list by TMDB list id.
@@ -168,4 +169,196 @@ func (s *ListsService) DeleteList(ctx context.Context, listID string, sessionID 
 	}
 
 	return status, resp, nil
+}
+
+// GetListV4 fetches a v4 list, walking the item pages until TMDB reports no
+// more (total_pages) or pagesLimit is reached (0 = unlimited). The user
+// access token is optional: without it only public lists are readable.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-details
+func (s *ListsService) GetListV4(ctx context.Context, accessToken, listID string, pagesLimit int, opts uri.ListV4Options) (*str.ListV4, error) {
+	var reqOpts []RequestOption
+	if accessToken != "" {
+		reqOpts = append(reqOpts, withUserToken(accessToken))
+	}
+
+	list := new(str.ListV4)
+	_, err := FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.ListItemV4], error) {
+		opts.Page = page
+		urlStr, err := uri.AddQuery(fmt.Sprintf("list/%s", listID), &opts)
+		if err != nil {
+			return PageResult[str.ListItemV4]{}, err
+		}
+
+		req, err := s.client.NewRequestV4(http.MethodGet, urlStr, nil, reqOpts...)
+		if err != nil {
+			return PageResult[str.ListItemV4]{}, err
+		}
+
+		body := new(str.ListV4)
+		if _, err := s.client.Do(ctx, req, body); err != nil {
+			return PageResult[str.ListItemV4]{}, err
+		}
+		results := body.Results
+		if page == 1 {
+			*list = *body
+			list.Results = nil
+		}
+		list.Results = append(list.Results, results...)
+		return PageResult[str.ListItemV4]{Results: results, Page: body.Page, TotalPages: body.TotalPages}, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
+// CreateListV4 creates a list owned by the v4 user access token's account.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-create
+func (s *ListsService) CreateListV4(ctx context.Context, accessToken string, body *str.ListCreateRequestV4) (*str.ListCreateResponseV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodPost, "list", body, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	created := new(str.ListCreateResponseV4)
+	if _, err := s.client.Do(ctx, req, created); err != nil {
+		return nil, err
+	}
+
+	return created, nil
+}
+
+// UpdateListV4 updates a list's name, description, visibility, sort order or
+// backdrop; only the fields set on body are changed.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-update
+func (s *ListsService) UpdateListV4(ctx context.Context, accessToken, listID string, body *str.ListUpdateRequestV4) (*str.ListStatusV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodPut, fmt.Sprintf("list/%s", listID), body, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	status := new(str.ListStatusV4)
+	if _, err := s.client.Do(ctx, req, status); err != nil {
+		return nil, err
+	}
+
+	return status, nil
+}
+
+// DeleteListV4 deletes a list owned by the v4 user access token's account.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-delete
+func (s *ListsService) DeleteListV4(ctx context.Context, accessToken, listID string) (*str.ListStatusV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodDelete, fmt.Sprintf("list/%s", listID), nil, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	status := new(str.ListStatusV4)
+	if _, err := s.client.Do(ctx, req, status); err != nil {
+		return nil, err
+	}
+
+	return status, nil
+}
+
+// AddItemsV4 adds movies and TV shows to a list in one request.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-add-items
+func (s *ListsService) AddItemsV4(ctx context.Context, accessToken, listID string, items []str.ListMediaV4) (*str.ListItemsResponseV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodPost, fmt.Sprintf("list/%s/items", listID), &str.ListItemsRequestV4{Items: items}, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	result := new(str.ListItemsResponseV4)
+	if _, err := s.client.Do(ctx, req, result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// UpdateItemsV4 updates the comments of items already on a list.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-update-items
+func (s *ListsService) UpdateItemsV4(ctx context.Context, accessToken, listID string, items []str.ListMediaV4) (*str.ListItemsResponseV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodPut, fmt.Sprintf("list/%s/items", listID), &str.ListItemsRequestV4{Items: items}, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	result := new(str.ListItemsResponseV4)
+	if _, err := s.client.Do(ctx, req, result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// RemoveItemsV4 removes movies and TV shows from a list in one request.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-remove-items
+func (s *ListsService) RemoveItemsV4(ctx context.Context, accessToken, listID string, items []str.ListMediaV4) (*str.ListItemsResponseV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodDelete, fmt.Sprintf("list/%s/items", listID), &str.ListItemsRequestV4{Items: items}, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	result := new(str.ListItemsResponseV4)
+	if _, err := s.client.Do(ctx, req, result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// GetItemStatusV4 reports whether a movie or TV show is on a list. TMDB's
+// reference says the caller must own the list, so pass the user access token;
+// an empty one falls back to the read token.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-check-item-status
+func (s *ListsService) GetItemStatusV4(ctx context.Context, accessToken, listID, mediaType string, mediaID int64) (*str.ListItemStatusV4, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("list/%s/item_status", listID), &uri.ListItemStatusV4Options{MediaID: mediaID, MediaType: mediaType})
+	if err != nil {
+		return nil, err
+	}
+
+	var reqOpts []RequestOption
+	if accessToken != "" {
+		reqOpts = append(reqOpts, withUserToken(accessToken))
+	}
+	req, err := s.client.NewRequestV4(http.MethodGet, urlStr, nil, reqOpts...)
+	if err != nil {
+		return nil, err
+	}
+
+	status := new(str.ListItemStatusV4)
+	if _, err := s.client.Do(ctx, req, status); err != nil {
+		return nil, err
+	}
+
+	return status, nil
+}
+
+// ClearListV4 removes all items from a list. TMDB's v4 reference documents
+// this as a GET request.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-clear
+func (s *ListsService) ClearListV4(ctx context.Context, accessToken, listID string) (*str.ListClearResponseV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodGet, fmt.Sprintf("list/%s/clear", listID), nil, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	status := new(str.ListClearResponseV4)
+	if _, err := s.client.Do(ctx, req, status); err != nil {
+		return nil, err
+	}
+
+	return status, nil
 }
