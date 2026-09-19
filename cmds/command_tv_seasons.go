@@ -49,6 +49,10 @@ func execTVSeasonsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Conf
 		return err
 	}
 
+	if err := requireSeasonEpisodeFlags(flagSet, "tv-seasons", *action, tvSeasonsActionsHelp, false); err != nil {
+		return err
+	}
+
 	if tvSeasonsSessionActions[*action] {
 		if err := cli.HandleToken(fs, config, client, options); err != nil {
 			return fmt.Errorf("tv-seasons: %w", err)

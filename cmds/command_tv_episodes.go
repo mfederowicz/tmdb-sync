@@ -56,6 +56,13 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 		return err
 	}
 
+	if err := requireSeasonEpisodeFlags(flagSet, "tv-episodes", *action, tvEpisodesActionsHelp, true); err != nil {
+		return err
+	}
+	if err := validateRatingValue("tv-episodes", *action, *value); err != nil {
+		return err
+	}
+
 	ratingGuestSessionID, err := resolveRatingGuestSessionID(*action, *guestSessionID, *guest, options)
 	if err != nil {
 		return fmt.Errorf("tv-episodes: %w", err)
@@ -118,9 +125,6 @@ func execTVEpisodesAttempt(fs afero.Fs, client *internal.Client, config *cfg.Con
 	case "add-rating":
 		if *seriesID == 0 {
 			return fmt.Errorf("tv-episodes: -i <series_id> is required for -a add-rating")
-		}
-		if *value == 0 {
-			return fmt.Errorf("tv-episodes: -value <rating> is required for -a add-rating")
 		}
 		sessionID := ""
 		if !usingGuestSession {

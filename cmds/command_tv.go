@@ -63,6 +63,10 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 		return err
 	}
 
+	if err := validateRatingValue("tv", *action, *value); err != nil {
+		return err
+	}
+
 	ratingGuestSessionID, err := resolveRatingGuestSessionID(*action, *guestSessionID, *guest, options)
 	if err != nil {
 		return fmt.Errorf("tv: %w", err)
@@ -201,9 +205,6 @@ func execTVAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, opt
 	case "add-rating":
 		if *seriesID == 0 {
 			return fmt.Errorf("tv: -i <series_id> is required for -a add-rating")
-		}
-		if *value == 0 {
-			return fmt.Errorf("tv: -value <rating> is required for -a add-rating")
 		}
 		sessionID := ""
 		if !usingGuestSession {
