@@ -502,3 +502,12 @@ func (s *AccountService) GetRecommendedTVV4(ctx context.Context, accessToken, ac
 func (s *AccountService) GetWatchlistMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.Movie, error) {
 	return fetchAccountV4[str.Movie](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/watchlist", accountID), pagesLimit)
 }
+
+// GetWatchlistTVV4 returns a v4 account's watchlisted TV shows, walking pages
+// until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/account-watchlist-tv
+func (s *AccountService) GetWatchlistTVV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.TV, error) {
+	return fetchAccountV4[str.TV](ctx, s, accessToken, fmt.Sprintf("account/%s/tv/watchlist", accountID), pagesLimit)
+}

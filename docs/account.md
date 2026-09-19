@@ -51,6 +51,7 @@ and a cached user access token from `tmdb-sync auth -v4 -a login` (no v3 session
 | `recommended-movies` | `tmdb-sync account -v4 -a recommended-movies` | `account_recommended-movies_v4.json` |
 | `recommended-tv` | `tmdb-sync account -v4 -a recommended-tv` | `account_recommended-tv_v4.json` |
 | `watchlist-movies` | `tmdb-sync account -v4 -a watchlist-movies` | `account_watchlist-movies_v4.json` |
+| `watchlist-tv` | `tmdb-sync account -v4 -a watchlist-tv` | `account_watchlist-tv_v4.json` |
 
 `recommended-movies` and `recommended-tv` exist only in v4; without `-v4` they fail with a hint.
 
