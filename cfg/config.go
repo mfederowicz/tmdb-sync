@@ -25,6 +25,7 @@ type Config struct {
 	SessionPath      string `toml:"session_path"`
 	AccountPath      string `toml:"account_path"`
 	GuestSessionPath string `toml:"guest_session_path"`
+	AccessTokenPath  string `toml:"access_token_path"`
 	OutputDir        string `toml:"output_dir"`
 	PerPage          int    `toml:"per_page"`
 	PagesLimit       int    `toml:"pages_limit"`
@@ -93,6 +94,12 @@ func MergeConfigs(defaultConfig *Config, fileConfig *Config, flagConfig map[stri
 		return nil, fmt.Errorf("config error : %w", err)
 	}
 	defaultConfig.GuestSessionPath = guestSessionPath
+
+	accessTokenPath, err := processOptionAccessTokenPath(defaultConfig, fileConfig)
+	if err != nil {
+		return nil, fmt.Errorf("config error : %w", err)
+	}
+	defaultConfig.AccessTokenPath = accessTokenPath
 
 	defaultConfig.ConfigPath = processOptionConfigPath(defaultConfig, fileConfig, flagConfig, flagset)
 
@@ -207,6 +214,18 @@ func processOptionGuestSessionPath(defaultConfig *Config, fileConfig *Config) (s
 	return guestSessionPath, nil
 }
 
+func processOptionAccessTokenPath(defaultConfig *Config, fileConfig *Config) (string, error) {
+	if len(fileConfig.AccessTokenPath) > consts.ZeroValue {
+		defaultConfig.AccessTokenPath = fileConfig.AccessTokenPath
+	}
+
+	accessTokenPath, err := expandTilde(defaultConfig.AccessTokenPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to expand tilde from accessTokenPath: %w", err)
+	}
+	return accessTokenPath, nil
+}
+
 func processOptionConfigPath(defaultConfig *Config, fileConfig *Config, flagConfig map[string]string, flagset map[string]bool) string {
 	if len(fileConfig.ConfigPath) > consts.ZeroValue {
 		defaultConfig.ConfigPath = fileConfig.ConfigPath
@@ -247,6 +266,7 @@ func DefaultConfig() *Config {
 		SessionPath:      buildDefaultSessionPath(),
 		AccountPath:      buildDefaultAccountPath(),
 		GuestSessionPath: buildDefaultGuestSessionPath(),
+		AccessTokenPath:  buildDefaultAccessTokenPath(),
 		OutputDir:        consts.EmptyString,
 		PerPage:          consts.ZeroValue,
 		PagesLimit:       consts.PagesLimit,
@@ -304,6 +324,14 @@ func buildDefaultAccountPath() string {
 
 func buildDefaultGuestSessionPath() string {
 	absPath, err := expandTilde("~/.config/tmdb-sync/guest_session.json")
+	if err != nil {
+		panic(err)
+	}
+	return absPath
+}
+
+func buildDefaultAccessTokenPath() string {
+	absPath, err := expandTilde("~/.config/tmdb-sync/access_token.json")
 	if err != nil {
 		panic(err)
 	}

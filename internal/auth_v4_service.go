@@ -37,3 +37,26 @@ func (s *AuthV4Service) CreateRequestToken(ctx context.Context, redirectTo strin
 
 	return token, resp, nil
 }
+
+// CreateAccessToken exchanges an approved v4 request token for a user access
+// token and account id.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/auth-create-access-token
+func (s *AuthV4Service) CreateAccessToken(ctx context.Context, requestToken string) (*str.AccessTokenV4, *str.Response, error) {
+	body := struct {
+		RequestToken string `json:"request_token"`
+	}{RequestToken: requestToken}
+
+	req, err := s.client.NewRequestV4(http.MethodPost, "auth/access_token", body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	accessToken := new(str.AccessTokenV4)
+	resp, err := s.client.Do(ctx, req, accessToken)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return accessToken, resp, nil
+}

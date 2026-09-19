@@ -23,6 +23,7 @@ api_key = "your-v3-api-key"
 # read_access_token = "your-v4-read-access-token"   # used as a Bearer header instead of api_key
 
 session_path = "~/.config/tmdb-sync/session.json"   # created by the auth flow, only needed for account commands
+access_token_path = "~/.config/tmdb-sync/access_token.json"   # v4 user token, created by `auth -v4 -a login`
 output_dir = ""        # where result JSON files are written; "" = current directory
 per_page = 20
 pages_limit = 10       # cap on pages walked by -all; 0 = unlimited (bounded by TMDB's total_pages)

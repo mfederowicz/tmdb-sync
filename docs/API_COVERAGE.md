@@ -227,7 +227,7 @@ rather than replacing it. Bearer token only — never `api_key`; account/list ca
 
 ## v4 — Auth
 - [x] Create Request Token — `POST /4/auth/request_token`
-- [ ] Create Access Token — `POST /4/auth/access_token`
+- [x] Create Access Token — `POST /4/auth/access_token`
 - [ ] Delete Access Token (logout) — `DELETE /4/auth/access_token`
 
 ## v4 — Account 🔒
