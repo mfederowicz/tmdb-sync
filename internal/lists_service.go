@@ -248,3 +248,20 @@ func (s *ListsService) UpdateListV4(ctx context.Context, accessToken, listID str
 
 	return status, nil
 }
+
+// DeleteListV4 deletes a list owned by the v4 user access token's account.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-delete
+func (s *ListsService) DeleteListV4(ctx context.Context, accessToken, listID string) (*str.ListStatusV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodDelete, fmt.Sprintf("list/%s", listID), nil, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	status := new(str.ListStatusV4)
+	if _, err := s.client.Do(ctx, req, status); err != nil {
+		return nil, err
+	}
+
+	return status, nil
+}
