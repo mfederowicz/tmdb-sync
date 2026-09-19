@@ -376,3 +376,71 @@ func TestGetWatchlistTV(t *testing.T) {
 		t.Errorf("GetWatchlistTV() = %+v, want one show with ID=1396", shows)
 	}
 }
+
+func TestAccountGetListsV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/lists", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		page := r.URL.Query().Get("page")
+		id := 1
+		if page == "2" {
+			id = 2
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":          id,
+			"total_pages":   2,
+			"total_results": 2,
+			"results": []map[string]any{
+				{"id": id, "name": "list", "public": 1, "number_of_items": 3, "created_at": "2024-01-01 00:00:00 UTC"},
+			},
+		})
+	})
+
+	lists, err := client.Account.GetListsV4(context.Background(), "usertok", "acc123", 0)
+	if err != nil {
+		t.Fatalf("GetListsV4() error = %v", err)
+	}
+	if len(lists) != 2 || lists[0].ID != 1 || lists[1].ID != 2 || lists[0].NumberOfItems != 3 || lists[0].Public != 1 {
+		t.Errorf("lists = %+v, want two pages of results", lists)
+	}
+}
+
+func TestAccountGetListsV4_PagesLimit(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	calls := 0
+	mux.HandleFunc("/account/acc123/lists", func(w http.ResponseWriter, _ *http.Request) {
+		calls++
+		json.NewEncoder(w).Encode(map[string]any{"page": calls, "total_pages": 5, "results": []map[string]any{{"id": calls}}})
+	})
+
+	lists, err := client.Account.GetListsV4(context.Background(), "usertok", "acc123", 1)
+	if err != nil {
+		t.Fatalf("GetListsV4() error = %v", err)
+	}
+	if calls != 1 || len(lists) != 1 {
+		t.Errorf("calls = %d, lists = %d, want 1 and 1", calls, len(lists))
+	}
+}
+
+func TestAccountGetListsV4_NeedsReadToken(t *testing.T) {
+	client, _, teardown := setupV4()
+	defer teardown()
+
+	if _, err := client.Account.GetListsV4(context.Background(), "usertok", "acc123", 1); err == nil {
+		t.Error("GetListsV4() error = nil, want error without read_access_token")
+	}
+}

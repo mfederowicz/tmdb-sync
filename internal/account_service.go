@@ -10,7 +10,8 @@ import (
 )
 
 // AccountService handles communication with the /account 🔒 endpoints of the
-// TMDB API. Every method requires a valid v3 session id.
+// TMDB API. Methods require a valid v3 session id, except the V4-suffixed ones,
+// which use the v4 user access token instead of a session_id.
 type AccountService Service
 
 // GetDetails fetches an account's details. If accountID is 0, it resolves
@@ -395,4 +396,49 @@ func (s *AccountService) AddRemoveFavorite(ctx context.Context, accountID int64,
 	}
 
 	return status, resp, nil
+}
+
+// withUserToken replaces the read access token with the v4 user access token.
+func withUserToken(accessToken string) RequestOption {
+	return func(req *http.Request) {
+		req.Header.Set("Authorization", "Bearer "+accessToken)
+	}
+}
+
+func (s *AccountService) getListsV4Page(ctx context.Context, accessToken, accountID string, page int) (*str.AccountListsV4, *str.Response, error) {
+	urlStr, err := uri.AddQuery(fmt.Sprintf("account/%s/lists", accountID), &uri.PageOptions{Page: page})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequestV4(http.MethodGet, urlStr, nil, withUserToken(accessToken))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	lists := new(str.AccountListsV4)
+	resp, err := s.client.Do(ctx, req, lists)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return lists, resp, nil
+}
+
+// GetListsV4 returns a v4 account's lists, walking pages until TMDB reports no
+// more (total_pages) or pagesLimit is reached (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/account-lists
+func (s *AccountService) GetListsV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.AccountListV4, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.AccountListV4], error) {
+		lists, _, err := s.getListsV4Page(ctx, accessToken, accountID, page)
+		if err != nil {
+			return PageResult[str.AccountListV4]{}, err
+		}
+		return PageResult[str.AccountListV4]{
+			Results:    lists.Results,
+			Page:       lists.Page,
+			TotalPages: lists.TotalPages,
+		}, nil
+	})
 }

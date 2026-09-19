@@ -6,6 +6,8 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"slices"
+	"strings"
 
 	"github.com/mfederowicz/tmdb-sync/cfg"
 	"github.com/mfederowicz/tmdb-sync/cli"
@@ -28,6 +30,9 @@ func isSessionInvalid(err error) bool {
 	var errResp *str.ErrorResponse
 	return errors.As(err, &errResp) && errResp.StatusCode == http.StatusUnauthorized
 }
+
+// accountV4Actions are the `account` actions implemented for -v4.
+var accountV4Actions = []string{"lists"}
 
 // AccountCmd is the "account" 🔒 module. Every action requires a v3 session,
 // established on demand via cli.HandleToken.
@@ -53,18 +58,35 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 	mediaID := flagSet.Int64("media-id", 0, "movie/tv id - required for -a add-watchlist, add-favorite")
 	watchlist := flagSet.Bool("watchlist", true, "used by -a add-watchlist: true adds, false removes")
 	favorite := flagSet.Bool("favorite", true, "used by -a add-favorite: true adds, false removes")
+	v3 := flagSet.Bool("v3", false, "use the v3 API (default)")
+	v4 := flagSet.Bool("v4", false, "use the v4 API: needs `auth -v4 -a login` first; actions: lists")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a favorite-movies, favorite-tv, lists, rated-movies, rated-tv, rated-tv-episodes, watchlist-movies, watchlist-tv (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
 
-	if err := cli.HandleToken(fs, config, client, options); err != nil {
+	version, err := resolveAPIVersion(*v3, *v4)
+	if err != nil {
 		return fmt.Errorf("account: %w", err)
 	}
+	v4Mode := version == apiV4
 
-	id := *accountID
-	if id == 0 && options.Account != nil && options.Account.ID != 0 {
-		id = options.Account.ID
+	var id int64
+	if v4Mode {
+		if *action != "" && !slices.Contains(accountV4Actions, *action) {
+			return fmt.Errorf("account: action %q is not available with -v4 (v4 actions: %s)", *action, strings.Join(accountV4Actions, ", "))
+		}
+		if *action != "" && (options.AccessTokenV4 == nil || options.AccessTokenV4.AccessToken == "" || options.AccessTokenV4.AccountID == "") {
+			return fmt.Errorf("account: no v4 access token cached at %s, run `auth -v4 -a login` first", config.AccessTokenPath)
+		}
+	} else {
+		if err := cli.HandleToken(fs, config, client, options); err != nil {
+			return fmt.Errorf("account: %w", err)
+		}
+		id = *accountID
+		if id == 0 && options.Account != nil && options.Account.ID != 0 {
+			id = options.Account.ID
+		}
 	}
 
 	var handler handlers.Handler
@@ -126,6 +148,11 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 		handler = handlers.AccountFavoriteTVHandler{AccountID: id, SessionID: options.Session.SessionID, PagesLimit: *pagesLimit}
 		params = []string{fmt.Sprintf("id-%d", id)}
 	case "lists":
+		if v4Mode {
+			handler = handlers.AccountListsHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
+			params = []string{"v4"}
+			break
+		}
 		if id == 0 {
 			return fmt.Errorf("account: -i <account_id> is required for -a lists (or run -a details once to cache it)")
 		}

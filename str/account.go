@@ -61,3 +61,31 @@ type AccountLists struct {
 	TotalPages   int           `json:"total_pages"`
 	TotalResults int           `json:"total_results"`
 }
+
+// AccountListV4 is one of an account's lists, as returned by
+// GET /4/account/{account_object_id}/lists.
+type AccountListV4 struct {
+	ID            int64   `json:"id"`
+	Name          string  `json:"name"`
+	Description   string  `json:"description"`
+	ISO6391       string  `json:"iso_639_1"`
+	ISO31661      string  `json:"iso_3166_1"`
+	Public        int     `json:"public"`
+	SortBy        string  `json:"sort_by"`
+	PosterPath    string  `json:"poster_path"`
+	BackdropPath  string  `json:"backdrop_path"`
+	AverageRating float64 `json:"average_rating"`
+	Runtime       int     `json:"runtime"`
+	Revenue       int64   `json:"revenue"`
+	NumberOfItems int     `json:"number_of_items"`
+	CreatedAt     string  `json:"created_at"`
+	UpdatedAt     string  `json:"updated_at"`
+}
+
+// AccountListsV4 is a paginated list of a v4 account's lists.
+type AccountListsV4 struct {
+	Page         int             `json:"page"`
+	Results      []AccountListV4 `json:"results"`
+	TotalPages   int             `json:"total_pages"`
+	TotalResults int             `json:"total_results"`
+}

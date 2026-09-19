@@ -88,3 +88,54 @@ func TestExecAccount_RefreshesStaleSession(t *testing.T) {
 		t.Errorf("options.Session.SessionID = %q, want %q", options.Session.SessionID, "new-session")
 	}
 }
+
+func TestExecAccountV4_Lists(t *testing.T) {
+	client, mux, teardown := setupAccountClient()
+	defer teardown()
+	client.BaseURLV4, _ = url.Parse(client.BaseURL.String())
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/account/acc123/lists", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		w.Write([]byte(`{"page":1,"total_pages":1,"total_results":1,"results":[{"id":7,"name":"mine"}]}`))
+	})
+
+	fs := afero.NewMemMapFs()
+	config := cfg.DefaultConfig()
+	config.OutputDir = "out"
+	options := &str.Options{AccessTokenV4: &str.AccessTokenV4{Success: true, AccessToken: "usertok", AccountID: "acc123"}}
+
+	if err := execAccount(fs, client, config, options, []string{"-v4", "-a", "lists"}); err != nil {
+		t.Fatalf("execAccount() error = %v", err)
+	}
+	if exists, _ := afero.Exists(fs, "out/account_lists_v4.json"); !exists {
+		t.Error("expected out/account_lists_v4.json to be written")
+	}
+}
+
+func TestExecAccountV4_Errors(t *testing.T) {
+	client, _, teardown := setupAccountClient()
+	defer teardown()
+
+	loggedIn := &str.Options{AccessTokenV4: &str.AccessTokenV4{Success: true, AccessToken: "usertok", AccountID: "acc123"}}
+	tests := []struct {
+		name    string
+		options *str.Options
+		args    []string
+	}{
+		{"no cached token", &str.Options{}, []string{"-v4", "-a", "lists"}},
+		{"missing action", loggedIn, []string{"-v4"}},
+		{"unknown action", loggedIn, []string{"-v4", "-a", "details"}},
+		{"both versions", loggedIn, []string{"-v3", "-v4", "-a", "lists"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := execAccount(afero.NewMemMapFs(), client, cfg.DefaultConfig(), tt.options, tt.args)
+			if err == nil {
+				t.Error("execAccount() error = nil, want error")
+			}
+		})
+	}
+}

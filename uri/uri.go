@@ -39,6 +39,12 @@ type AccountListOptions struct {
 	Page      int    `url:"page,omitempty"`
 }
 
+// PageOptions carries only the page query parameter, for paginated endpoints
+// that need no other query (e.g. the v4 account lists).
+type PageOptions struct {
+	Page int `url:"page,omitempty"`
+}
+
 // RatingOptions carries the session_id or guest_session_id query parameter
 // accepted by movie/tv/tv-episode add-rating (🔒) endpoints, which take
 // either an account session or a guest session.

@@ -33,3 +33,14 @@ Notes:
 - If TMDB reports the cached session as no longer valid (HTTP 401 — e.g. it expired or was
   revoked from the TMDB website), the action transparently re-runs the browser-approval login
   flow and retries once, instead of failing outright.
+
+## v4 (`-v4`)
+
+`account -v4 -a <action>` uses the TMDB v4 API instead. It needs `read_access_token` in the config
+and a cached user access token from `tmdb-sync auth -v4 -a login` (no v3 session, no `-i`: the v4
+`account_object_id` is read from the cached token file). Output files carry a `_v4` suffix and
+`-pages-limit` works as in v3. Combining `-v3` and `-v4` is an error.
+
+| action  | example                             | output file            |
+|---------|-------------------------------------|------------------------|
+| `lists` | `tmdb-sync account -v4 -a lists`    | `account_lists_v4.json` |
