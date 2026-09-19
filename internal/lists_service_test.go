@@ -216,7 +216,7 @@ func TestListsGetListV4(t *testing.T) {
 		json.NewEncoder(w).Encode(map[string]any{
 			"id": 8, "name": "mine", "page": json.Number(page), "total_pages": 2, "total_results": 2,
 			"public": true, "revenue": 100853753, "sort_by": "original_order.asc",
-			"comments": map[string]any{"movie:1": "great", "tv:2": nil},
+			"comments":   map[string]any{"movie:1": "great", "tv:2": nil},
 			"created_by": map[string]any{"username": "me"},
 			"results":    []any{item},
 		})
