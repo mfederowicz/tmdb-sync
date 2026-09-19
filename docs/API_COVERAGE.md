@@ -250,7 +250,7 @@ account id).
 - [x] Delete — `DELETE /4/list/{list_id}` *(reference documents it as `/4/{list_id}`, likely a
       typo — verify against the live API)*
 - [x] Add Items — `POST /4/list/{list_id}/items`
-- [ ] Update Items — `PUT /4/list/{list_id}/items`
+- [x] Update Items — `PUT /4/list/{list_id}/items`
 - [ ] Remove Items — `DELETE /4/list/{list_id}/items`
 - [ ] Check Item Status — `GET /4/list/{list_id}/item_status`
 - [ ] Clear — `GET /4/list/{list_id}/clear` *(reference documents it as GET — verify against the

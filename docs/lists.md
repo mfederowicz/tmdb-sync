@@ -31,6 +31,7 @@ Notes:
 | `update` 🔒 | `tmdb-sync lists -v4 -a update -i 8 -name "new" -public=false` | `lists_update_id-8_v4.json` |
 | `delete` 🔒 | `tmdb-sync lists -v4 -a delete -i 8` | `lists_delete_id-8_v4.json` |
 | `add-items` 🔒 | `tmdb-sync lists -v4 -a add-items -i 8 -item movie:100 -item tv:200` | `lists_add-items_id-8_v4.json` |
+| `update-items` 🔒 | `tmdb-sync lists -v4 -a update-items -i 8 -item "movie:100:my comment"` | `lists_update-items_id-8_v4.json` |
 
 - `-v4 -a details` walks every item page (`-pages-limit`, default from config, 0 = unlimited) and
   merges the items into `results`. `-language` and `-sort-by` (e.g. `original_order.asc`) are optional.
@@ -44,3 +45,5 @@ Notes:
   documents the path as `/4/{list_id}`, which looks like a typo (to be confirmed against the live API).
 - `-v4 -a add-items` needs `auth -v4 -a login` and one or more `-item movie:<id>` / `-item tv:<id>`;
   the output has TMDB's per-item `results`.
+- `-v4 -a update-items` sets the comment of items already on the list: `-item movie:<id>:<comment>`
+  (repeatable, comment required, may contain colons). `add-items` rejects comments.

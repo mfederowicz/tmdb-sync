@@ -282,3 +282,20 @@ func (s *ListsService) AddItemsV4(ctx context.Context, accessToken, listID strin
 
 	return result, nil
 }
+
+// UpdateItemsV4 updates the comments of items already on a list.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-update-items
+func (s *ListsService) UpdateItemsV4(ctx context.Context, accessToken, listID string, items []str.ListMediaV4) (*str.ListItemsResponseV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodPut, fmt.Sprintf("list/%s/items", listID), &str.ListItemsRequestV4{Items: items}, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	result := new(str.ListItemsResponseV4)
+	if _, err := s.client.Do(ctx, req, result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}

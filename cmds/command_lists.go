@@ -27,7 +27,7 @@ var listsSessionActions = map[string]bool{
 }
 
 // listsV4Actions are the `lists` actions implemented for -v4.
-var listsV4Actions = []string{"details", "create", "update", "delete", "add-items"}
+var listsV4Actions = []string{"details", "create", "update", "delete", "add-items", "update-items"}
 
 // ListsCmd is the "lists" module. Read actions (details, item-status) are
 // public; mutation actions (create, add-movie, remove-movie, clear, delete)
@@ -55,12 +55,12 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	description := flagSet.String("description", "", "list description, used by -a create")
 	language := flagSet.String("language", "", "list language (ISO 639-1), used by -a create")
 	v3 := flagSet.Bool("v3", false, "use the v3 API (default)")
-	v4 := flagSet.Bool("v4", false, "use the v4 API (optionally with `auth -v4 -a login` for private lists); actions: details, create, update, delete, add-items")
+	v4 := flagSet.Bool("v4", false, "use the v4 API (optionally with `auth -v4 -a login` for private lists); actions: details, create, update, delete, add-items, update-items")
 	sortBy := flagSet.String("sort-by", "", "v4 only: sort order of the items, for -a details (e.g. original_order.asc, vote_average.desc)")
 	country := flagSet.String("country", "", "v4 only: list country (ISO 3166-1, e.g. US), required for -a create")
 	public := flagSet.Bool("public", false, "v4 only: make the list public, used by -a create")
 	var items itemFlag
-	flagSet.Var(&items, "item", "v4 only: media to add, as movie:<id> or tv:<id>, repeatable, required for -a add-items")
+	flagSet.Var(&items, "item", "v4 only: media as movie:<id> or tv:<id>, repeatable, required for -a add-items and update-items; update-items needs a comment: movie:<id>:<comment>")
 	backdropPath := flagSet.String("backdrop-path", "", "v4 only: backdrop image path, used by -a update")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "v4 only: item pages limit for -a details (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
@@ -164,7 +164,29 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 		if len(items) == 0 {
 			return fmt.Errorf("lists: at least one -item <movie|tv>:<id> is required for -a add-items")
 		}
+		for _, item := range items {
+			if item.Comment != "" {
+				return fmt.Errorf("lists: comments in -item are only used by -a update-items")
+			}
+		}
 		handler = handlers.ListsAddItemsHandler{ListID: *listID, AccessToken: options.AccessTokenV4.AccessToken, Items: items}
+		params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
+	case "update-items":
+		if !v4Mode {
+			return fmt.Errorf("lists: -a update-items exists only in v4, add -v4")
+		}
+		if *listID == "" {
+			return fmt.Errorf("lists: -i <list_id> is required for -a update-items")
+		}
+		if len(items) == 0 {
+			return fmt.Errorf("lists: at least one -item <movie|tv>:<id>:<comment> is required for -a update-items")
+		}
+		for _, item := range items {
+			if item.Comment == "" {
+				return fmt.Errorf("lists: -item %s:%d needs a comment for -a update-items (movie:<id>:<comment>)", item.MediaType, item.MediaID)
+			}
+		}
+		handler = handlers.ListsUpdateItemsHandler{ListID: *listID, AccessToken: options.AccessTokenV4.AccessToken, Items: items}
 		params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
 	case "add-movie":
 		if *listID == "" {

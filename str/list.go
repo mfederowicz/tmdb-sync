@@ -135,9 +135,11 @@ type ListStatusV4 struct {
 type ListMediaV4 struct {
 	MediaType string `json:"media_type"`
 	MediaID   int64  `json:"media_id"`
+	Comment   string `json:"comment,omitempty"`
 }
 
-// ListItemsRequestV4 is the body of POST /4/list/{list_id}/items.
+// ListItemsRequestV4 is the body of POST and PUT /4/list/{list_id}/items;
+// comment is only meaningful for PUT.
 type ListItemsRequestV4 struct {
 	Items []ListMediaV4 `json:"items"`
 }
