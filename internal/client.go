@@ -51,7 +51,6 @@ type Client struct {
 	common         Service
 	Account        *AccountService
 	Auth           *AuthService
-	AuthV4         *AuthV4Service
 	Certifications *CertificationsService
 	Changes        *ChangesService
 	Collections    *CollectionsService
@@ -114,7 +113,6 @@ func (c *Client) initialize() {
 	c.common.client = c
 	c.Account = (*AccountService)(&c.common)
 	c.Auth = (*AuthService)(&c.common)
-	c.AuthV4 = (*AuthV4Service)(&c.common)
 	c.Certifications = (*CertificationsService)(&c.common)
 	c.Changes = (*ChangesService)(&c.common)
 	c.Collections = (*CollectionsService)(&c.common)

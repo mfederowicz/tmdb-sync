@@ -13,7 +13,7 @@ type AuthLogoutHandler struct {
 
 // Handle invalidates the v4 user access token.
 func (h AuthLogoutHandler) Handle(ctx context.Context, client *internal.Client) (any, error) {
-	status, _, err := client.AuthV4.DeleteAccessToken(ctx, h.AccessToken)
+	status, _, err := client.Auth.DeleteAccessTokenV4(ctx, h.AccessToken)
 	if err != nil {
 		return nil, err
 	}

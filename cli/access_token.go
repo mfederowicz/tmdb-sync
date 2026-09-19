@@ -20,7 +20,7 @@ const tmdbApproveURLV4Fmt = "https://www.themoviedb.org/auth/access?request_toke
 func CreateAccessTokenInteractively(fs afero.Fs, config *cfg.Config, client *internal.Client) (*str.AccessTokenV4, error) {
 	ctx := context.Background()
 
-	requestToken, _, err := client.AuthV4.CreateRequestToken(ctx, "")
+	requestToken, _, err := client.Auth.CreateRequestTokenV4(ctx, "")
 	if err != nil {
 		return nil, fmt.Errorf("create v4 request token: %w", err)
 	}
@@ -31,7 +31,7 @@ func CreateAccessTokenInteractively(fs afero.Fs, config *cfg.Config, client *int
 	printer.Println("Press Enter once you have approved access...")
 	WaitForEnter()
 
-	accessToken, _, err := client.AuthV4.CreateAccessToken(ctx, requestToken.RequestToken)
+	accessToken, _, err := client.Auth.CreateAccessTokenV4(ctx, requestToken.RequestToken)
 	if err != nil {
 		return nil, fmt.Errorf("create v4 access token: %w", err)
 	}
