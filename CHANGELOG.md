@@ -26,6 +26,15 @@ schedule.
 
 ### Fixed
 
+- API client: response bodies of failed (non-2xx) requests are now closed, so failed calls no
+  longer leak connections.
+- A 429 error no longer prints the request URL with the `api_key` query parameter in clear.
+- A 429 with a `Retry-After` header now arms the client's rate-limit guard, so later requests in
+  the same run stop instead of hammering the API.
+- Error responses with a non-JSON body (e.g. a proxy's HTML page) now keep their HTTP status code,
+  so a 401 still triggers the session re-login.
+- v4 requests made with a user access token no longer require `read_access_token` in the config.
+
 ## [0.27.0] - 2026-09-19
 
 ### Added

@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -146,10 +147,16 @@ func (c *Client) NewRequest(method, urlStr string, body any, opts ...RequestOpti
 // NewRequestV4 creates a TMDB v4 API request: it targets BaseURLV4 and
 // authenticates with the bearer token only, never appending api_key.
 func (c *Client) NewRequestV4(method, urlStr string, body any, opts ...RequestOption) (*http.Request, error) {
-	if c.headers["Authorization"] == nil {
+	req, err := c.newRequest(c.BaseURLV4, false, method, urlStr, body, opts...)
+	if err != nil {
+		return nil, err
+	}
+	// Checked after the options run: a user access token option sets the
+	// Authorization header itself, so the read token isn't required then.
+	if req.Header.Get("Authorization") == "" {
 		return nil, errV4NeedsReadToken
 	}
-	return c.newRequest(c.BaseURLV4, false, method, urlStr, body, opts...)
+	return req, nil
 }
 
 func (c *Client) newRequest(base *url.URL, withAPIKey bool, method, urlStr string, body any, opts ...RequestOption) (*http.Request, error) {
@@ -236,9 +243,6 @@ func (c *Client) requestSetHeaders(r *http.Request, body any) *http.Request {
 func (c *Client) Do(ctx context.Context, req *http.Request, v any) (*str.Response, error) {
 	resp, err := c.BareDo(ctx, req)
 	if err != nil {
-		if v != nil && resp != nil && resp.StatusCode > 399 {
-			json.NewDecoder(resp.Body).Decode(v)
-		}
 		return resp, err
 	}
 	defer resp.Body.Close()
@@ -280,10 +284,30 @@ func (c *Client) BareDo(ctx context.Context, req *http.Request) (*str.Response, 
 	resp := c.NewResponse(httpResp)
 
 	if err := CheckResponse(httpResp); err != nil {
+		// CheckResponse has already read what it needs from the body; release
+		// the connection since callers won't close the body of a failed call.
+		httpResp.Body.Close()
+		c.recordRetryAfter(httpResp)
 		return resp, err
 	}
 
 	return resp, nil
+}
+
+// recordRetryAfter arms the local rate-limit guard from a 429's Retry-After
+// header (delta-seconds), so later requests short-circuit instead of hammering
+// the API. A missing or unparseable header leaves the guard untouched.
+func (c *Client) recordRetryAfter(r *http.Response) {
+	if r.StatusCode != http.StatusTooManyRequests {
+		return
+	}
+	seconds, err := strconv.Atoi(strings.TrimSpace(r.Header.Get("Retry-After")))
+	if err != nil || seconds <= 0 {
+		return
+	}
+	c.rateMu.Lock()
+	c.RateLimitReset = time.Now().Add(time.Duration(seconds) * time.Second)
+	c.rateMu.Unlock()
 }
 
 func handleBareDoError(ctx context.Context, err error) (*str.Response, error) {
@@ -342,7 +366,9 @@ func CheckResponse(r *http.Response) error {
 		return errorResponse
 	}
 
-	return fmt.Errorf("tmdb: unexpected status %s", r.Status)
+	// Non-JSON body (e.g. a proxy's HTML error page): keep the status code so
+	// callers can still match on it, such as the 401 re-login check.
+	return &str.ErrorResponse{StatusCode: r.StatusCode, StatusMessage: r.Status}
 }
 
 // CheckRetryAfter check Retry After header.
