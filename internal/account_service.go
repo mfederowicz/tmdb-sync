@@ -405,24 +405,33 @@ func withUserToken(accessToken string) RequestOption {
 	}
 }
 
-func (s *AccountService) getListsV4Page(ctx context.Context, accessToken, accountID string, page int) (*str.AccountListsV4, *str.Response, error) {
-	urlStr, err := uri.AddQuery(fmt.Sprintf("account/%s/lists", accountID), &uri.PageOptions{Page: page})
-	if err != nil {
-		return nil, nil, err
-	}
+// pagedV4 is the envelope shared by v4 account list endpoints.
+type pagedV4[T any] struct {
+	Page       int `json:"page"`
+	Results    []T `json:"results"`
+	TotalPages int `json:"total_pages"`
+}
 
-	req, err := s.client.NewRequestV4(http.MethodGet, urlStr, nil, withUserToken(accessToken))
-	if err != nil {
-		return nil, nil, err
-	}
+// fetchAccountV4 walks every page (up to pagesLimit, 0 = unlimited) of the v4
+// account endpoint at path, authenticated with the user access token.
+func fetchAccountV4[T any](ctx context.Context, s *AccountService, accessToken, path string, pagesLimit int) ([]T, error) {
+	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[T], error) {
+		urlStr, err := uri.AddQuery(path, &uri.PageOptions{Page: page})
+		if err != nil {
+			return PageResult[T]{}, err
+		}
 
-	lists := new(str.AccountListsV4)
-	resp, err := s.client.Do(ctx, req, lists)
-	if err != nil {
-		return nil, resp, err
-	}
+		req, err := s.client.NewRequestV4(http.MethodGet, urlStr, nil, withUserToken(accessToken))
+		if err != nil {
+			return PageResult[T]{}, err
+		}
 
-	return lists, resp, nil
+		body := new(pagedV4[T])
+		if _, err := s.client.Do(ctx, req, body); err != nil {
+			return PageResult[T]{}, err
+		}
+		return PageResult[T]{Results: body.Results, Page: body.Page, TotalPages: body.TotalPages}, nil
+	})
 }
 
 // GetListsV4 returns a v4 account's lists, walking pages until TMDB reports no
@@ -430,15 +439,14 @@ func (s *AccountService) getListsV4Page(ctx context.Context, accessToken, accoun
 //
 // Api docs: https://developer.themoviedb.org/v4/reference/account-lists
 func (s *AccountService) GetListsV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.AccountListV4, error) {
-	return FetchAllPages(ctx, pagesLimit, func(ctx context.Context, page int) (PageResult[str.AccountListV4], error) {
-		lists, _, err := s.getListsV4Page(ctx, accessToken, accountID, page)
-		if err != nil {
-			return PageResult[str.AccountListV4]{}, err
-		}
-		return PageResult[str.AccountListV4]{
-			Results:    lists.Results,
-			Page:       lists.Page,
-			TotalPages: lists.TotalPages,
-		}, nil
-	})
+	return fetchAccountV4[str.AccountListV4](ctx, s, accessToken, fmt.Sprintf("account/%s/lists", accountID), pagesLimit)
+}
+
+// GetFavoriteMoviesV4 returns a v4 account's favorited movies, walking pages
+// until TMDB reports no more (total_pages) or pagesLimit is reached
+// (0 = unlimited).
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/account-favorite-movies
+func (s *AccountService) GetFavoriteMoviesV4(ctx context.Context, accessToken, accountID string, pagesLimit int) ([]str.Movie, error) {
+	return fetchAccountV4[str.Movie](ctx, s, accessToken, fmt.Sprintf("account/%s/movie/favorites", accountID), pagesLimit)
 }

@@ -444,3 +444,35 @@ func TestAccountGetListsV4_NeedsReadToken(t *testing.T) {
 		t.Error("GetListsV4() error = nil, want error without read_access_token")
 	}
 }
+
+func TestAccountGetFavoriteMoviesV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read", APIKeyParam: "mykey"})
+
+	mux.HandleFunc("/account/acc123/movie/favorites", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user access token", got)
+		}
+		if r.URL.Query().Has(APIKeyParam) {
+			t.Errorf("v4 request must not carry api_key, got query %q", r.URL.RawQuery)
+		}
+		page := 1
+		if r.URL.Query().Get("page") == "2" {
+			page = 2
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"page":        page,
+			"total_pages": 2,
+			"results":     []map[string]any{{"id": 550 + page, "title": "Fight Club"}},
+		})
+	})
+
+	movies, err := client.Account.GetFavoriteMoviesV4(context.Background(), "usertok", "acc123", 0)
+	if err != nil {
+		t.Fatalf("GetFavoriteMoviesV4() error = %v", err)
+	}
+	if len(movies) != 2 || movies[0].ID != 551 || movies[1].ID != 552 {
+		t.Errorf("movies = %+v, want two pages of results", movies)
+	}
+}

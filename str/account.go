@@ -81,11 +81,3 @@ type AccountListV4 struct {
 	CreatedAt     string  `json:"created_at"`
 	UpdatedAt     string  `json:"updated_at"`
 }
-
-// AccountListsV4 is a paginated list of a v4 account's lists.
-type AccountListsV4 struct {
-	Page         int             `json:"page"`
-	Results      []AccountListV4 `json:"results"`
-	TotalPages   int             `json:"total_pages"`
-	TotalResults int             `json:"total_results"`
-}

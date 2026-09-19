@@ -234,7 +234,7 @@ rather than replacing it. Bearer token only — never `api_key`; account/list ca
 Path parameter is the v4 `account_object_id` returned by Create Access Token (not the v3 numeric
 account id).
 - [x] Lists — `GET /4/account/{account_object_id}/lists`
-- [ ] Favorite Movies — `GET /4/account/{account_object_id}/movie/favorites`
+- [x] Favorite Movies — `GET /4/account/{account_object_id}/movie/favorites`
 - [ ] Favorite TV Shows — `GET /4/account/{account_object_id}/tv/favorites`
 - [ ] Rated Movies — `GET /4/account/{account_object_id}/movie/rated`
 - [ ] Rated TV Shows — `GET /4/account/{account_object_id}/tv/rated`

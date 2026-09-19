@@ -32,7 +32,7 @@ func isSessionInvalid(err error) bool {
 }
 
 // accountV4Actions are the `account` actions implemented for -v4.
-var accountV4Actions = []string{"lists"}
+var accountV4Actions = []string{"lists", "favorite-movies"}
 
 // AccountCmd is the "account" 🔒 module. Every action requires a v3 session,
 // established on demand via cli.HandleToken.
@@ -59,7 +59,7 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 	watchlist := flagSet.Bool("watchlist", true, "used by -a add-watchlist: true adds, false removes")
 	favorite := flagSet.Bool("favorite", true, "used by -a add-favorite: true adds, false removes")
 	v3 := flagSet.Bool("v3", false, "use the v3 API (default)")
-	v4 := flagSet.Bool("v4", false, "use the v4 API: needs `auth -v4 -a login` first; actions: lists")
+	v4 := flagSet.Bool("v4", false, "use the v4 API: needs `auth -v4 -a login` first; actions: lists, favorite-movies")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "pages limit, used by -a favorite-movies, favorite-tv, lists, rated-movies, rated-tv, rated-tv-episodes, watchlist-movies, watchlist-tv (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
@@ -136,6 +136,11 @@ func execAccountAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config
 		}
 		params = []string{fmt.Sprintf("id-%d", id), *mediaType, fmt.Sprintf("media-%d", *mediaID)}
 	case "favorite-movies":
+		if v4Mode {
+			handler = handlers.AccountFavoriteMoviesHandler{V4: true, AccessToken: options.AccessTokenV4.AccessToken, V4AccountID: options.AccessTokenV4.AccountID, PagesLimit: *pagesLimit}
+			params = []string{"v4"}
+			break
+		}
 		if id == 0 {
 			return fmt.Errorf("account: -i <account_id> is required for -a favorite-movies (or run -a details once to cache it)")
 		}

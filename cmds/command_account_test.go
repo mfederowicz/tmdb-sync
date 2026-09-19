@@ -128,6 +128,7 @@ func TestExecAccountV4_Errors(t *testing.T) {
 		{"no cached token", &str.Options{}, []string{"-v4", "-a", "lists"}},
 		{"missing action", loggedIn, []string{"-v4"}},
 		{"unknown action", loggedIn, []string{"-v4", "-a", "details"}},
+		{"v3-only action", loggedIn, []string{"-v4", "-a", "rated-tv"}},
 		{"both versions", loggedIn, []string{"-v3", "-v4", "-a", "lists"}},
 	}
 	for _, tt := range tests {
