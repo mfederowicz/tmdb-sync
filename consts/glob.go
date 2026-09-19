@@ -7,6 +7,8 @@ const (
 	ZeroValue   = 0
 	// X644 is the default file permission for written json files.
 	X644 = 0o644
+	// X600 is the file permission for written files holding secrets (tokens).
+	X600 = 0o600
 )
 
 // usage strings for CLI flags

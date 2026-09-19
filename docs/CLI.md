@@ -23,6 +23,7 @@ api_key = "your-v3-api-key"
 # read_access_token = "your-v4-read-access-token"   # used as a Bearer header instead of api_key
 
 session_path = "~/.config/tmdb-sync/session.json"   # created by the auth flow, only needed for account commands
+access_token_path = "~/.config/tmdb-sync/access_token.json"   # v4 user token, created by `auth -v4 -a login`
 output_dir = ""        # where result JSON files are written; "" = current directory
 per_page = 20
 pages_limit = 10       # cap on pages walked by -all; 0 = unlimited (bounded by TMDB's total_pages)
@@ -33,7 +34,7 @@ pages_limit = 10       # cap on pages walked by -all; 0 = unlimited (bounded by 
 - `-c <path>` — path to the config file (default `~/tmdb-sync.toml`)
 - `-v` — verbose output
 - `-version` — print version and exit
-- `-v3` / `-v4` — *(planned, v4 phase)* API version for modules that exist in both (`account`,
+- `-v3` / `-v4` — *(v4 phase; implemented for `auth`, planned for `account`/`lists`)* API version for modules that exist in both (`account`,
   `lists`, plus `auth` for v4 login); v3 is the default, both together is an error. See
   [v3 vs v4](#v3-vs-v4-planned).
 
@@ -53,6 +54,7 @@ Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
 | module            | actions (examples)                          |
 |-------------------|----------------------------------------------|
 | `account`         | 🔒 `details`, `favorites`, `watchlist`, `rated`, `lists`, `add-favorite`, `add-watchlist` |
+| `auth` ✅ v4 only ([docs](auth.md)) | `login -v4`, `request-token -v4`, `access-token -v4 -request-token <token>`, `logout -v4` |
 | `certifications` ✅ ([docs](certifications.md)) | `movie`, `tv` |
 | `changes` ✅ ([docs](changes.md)) | `movie`, `tv`, `person` |
 | `collections` ✅ ([docs](collections.md)) | `details -i <id>`, `images -i <id>`, `translations -i <id>` |

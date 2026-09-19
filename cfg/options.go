@@ -42,6 +42,11 @@ func OptionsFromConfig(fs afero.Fs, config *Config) (*str.Options, error) {
 		options.GuestSession = guestSession
 	}
 
+	accessToken, err := readAccessToken(fs, config.AccessTokenPath)
+	if err == nil {
+		options.AccessTokenV4 = accessToken
+	}
+
 	return options, nil
 }
 
@@ -117,4 +122,28 @@ func WriteGuestSession(fs afero.Fs, path string, guestSession *str.GuestSession)
 		return err
 	}
 	return afero.WriteFile(fs, path, data, consts.X644)
+}
+
+func readAccessToken(fs afero.Fs, path string) (*str.AccessTokenV4, error) {
+	data, err := afero.ReadFile(fs, path)
+	if err != nil {
+		return nil, err
+	}
+
+	var accessToken str.AccessTokenV4
+	if err := json.Unmarshal(data, &accessToken); err != nil {
+		return nil, err
+	}
+
+	return &accessToken, nil
+}
+
+// WriteAccessToken persists a v4 user access token to disk at path, readable
+// by the owner only since the token grants access to the user's account.
+func WriteAccessToken(fs afero.Fs, path string, accessToken *str.AccessTokenV4) error {
+	data, err := json.Marshal(accessToken)
+	if err != nil {
+		return err
+	}
+	return afero.WriteFile(fs, path, data, consts.X600)
 }

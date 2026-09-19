@@ -28,11 +28,14 @@ const (
 	skipRateLimitCheck contextKey = "skipRateLimitCheck"
 	// BaseURL is the TMDB v3 API base URL.
 	BaseURL = "https://api.themoviedb.org/3/"
+	// BaseURLV4 is the TMDB v4 API base URL.
+	BaseURLV4 = "https://api.themoviedb.org/4/"
 	// APIKeyParam is the query string parameter name used for v3 API key auth.
 	APIKeyParam = "api_key"
 )
 
 var errNonNilContext = errors.New("context must be non-nil")
+var errV4NeedsReadToken = errors.New("tmdb: v4 endpoints need read_access_token in the config (api_key alone is not enough)")
 var emptyReader = strings.NewReader("")
 
 // RequestOption represents an option that can modify an http.Request.
@@ -42,11 +45,13 @@ type RequestOption func(req *http.Request)
 type Client struct {
 	client         *http.Client
 	BaseURL        *url.URL
+	BaseURLV4      *url.URL
 	AuthURL        *url.URL
 	headers        map[string]any
 	common         Service
 	Account        *AccountService
 	Auth           *AuthService
+	AuthV4         *AuthV4Service
 	Certifications *CertificationsService
 	Changes        *ChangesService
 	Collections    *CollectionsService
@@ -103,9 +108,13 @@ func (c *Client) initialize() {
 	if c.BaseURL == nil {
 		c.BaseURL, _ = url.Parse(BaseURL)
 	}
+	if c.BaseURLV4 == nil {
+		c.BaseURLV4, _ = url.Parse(BaseURLV4)
+	}
 	c.common.client = c
 	c.Account = (*AccountService)(&c.common)
 	c.Auth = (*AuthService)(&c.common)
+	c.AuthV4 = (*AuthV4Service)(&c.common)
 	c.Certifications = (*CertificationsService)(&c.common)
 	c.Changes = (*ChangesService)(&c.common)
 	c.Collections = (*CollectionsService)(&c.common)
@@ -133,15 +142,28 @@ func (c *Client) initialize() {
 
 // NewRequest creates an API request.
 func (c *Client) NewRequest(method, urlStr string, body any, opts ...RequestOption) (*http.Request, error) {
-	if !strings.HasSuffix(c.BaseURL.Path, "/") {
-		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL)
+	return c.newRequest(c.BaseURL, true, method, urlStr, body, opts...)
+}
+
+// NewRequestV4 creates a TMDB v4 API request: it targets BaseURLV4 and
+// authenticates with the bearer token only, never appending api_key.
+func (c *Client) NewRequestV4(method, urlStr string, body any, opts ...RequestOption) (*http.Request, error) {
+	if c.headers["Authorization"] == nil {
+		return nil, errV4NeedsReadToken
 	}
-	u, err := c.BaseURL.Parse(urlStr)
+	return c.newRequest(c.BaseURLV4, false, method, urlStr, body, opts...)
+}
+
+func (c *Client) newRequest(base *url.URL, withAPIKey bool, method, urlStr string, body any, opts ...RequestOption) (*http.Request, error) {
+	if !strings.HasSuffix(base.Path, "/") {
+		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", base)
+	}
+	u, err := base.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
-	if apiKey, ok := c.headers[APIKeyParam]; ok {
+	if apiKey, ok := c.headers[APIKeyParam]; ok && withAPIKey {
 		q := u.Query()
 		q.Set(APIKeyParam, fmt.Sprintf("%v", apiKey))
 		u.RawQuery = q.Encode()
