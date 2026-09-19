@@ -112,3 +112,21 @@ type ListCreateResponseV4 struct {
 	StatusMessage string `json:"status_message"`
 	Success       bool   `json:"success"`
 }
+
+// ListUpdateRequestV4 is the body of PUT /4/list/{list_id}; only the fields
+// that are set are sent.
+type ListUpdateRequestV4 struct {
+	BackdropPath string `json:"backdrop_path,omitempty"`
+	Description  string `json:"description,omitempty"`
+	Name         string `json:"name,omitempty"`
+	Public       *bool  `json:"public,omitempty"`
+	SortBy       string `json:"sort_by,omitempty"`
+}
+
+// ListStatusV4 is the response of the v4 list mutation endpoints that only
+// report success (update, delete, items, clear).
+type ListStatusV4 struct {
+	StatusCode    int    `json:"status_code"`
+	StatusMessage string `json:"status_message"`
+	Success       bool   `json:"success"`
+}

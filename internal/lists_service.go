@@ -230,3 +230,21 @@ func (s *ListsService) CreateListV4(ctx context.Context, accessToken string, bod
 
 	return created, nil
 }
+
+// UpdateListV4 updates a list's name, description, visibility, sort order or
+// backdrop; only the fields set on body are changed.
+//
+// Api docs: https://developer.themoviedb.org/v4/reference/list-update
+func (s *ListsService) UpdateListV4(ctx context.Context, accessToken, listID string, body *str.ListUpdateRequestV4) (*str.ListStatusV4, error) {
+	req, err := s.client.NewRequestV4(http.MethodPut, fmt.Sprintf("list/%s", listID), body, withUserToken(accessToken))
+	if err != nil {
+		return nil, err
+	}
+
+	status := new(str.ListStatusV4)
+	if _, err := s.client.Do(ctx, req, status); err != nil {
+		return nil, err
+	}
+
+	return status, nil
+}

@@ -28,6 +28,7 @@ Notes:
 |-----------|-----------------------------------------------------------|----------------------------|
 | `details` | `tmdb-sync lists -v4 -a details -i 8 -language en-US`     | `lists_details_id-8_v4.json` |
 | `create` 🔒 | `tmdb-sync lists -v4 -a create -name "x" -language en -country US -public` | `lists_create_id-<id>_v4.json` |
+| `update` 🔒 | `tmdb-sync lists -v4 -a update -i 8 -name "new" -public=false` | `lists_update_id-8_v4.json` |
 
 - `-v4 -a details` walks every item page (`-pages-limit`, default from config, 0 = unlimited) and
   merges the items into `results`. `-language` and `-sort-by` (e.g. `original_order.asc`) are optional.
@@ -35,3 +36,5 @@ Notes:
   so private lists you own are readable too.
 - `-v4 -a create` needs `auth -v4 -a login` first; `-name`, `-language` (ISO 639-1) and `-country`
   (ISO 3166-1) are required, `-description` and `-public` (default private) are optional.
+- `-v4 -a update` needs `auth -v4 -a login` and at least one of `-name`, `-description`, `-public`
+  (`-public=false` makes it private), `-sort-by`, `-backdrop-path`; only the flags you pass are sent.

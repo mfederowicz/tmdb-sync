@@ -27,7 +27,7 @@ var listsSessionActions = map[string]bool{
 }
 
 // listsV4Actions are the `lists` actions implemented for -v4.
-var listsV4Actions = []string{"details", "create"}
+var listsV4Actions = []string{"details", "create", "update"}
 
 // ListsCmd is the "lists" module. Read actions (details, item-status) are
 // public; mutation actions (create, add-movie, remove-movie, clear, delete)
@@ -55,14 +55,18 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	description := flagSet.String("description", "", "list description, used by -a create")
 	language := flagSet.String("language", "", "list language (ISO 639-1), used by -a create")
 	v3 := flagSet.Bool("v3", false, "use the v3 API (default)")
-	v4 := flagSet.Bool("v4", false, "use the v4 API (optionally with `auth -v4 -a login` for private lists); actions: details, create")
+	v4 := flagSet.Bool("v4", false, "use the v4 API (optionally with `auth -v4 -a login` for private lists); actions: details, create, update")
 	sortBy := flagSet.String("sort-by", "", "v4 only: sort order of the items, for -a details (e.g. original_order.asc, vote_average.desc)")
 	country := flagSet.String("country", "", "v4 only: list country (ISO 3166-1, e.g. US), required for -a create")
 	public := flagSet.Bool("public", false, "v4 only: make the list public, used by -a create")
+	backdropPath := flagSet.String("backdrop-path", "", "v4 only: backdrop image path, used by -a update")
 	pagesLimit := flagSet.Int("pages-limit", config.PagesLimit, "v4 only: item pages limit for -a details (default: pages_limit from config, 0 = unlimited)")
 	if err := flagSet.Parse(args); err != nil {
 		return err
 	}
+
+	visited := map[string]bool{}
+	flagSet.Visit(func(f *flag.Flag) { visited[f.Name] = true })
 
 	version, err := resolveAPIVersion(*v3, *v4)
 	if err != nil {
@@ -72,8 +76,8 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 	if v4Mode && *action != "" && !slices.Contains(listsV4Actions, *action) {
 		return fmt.Errorf("lists: action %q is not available with -v4 (v4 actions: %s)", *action, strings.Join(listsV4Actions, ", "))
 	}
-	if !v4Mode && (*sortBy != "" || *country != "" || *public) {
-		return fmt.Errorf("lists: -sort-by, -country and -public need -v4")
+	if !v4Mode && (*sortBy != "" || *country != "" || visited["public"] || *backdropPath != "") {
+		return fmt.Errorf("lists: -sort-by, -country, -public and -backdrop-path need -v4")
 	}
 	if v4Mode && *action != "" && (options.AccessTokenV4 == nil || options.AccessTokenV4.AccessToken == "") && *action != "details" {
 		return fmt.Errorf("lists: no v4 access token cached at %s, run `auth -v4 -a login` first", config.AccessTokenPath)
@@ -132,6 +136,22 @@ func execListsAttempt(fs afero.Fs, client *internal.Client, config *cfg.Config, 
 			Description: *description,
 			Language:    *language,
 		}
+	case "update":
+		if !v4Mode {
+			return fmt.Errorf("lists: -a update exists only in v4, add -v4")
+		}
+		if *listID == "" {
+			return fmt.Errorf("lists: -i <list_id> is required for -a update")
+		}
+		body := str.ListUpdateRequestV4{Name: *name, Description: *description, SortBy: *sortBy, BackdropPath: *backdropPath}
+		if visited["public"] {
+			body.Public = public
+		}
+		if body == (str.ListUpdateRequestV4{}) {
+			return fmt.Errorf("lists: -a update needs at least one of -name, -description, -public, -sort-by, -backdrop-path")
+		}
+		handler = handlers.ListsUpdateHandler{ListID: *listID, AccessToken: options.AccessTokenV4.AccessToken, Body: body}
+		params = []string{fmt.Sprintf("id-%s", *listID), "v4"}
 	case "add-movie":
 		if *listID == "" {
 			return fmt.Errorf("lists: -i <list_id> is required for -a add-movie")

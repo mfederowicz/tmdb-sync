@@ -279,3 +279,35 @@ func TestListsCreateListV4(t *testing.T) {
 		t.Errorf("CreateListV4() = %+v", created)
 	}
 }
+
+func TestListsUpdateListV4(t *testing.T) {
+	client, mux, teardown := setupV4()
+	defer teardown()
+	client.UpdateHeaders(map[string]any{"Authorization": "Bearer read"})
+
+	mux.HandleFunc("/list/8", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer usertok" {
+			t.Errorf("Authorization = %q, want user token", got)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if len(body) != 2 || body["name"] != "renamed" || body["public"] != false {
+			t.Errorf("body = %v, want only name and public=false", body)
+		}
+		json.NewEncoder(w).Encode(map[string]any{"success": true, "status_code": 1})
+	})
+
+	public := false
+	status, err := client.Lists.UpdateListV4(context.Background(), "usertok", "8", &str.ListUpdateRequestV4{Name: "renamed", Public: &public})
+	if err != nil {
+		t.Fatalf("UpdateListV4() error = %v", err)
+	}
+	if !status.Success {
+		t.Errorf("UpdateListV4() = %+v", status)
+	}
+}

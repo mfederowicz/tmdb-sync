@@ -246,7 +246,7 @@ account id).
 ## v4 — Lists 🔒 for mutation and private lists
 - [x] Details — `GET /4/list/{list_id}`
 - [x] Create — `POST /4/list`
-- [ ] Update — `PUT /4/list/{list_id}`
+- [x] Update — `PUT /4/list/{list_id}`
 - [ ] Delete — `DELETE /4/list/{list_id}` *(reference documents it as `/4/{list_id}`, likely a
       typo — verify against the live API)*
 - [ ] Add Items — `POST /4/list/{list_id}/items`
