@@ -18,6 +18,14 @@ schedule.
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [0.27.0] - 2026-09-19
+
+### Added
+
 - `account -v4` (needs `-v4`, `read_access_token` and a cached user token from `auth -v4 -a login`;
   no v3 session and no `-i`): `-a lists`, `favorite-movies`, `favorite-tv`, `rated-movies`,
   `rated-tv`, `watchlist-movies`, `watchlist-tv`, and the v4-only `recommended-movies` and
@@ -39,8 +47,6 @@ schedule.
 - Internal refactor, no behavior change: the v4 auth service methods, tests and types now live in
   the v3 auth files (`Client.Auth.*V4`, `str.RequestTokenV4`/`AccessTokenV4`) instead of separate
   `*_v4` files, matching how v4 account is laid out.
-
-### Fixed
 
 ## [0.26.0] - 2026-09-19
 
