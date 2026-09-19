@@ -22,6 +22,20 @@ schedule.
 
 ### Fixed
 
+## [0.25.0] - 2026-09-19
+
+### Added
+
+- `-d`/`-debug` now also prints the outgoing request headers (sorted, with the `Authorization`
+  value redacted).
+- `movies`, `tv`, and `tv-episodes` `-a add-rating` accept a new `-guest` flag that rates as the
+  guest session cached by `guest-sessions -a create`, ignoring any account session; errors when no
+  guest session is cached.
+
+### Changed
+
+- `-d`/`-debug` request URL line now includes the `api_key` query parameter, shown as `REDACTED`.
+
 ## [0.24.0] - 2026-09-18
 
 ### Added
