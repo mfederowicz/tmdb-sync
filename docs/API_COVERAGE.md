@@ -238,7 +238,7 @@ account id).
 - [x] Favorite TV Shows — `GET /4/account/{account_object_id}/tv/favorites`
 - [x] Rated Movies — `GET /4/account/{account_object_id}/movie/rated`
 - [x] Rated TV Shows — `GET /4/account/{account_object_id}/tv/rated`
-- [ ] Recommended Movies — `GET /4/account/{account_object_id}/movie/recommendations`
+- [x] Recommended Movies — `GET /4/account/{account_object_id}/movie/recommendations`
 - [ ] Recommended TV Shows — `GET /4/account/{account_object_id}/tv/recommendations`
 - [ ] Watchlist Movies — `GET /4/account/{account_object_id}/movie/watchlist`
 - [ ] Watchlist TV Shows — `GET /4/account/{account_object_id}/tv/watchlist`
