@@ -24,8 +24,13 @@ schedule.
 
 ### Changed
 
+- The cached v3 session, account, guest-session and v4 access-token files are now written
+  owner-only (`0600`), and an existing world-readable file is tightened on the next write.
+
 ### Fixed
 
+- Login no longer fails on a fresh machine: the parent directory of the session, account,
+  guest-session and access-token cache files is created if missing.
 - API client: response bodies of failed (non-2xx) requests are now closed, so failed calls no
   longer leak connections.
 - A 429 error no longer prints the request URL with the `api_key` query parameter in clear.
