@@ -402,7 +402,10 @@ func TestAccountGetListsV4(t *testing.T) {
 			"total_pages":   2,
 			"total_results": 2,
 			"results": []map[string]any{
-				{"id": id, "name": "list", "public": 1, "number_of_items": 3, "created_at": "2024-01-01 00:00:00 UTC"},
+				{
+					"id": id, "name": "list", "public": 1, "number_of_items": 3, "created_at": "2024-01-01 00:00:00 UTC",
+					"account_object_id": "acc123", "adult": 0, "featured": 1, "sort_by": 2, "revenue": "1000000",
+				},
 			},
 		})
 	})
@@ -411,7 +414,8 @@ func TestAccountGetListsV4(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetListsV4() error = %v", err)
 	}
-	if len(lists) != 2 || lists[0].ID != 1 || lists[1].ID != 2 || lists[0].NumberOfItems != 3 || lists[0].Public != 1 {
+	if len(lists) != 2 || lists[0].ID != 1 || lists[1].ID != 2 || lists[0].NumberOfItems != 3 || lists[0].Public != 1 ||
+		lists[0].SortBy != 2 || lists[0].Revenue != "1000000" || lists[0].Featured != 1 || lists[0].AccountObjectID != "acc123" {
 		t.Errorf("lists = %+v, want two pages of results", lists)
 	}
 }

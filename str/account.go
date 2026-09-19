@@ -63,23 +63,27 @@ type AccountLists struct {
 }
 
 // AccountListV4 is one of an account's lists, as returned by
-// GET /4/account/{account_object_id}/lists.
+// GET /4/account/{account_object_id}/lists. TMDB sends the flags (adult,
+// featured, public) and sort_by as integers and revenue as a string.
 type AccountListV4 struct {
-	ID            int64   `json:"id"`
-	Name          string  `json:"name"`
-	Description   string  `json:"description"`
-	ISO6391       string  `json:"iso_639_1"`
-	ISO31661      string  `json:"iso_3166_1"`
-	Public        int     `json:"public"`
-	SortBy        string  `json:"sort_by"`
-	PosterPath    string  `json:"poster_path"`
-	BackdropPath  string  `json:"backdrop_path"`
-	AverageRating float64 `json:"average_rating"`
-	Runtime       int     `json:"runtime"`
-	Revenue       int64   `json:"revenue"`
-	NumberOfItems int     `json:"number_of_items"`
-	CreatedAt     string  `json:"created_at"`
-	UpdatedAt     string  `json:"updated_at"`
+	AccountObjectID string  `json:"account_object_id"`
+	Adult           int     `json:"adult"`
+	AverageRating   float64 `json:"average_rating"`
+	BackdropPath    string  `json:"backdrop_path"`
+	CreatedAt       string  `json:"created_at"`
+	Description     string  `json:"description"`
+	Featured        int     `json:"featured"`
+	ID              int64   `json:"id"`
+	ISO31661        string  `json:"iso_3166_1"`
+	ISO6391         string  `json:"iso_639_1"`
+	Name            string  `json:"name"`
+	NumberOfItems   int     `json:"number_of_items"`
+	PosterPath      string  `json:"poster_path"`
+	Public          int     `json:"public"`
+	Revenue         string  `json:"revenue"`
+	Runtime         int     `json:"runtime"`
+	SortBy          int     `json:"sort_by"`
+	UpdatedAt       string  `json:"updated_at"`
 }
 
 // AccountRatingV4 is the user's rating on an item in the v4 rated endpoints.
