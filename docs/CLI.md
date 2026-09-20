@@ -1,9 +1,7 @@
 # tmdb-sync — CLI reference
 
-> Describes the intended CLI shape (see `PRD.md`/`ARCHITECTURE.md`). `certifications`,
-> `configuration`, and `movies` are implemented as of this doc (see
-> `API_COVERAGE.md`, marked ✅ below); the rest of the module table is still planned — update
-> examples as each module actually lands. The table is ordered to match TMDB's own reference nav
+> Describes the CLI shape (see `PRD.md`/`ARCHITECTURE.md`). All modules in the table below are
+> implemented (see `API_COVERAGE.md`). The table is ordered to match TMDB's own reference nav
 > (developer.themoviedb.org/reference) category-for-category, so the CLI's module list maps 1:1
 > onto TMDB's docs.
 
@@ -34,9 +32,9 @@ pages_limit = 10       # cap on pages walked by -all; 0 = unlimited (bounded by 
 - `-c <path>` — path to the config file (default `~/tmdb-sync.toml`)
 - `-v` — verbose output
 - `-version` — print version and exit
-- `-v3` / `-v4` — *(v4 phase; implemented for `auth` and `account`, planned for `lists`)* API version for modules that exist in both (`account`,
+- `-v3` / `-v4` — API version for modules that exist in both (`account`,
   `lists`, plus `auth` for v4 login); v3 is the default, both together is an error. See
-  [v3 vs v4](#v3-vs-v4-planned).
+  [v3 vs v4](#v3-vs-v4).
 
 ## Command shape
 
@@ -49,7 +47,7 @@ no args, or `tmdb-sync help`, lists all modules.
 
 ## Modules (see API_COVERAGE.md for the full endpoint list per module)
 
-Ordered to match TMDB's reference nav. ✅ = implemented; the rest are planned.
+Ordered to match TMDB's reference nav. ✅ = implemented.
 
 | module            | actions (examples)                          |
 |-------------------|----------------------------------------------|
@@ -104,7 +102,7 @@ Every command writes its result as one JSON file, named `<module>_<action>[_<par
 directory), and prints a one-line `wrote <path>` confirmation — the file is the product, not the
 terminal output. Read/process the file with `jq`, a script, etc.
 
-## v3 vs v4 (planned)
+## v3 vs v4
 
 v4 is a small API (auth, account, lists) on base `/4/` that complements v3. Overlapping modules
 take `-v4`; without a flag they use v3. v4 needs `read_access_token` and a user token from
