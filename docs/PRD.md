@@ -19,9 +19,8 @@ API: TOML config, `<module> -a <action>` command dispatch, one `internal/<x>_ser
 
 ## Non-goals (for v1 / this phase)
 
-- TMDB **v4** API and v4 auth (request_token → browser approval → v4 access_token, v4 lists,
-  v4 account). Explicitly a later phase — see [Roadmap](#roadmap). The v3 phase's architecture
-  must not need to change to accommodate it later (see `ARCHITECTURE.md`).
+- Anything beyond TMDB's v3 and v4 APIs. v4 (auth, account, lists) was originally a later phase
+  and is now implemented — see [Roadmap](#roadmap).
 - A GUI, TUI, or daemon/sync-loop mode — this is a one-shot CLI, invoked per command.
 - Write-heavy "sync" workflows (scrobbling, check-ins) — TMDB's account API is small
   (favorites/watchlist/ratings/lists only); no equivalent exists on TMDB.
@@ -43,8 +42,8 @@ line or from other tooling that shells out to it.
    reviews, credits — module by module, tracked in `API_COVERAGE.md`.
 4. **v3 account coverage**: favorites, watchlist, ratings, lists — using the session auth built
    in phase 2.
-5. **v4 phase** (v3 is complete; planned, see [v4 plan](#v4-plan)): v4 auth, v4-only endpoints,
-   added alongside v3 code, not replacing it.
+5. **v4 phase** (done, see [v4 notes](#v4-notes)): v4 auth, v4-only endpoints, added alongside
+   v3 code, not replacing it.
 
 ## Success criteria
 
@@ -56,10 +55,13 @@ line or from other tooling that shells out to it.
 
 ## Roadmap
 
-See `API_COVERAGE.md` for the concrete, checkable endpoint list, and `ARCHITECTURE.md` for how
-new modules get added without touching existing ones.
+All phases are complete: every v3 and v4 endpoint in `API_COVERAGE.md` is checked off (the one
+exception is `GET /keyword/{id}/movies`, deprecated by TMDB and left unchecked). See
+`API_COVERAGE.md` for the endpoint list and `ARCHITECTURE.md` for how new modules get added
+without touching existing ones. Remaining work is maintenance: bug fixes and keeping up with
+TMDB API changes.
 
-## v4 plan
+## v4 notes
 
 v4 is 21 endpoints (auth 3, account 9, lists 9 — see `API_COVERAGE.md`'s `## v4 —` sections) on
 base `/4/`, complementing v3 rather than replacing it.
@@ -71,14 +73,5 @@ action without `-v4` (e.g. `account -a recommended-movies`) errors with a hint i
 switching silently, and vice versa. v4 needs `read_access_token` plus the user token from
 `auth -v4 -a login`; v4 requests never carry `api_key`.
 
-**Branches** (one module per PR; endpoint count per branch confirmed with the maintainer first):
-1. Docs (this plan, coverage checklist, `CLI.md`/`ARCHITECTURE.md` design).
-2. v4 client plumbing + auth (`auth -v4 -a login|logout`, token persistence).
-3. `account -v4` (9 endpoints, likely two branches).
-4. `lists -v4` (9 endpoints, likely read/write split).
-
-**Open questions, to verify against the live API before documenting behavior:**
-- Whether v3 and v4 share data (lists, ratings, favorites), and how the v3 `account_id` relates
-  to the v4 `account_object_id`.
-- v4 response shapes vs. v3 (each endpoint likely needs its own `str/` type).
-- The reference's delete-list path (`/4/{list_id}`) and clear-list method (`GET`).
+**Verified against the live API:** the delete-list path is `/4/list/{list_id}` (the reference
+prints `/4/{list_id}`, a typo) and clear-list is a `GET`, as documented.

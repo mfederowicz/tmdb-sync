@@ -133,7 +133,7 @@ flow (`cli/access_token.go`). The same convention applies to every v4 endpoint o
 module (e.g. `AccountService.GetListsV4`, a `V4` flag on the handler, a `-v4` branch in the
 command); only a v4-only action gets its own handler file.
 
-### v4 design (planned)
+### v4 design
 
 - **Version is per invocation, not a config mode.** Overlapping modules (`account`, `lists`) take
   `-v3` (default) / `-v4`; one shared helper in `cmds/` resolves the flag (both set = error, a
