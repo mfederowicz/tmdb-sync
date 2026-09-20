@@ -1,11 +1,12 @@
 # tmdb-sync
 
 A Go CLI for [The Movie Database (TMDB)](https://www.themoviedb.org) API — modular, TOML-configured,
-aiming for full TMDB v3 API coverage, one module at a time.
+covering the TMDB v3 API and the v4 auth, account and lists endpoints.
 
 ## Status
 
-🚧 **In progress**, one module at a time. Implemented so far:
+✅ **Feature-complete**: every v3 and v4 endpoint is implemented, except the TMDB-deprecated
+`GET /keyword/{id}/movies`. Modules:
 
 - [`account`](docs/account.md) ✅ — 🔒 details, favorites, watchlist, lists, rated (v3 session or `-v4`),
   plus v4 recommendations.
@@ -53,8 +54,8 @@ See:
 ## Goal
 
 Near-100% coverage of the TMDB **v3** API (movies, tv, people, search, discover, trending,
-account, etc.) from a single Go binary configured with one TOML file, with TMDB **v4** auth and
-v4-only endpoints planned as a later, additive phase.
+account, etc.) from a single Go binary configured with one TOML file, plus TMDB **v4** auth,
+account and lists endpoints (selected with `-v4`).
 
 ## Install & usage
 
