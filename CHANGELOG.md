@@ -20,6 +20,9 @@ schedule.
 
 ### Changed
 
+- GitHub release notes now show the version's `CHANGELOG.md` section (Added / Changed / Fixed)
+  instead of a list of commits, and the release workflow fails if that section is missing.
+
 ### Fixed
 
 ## [0.28.1] - 2026-09-26
@@ -269,6 +272,26 @@ schedule.
 - `keywords` module: `details` action (`GET /keyword/{keyword_id}`), returning a keyword's id
   and name. TMDB's "Movies by keyword" endpoint is deprecated in favor of `discover -a movie`
   with `with_keywords` and is not implemented.
+
+## [0.9.2] - 2026-09-17
+
+### Fixed
+
+- Release workflow: `actions/checkout`, `actions/setup-go` and `goreleaser/goreleaser-action`
+  moved to v7 (Node 24), and GoReleaser is pinned to `~> v2` instead of the deprecated `latest`.
+
+## [0.9.1] - 2026-09-17
+
+### Changed
+
+- `--version` prints a multi-line Version / Commit / Built block, with the commit embedded via
+  ldflags.
+
+### Fixed
+
+- `--version` no longer prints `dev`/`unknown` for binaries built without ldflags (e.g.
+  `go install`): version, commit and build date come from Go's build info, or from the module
+  pseudo-version when no VCS info is embedded.
 
 ## [0.9.0] - 2026-09-17
 

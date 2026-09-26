@@ -28,6 +28,8 @@ Key decisions already made (don't relitigate without asking):
 - `make linter` — `revive --config ./revive.toml --formatter friendly ./...` (requires `revive`)
 - `make cleanup` — `gofmt -w` on all `.go` files
 - `make clean` — removes `*.json` files in the repo root
+- `make release-notes VERSION=X.Y.Z` — print the GitHub release body built from that version's
+  `CHANGELOG.md` section (what `release.yaml` publishes; the release fails if the section is missing)
 
 Module path: `github.com/mfederowicz/tmdb-sync`, Go 1.21.
 
