@@ -7,7 +7,7 @@ on:
 jobs:
   go-mod:
     name: Check go.mod
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
@@ -21,7 +21,7 @@ jobs:
 
   gofmt:
     name: Check unformatted Go code
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
@@ -34,7 +34,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
 
     - name: Check out code into the Go module directory

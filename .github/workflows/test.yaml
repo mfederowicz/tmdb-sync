@@ -4,7 +4,7 @@ on: [push]
 jobs:
   tests-on-unix:
     name: Tests on Unix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
