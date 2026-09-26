@@ -22,6 +22,13 @@ schedule.
 
 ### Fixed
 
+## [0.28.1] - 2026-09-26
+
+### Changed
+
+- CI: all workflow jobs run on the pinned `ubuntu-26.04` runner image instead of
+  `ubuntu-latest`.
+
 ## [0.28.0] - 2026-09-20
 
 ### Added
